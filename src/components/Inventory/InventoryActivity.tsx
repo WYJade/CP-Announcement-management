@@ -1,8 +1,5 @@
 import { useState, useMemo } from 'react'
-import {
-  X, AlertTriangle, Bell, ChevronRight, Search, Filter,
-  Download, Info, Package, TrendingDown, ShieldAlert, ClipboardCheck,
-} from 'lucide-react'
+import { Search, Filter, Download } from 'lucide-react'
 import OrderAlertBanner, { type OrderAlert } from '../common/OrderAlertBanner'
 
 // ─── Inventory alert data ────────────────────────────────────────────────────

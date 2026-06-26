@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Plus, Search, Filter, Clock, CheckCircle2, AlertCircle,
-  XCircle, ChevronRight, Paperclip, MessageSquare,
+  XCircle, ChevronRight, MessageSquare,
 } from 'lucide-react'
 import { useCollaboration } from '../../context/CollaborationContext'
 import type { WorkItem, WorkItemStatus } from '../../types/workItem'

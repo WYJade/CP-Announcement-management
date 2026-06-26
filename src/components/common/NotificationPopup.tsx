@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { X, Bell, AlertTriangle } from 'lucide-react'
+import { X, AlertTriangle } from 'lucide-react'
 
 const URGENT_NOTIFICATIONS = [
   {

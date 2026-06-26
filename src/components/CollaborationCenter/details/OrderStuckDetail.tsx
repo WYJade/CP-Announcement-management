@@ -109,8 +109,6 @@ export default function OrderStuckDetail({ item, onClose }: Props) {
   const { purchasedServices } = useCollaboration()
   const [upsellServiceId, setUpsellServiceId] = useState<ServiceId | null>(null)
   const [hoursStuck, setHoursStuck] = useState(0)
-  const [refreshing, setRefreshing] = useState(false)
-  const [showOrderList, setShowOrderList] = useState(false)
 
   const data = item.scenarioData as OrderStuckData | undefined
   const isOverdue = item.scenario === 'order-overdue'
