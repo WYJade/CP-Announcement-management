@@ -5,9 +5,9 @@ import { X, AlertTriangle } from 'lucide-react'
 const URGENT_NOTIFICATIONS = [
   {
     id: 'urgent-1',
-    title: 'Payment Overdue Notice',
-    message: 'Your account has an outstanding balance of $1,250.00 that requires immediate attention to avoid service disruptions.',
-    time: 'Just now',
+    title: 'Scheduled Maintenance Window',
+    message: 'Our platform will undergo scheduled maintenance on July 5, 2026 from 02:00-06:00 AM UTC. During this time, order processing and inventory updates may be temporarily unavailable.',
+    time: '10m ago',
   },
   {
     id: 'urgent-2',
