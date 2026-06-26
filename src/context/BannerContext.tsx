@@ -37,6 +37,26 @@ const defaultBanners: BannerConfig[] = [
     targeting: { pages: ['/dashboard/otif', '/dashboard/kpi', '/', '/finance/invoices'] },
   },
   {
+    id: 'security-login-alert',
+    tier: 'critical',
+    category: 'security',
+    title: 'Security Alert: Suspicious Login Detected',
+    message:
+      'Your account was accessed from an unusual IP address (Miami, US) at 2026-06-25 03:42. If this was not you, please change your password and review your security settings immediately.',
+    highlights: [
+      { label: 'IP', value: '192.168.x.x' },
+      { label: 'Location', value: 'Miami, US' },
+      { label: 'Time', value: '03:42 AM' },
+    ],
+    actions: [
+      { label: 'Review Login History', variant: 'primary', href: '/messages' },
+      { label: 'Change Password', variant: 'link', href: '/messages' },
+    ],
+    dismissType: 'dismissible',
+    priority: 85,
+    targeting: { pages: ['/dashboard/otif', '/'] },
+  },
+  {
     id: 'feature-release-002',
     tier: 'info',
     category: 'feature-release',

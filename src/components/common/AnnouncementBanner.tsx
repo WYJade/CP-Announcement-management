@@ -271,18 +271,19 @@ function AnnouncementBanner() {
 
   if (visibleBanners.length === 0) return null
 
+  // Only show one banner at a time (highest priority first), close to see next
+  const activeBanner = visibleBanners[0]
+
   return (
     <>
       <div className="space-y-2" aria-label="Announcements">
-        {visibleBanners.map((banner) => (
-          <BannerPopupItem
-            key={banner.id}
-            banner={banner}
-            onPayClick={() => setPayDialogOpen(true)}
-            onLearnMoreClick={() => setLearnMoreOpen(true)}
-            onReleaseNotesClick={() => setReleaseNotesOpen(true)}
-          />
-        ))}
+        <BannerPopupItem
+          key={activeBanner.id}
+          banner={activeBanner}
+          onPayClick={() => setPayDialogOpen(true)}
+          onLearnMoreClick={() => setLearnMoreOpen(true)}
+          onReleaseNotesClick={() => setReleaseNotesOpen(true)}
+        />
       </div>
 
       {/* Pay Dialog triggered from banner */}

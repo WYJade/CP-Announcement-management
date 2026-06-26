@@ -5,8 +5,6 @@ import OnTimeInFullTrendChart from './OnTimeInFullTrendChart'
 import PerformanceTrendsChart from './PerformanceTrendsChart'
 import OTIFComplianceChart from './OTIFComplianceChart'
 import TopCategoryChart from './TopCategoryChart'
-import OrderAlertBanner from '../common/OrderAlertBanner'
-import { DASHBOARD_ALERTS } from '../Orders/DashboardAlerts'
 import { useI18n } from '../../context/I18nContext'
 
 function OTIFDashboard() {
@@ -14,7 +12,6 @@ function OTIFDashboard() {
 
   return (
     <div className="space-y-4">
-      <OrderAlertBanner alerts={DASHBOARD_ALERTS} />
 
       {/* Page Title Bar */}
       <div className="flex items-center justify-between bg-white rounded-lg border border-gray-100 shadow-sm px-4 py-3">
