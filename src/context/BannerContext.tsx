@@ -50,7 +50,6 @@ const defaultBanners: BannerConfig[] = [
     ],
     actions: [
       { label: 'Review Login History', variant: 'primary', href: '/messages' },
-      { label: 'Change Password', variant: 'link', href: '/profile' },
     ],
     dismissType: 'dismissible',
     priority: 85,
