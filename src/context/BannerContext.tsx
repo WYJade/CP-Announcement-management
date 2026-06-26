@@ -34,7 +34,7 @@ const defaultBanners: BannerConfig[] = [
     ],
     dismissType: 'dismissible',
     priority: 90,
-    targeting: { pages: ['/dashboard/otif', '/dashboard/kpi', '/', '/finance/invoices'] },
+    targeting: {},
   },
   {
     id: 'security-login-alert',
@@ -53,7 +53,7 @@ const defaultBanners: BannerConfig[] = [
     ],
     dismissType: 'dismissible',
     priority: 85,
-    targeting: { pages: ['/dashboard/otif', '/'] },
+    targeting: {},
   },
   {
     id: 'feature-release-002',
@@ -67,7 +67,6 @@ const defaultBanners: BannerConfig[] = [
       { label: 'Available Since', value: '2025-08-20' },
     ],
     actions: [
-      { label: 'View Detail', variant: 'primary', href: '/messages' },
       { label: 'Release Notes', variant: 'link', href: '/messages' },
     ],
     dismissType: 'dismissible',
@@ -127,8 +126,8 @@ export function BannerProvider({ children }: { children: ReactNode }) {
         })
         .sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0))
 
-      // Only show the highest priority banner at a time
-      return filtered.slice(0, 1)
+      // Return all visible banners sorted by priority
+      return filtered
     },
     [banners, dismissedIds, acknowledgedIds]
   )
