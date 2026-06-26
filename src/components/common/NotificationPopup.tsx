@@ -15,12 +15,6 @@ const URGENT_NOTIFICATIONS = [
     message: 'Your account was accessed from an unusual location (Miami, US) at 03:42. If this was not you, please change your password immediately.',
     time: '2m ago',
   },
-  {
-    id: 'urgent-3',
-    title: '120 Orders Stuck in Picking',
-    message: '120 orders have been stuck in picking for over 4 hours. 35 orders are at SLA risk. Immediate action recommended.',
-    time: '5m ago',
-  },
 ]
 
 // Re-appear interval for demo: 2 minutes (120 seconds)

@@ -50,7 +50,7 @@ const defaultBanners: BannerConfig[] = [
     ],
     actions: [
       { label: 'Review Login History', variant: 'primary', href: '/messages' },
-      { label: 'Change Password', variant: 'link', href: '/messages' },
+      { label: 'Change Password', variant: 'link', href: '/profile' },
     ],
     dismissType: 'dismissible',
     priority: 85,
@@ -68,8 +68,8 @@ const defaultBanners: BannerConfig[] = [
       { label: 'Available Since', value: '2025-08-20' },
     ],
     actions: [
-      { label: 'Learn More', variant: 'primary', href: '/dashboard/kpi' },
-      { label: 'Release Notes', variant: 'link', href: '/dashboard/kpi' },
+      { label: 'View Detail', variant: 'primary', href: '/messages' },
+      { label: 'Release Notes', variant: 'link', href: '/messages' },
     ],
     dismissType: 'dismissible',
     priority: 50,

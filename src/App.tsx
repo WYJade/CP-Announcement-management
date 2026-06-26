@@ -21,6 +21,7 @@ import IntlShipments from './components/International/IntlShipments'
 import Containers from './components/International/Containers'
 import DrayageLoads from './components/International/DrayageLoads'
 import AgentWorkstation from './components/Agents/AgentWorkstation'
+import UserProfile from './components/UserProfile/UserProfile'
 
 function App() {
   return (
@@ -70,6 +71,9 @@ function App() {
 
         {/* Agents / AI Native */}
         <Route path="agents" element={<AgentWorkstation />} />
+
+        {/* User Profile */}
+        <Route path="profile" element={<UserProfile />} />
       </Route>
     </Routes>
   )
