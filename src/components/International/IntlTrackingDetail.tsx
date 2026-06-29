@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, CheckCircle2, Circle, Truck, Download, Eye } from 'lucide-react'
+import { ArrowLeft, CheckCircle2, Circle, Truck, Eye } from 'lucide-react'
 
 const D = {
   customer: 'ADOORN LLC', shipmentNo: 'SSHAS2608137', hbl: 'SSGNS2607829', mbl: '039GX40070',
@@ -10,12 +10,12 @@ const D = {
   progress: 62, totalContainers: 1, totalSkus: 10, totalWeight: '10,542 KG', volume: '68 M\u00b3',
   containers: [{ containerNo: 'WHSU8555505', size: '40HC', seal: 'WHLW847513', loadNo: 'UNIS_SAV_M012771', drayageStatus: 'Scheduled', pickupTerminal: 'Garden City Terminal', destWarehouse: 'UNIS Seabrook', lfd: 'Jun 11, 2026', deliveryEta: 'Jun 19, 2026', deliveredTime: '-' }],
   items: [
-    { sku: 'ADPOST-SMALL-WHITE', name: 'Post Mount Locking Mailbox', variant: 'Small - Snow White', expected: 72, received: '-', diff: '-', damaged: '-', unit: 'EA', status: 'Pending' },
-    { sku: 'ADPOST-SMALL-RED', name: 'Post Mount Locking Mailbox', variant: 'Small - Red', expected: 72, received: '-', diff: '-', damaged: '-', unit: 'EA', status: 'Pending' },
-    { sku: 'ADPOST-LARGE-WHITE', name: 'Post Mount Locking Mailbox', variant: 'Large - White', expected: 96, received: '-', diff: '-', damaged: '-', unit: 'EA', status: 'Pending' },
-    { sku: 'ADPOST-LARGE-RED', name: 'Post Mount Locking Mailbox', variant: 'Large - Red', expected: 96, received: '-', diff: '-', damaged: '-', unit: 'EA', status: 'Pending' },
-    { sku: 'ADBOX-SMALL', name: 'Package Box', variant: 'Small (Corrugated)', expected: 55, received: '-', diff: '-', damaged: '-', unit: 'EA', status: 'Pending' },
-    { sku: 'ADBOX-LARGE', name: 'Package Box', variant: 'Large (Corrugated)', expected: 55, received: '-', diff: '-', damaged: '-', unit: 'EA', status: 'Pending' },
+    { sku: 'ADPOST-SMALL-WHITE', name: 'Post Mount Locking Mailbox', variant: 'Small - Snow White', expected: 72, received: '72', diff: '0', damaged: '0', unit: 'EA', status: 'Received' },
+    { sku: 'ADPOST-SMALL-RED', name: 'Post Mount Locking Mailbox', variant: 'Small - Red', expected: 72, received: '70', diff: '-2', damaged: '1', unit: 'EA', status: 'Received' },
+    { sku: 'ADPOST-LARGE-WHITE', name: 'Post Mount Locking Mailbox', variant: 'Large - White', expected: 96, received: '96', diff: '0', damaged: '0', unit: 'EA', status: 'Received' },
+    { sku: 'ADPOST-LARGE-RED', name: 'Post Mount Locking Mailbox', variant: 'Large - Red', expected: 96, received: '94', diff: '-2', damaged: '2', unit: 'EA', status: 'Received' },
+    { sku: 'ADBOX-SMALL', name: 'Package Box', variant: 'Small (Corrugated)', expected: 55, received: '55', diff: '0', damaged: '0', unit: 'EA', status: 'Received' },
+    { sku: 'ADBOX-LARGE', name: 'Package Box', variant: 'Large (Corrugated)', expected: 55, received: '55', diff: '0', damaged: '0', unit: 'EA', status: 'Received' },
   ],
   documents: [
     { type: 'HBL', docNo: 'SSGNS2607829', fileName: 'HBL_SSGNS2607829.pdf', status: 'Available', time: 'Apr 22, 2026' },
@@ -85,34 +85,33 @@ export default function IntlTrackingDetail() {
         </div>
       </div>
 
-      {/* ─── Business Milestone Timeline (clean, no redundant details) ─── */}
+      {/* ─── Business Milestone Timeline ─── */}
       <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
         <h3 className="text-sm font-bold text-gray-900 mb-5">Business Milestone Timeline</h3>
         {[
-          { stage: 'Supplier Dispatch', status: 'done', date: 'Apr 15, 2026', desc: 'Supplier dispatch completed. Cargo loaded and ready for shipment.', sub: 'WIN WIN CORP \u00b7 Hai Phong, Vietnam' },
-          { stage: 'International Transportation', status: 'done', date: 'Apr 22, 2026', desc: 'Container loaded and vessel departed.', sub: 'WAN HAI A10 / E013 \u00b7 Haiphong, VN \u2192 Savannah, US \u00b7 POD ETA: Jun 13' },
-          { stage: 'Customs Clearance', status: 'done', date: 'Jun 10, 2026', desc: 'Customs entry released. All documents cleared.', sub: 'Entry: 82G-0101679-0 \u00b7 Savannah, GA \u00b7 Broker: JFS' },
-          { stage: 'Drayage', status: 'active', date: 'Jun 19, 2026 (ETA)', desc: 'Container scheduled for pickup and delivery to warehouse.', sub: 'Load: UNIS_SAV_M012771 \u00b7 Garden City Terminal \u2192 UNIS Seabrook' },
-          { stage: 'Warehouse Receiving', status: 'pending', date: 'TBD (~Jun 21)', desc: 'Awaiting container arrival for unloading and receiving.', sub: 'Receipt: RN-38199 \u00b7 UNIS Seabrook \u00b7 Expected: 782 EA' },
+          { stage: 'Supplier Dispatch', id: '', status: 'done', date: 'Apr 15, 2026', location: 'Hai Phong, Vietnam', desc: 'Supplier dispatch completed. Cargo loaded and ready for shipment.', sub: 'WIN WIN CORP' },
+          { stage: 'International Transportation', id: 'SSGNS2607829', status: 'done', date: 'Apr 22, 2026', location: 'Haiphong, VN', desc: 'Container loaded and vessel departed.', sub: 'WAN HAI A10 / E013 \u00b7 Haiphong, VN \u2192 Savannah, US \u00b7 POD ETA: Jun 13' },
+          { stage: 'Customs Clearance', id: '82G-0101679-0', status: 'done', date: 'Jun 10, 2026', location: 'Savannah, GA', desc: 'Customs entry released. All documents cleared.', sub: 'Broker: JFS' },
+          { stage: 'Drayage', id: 'UNIS_SAV_M012771', status: 'active', date: 'Jun 19, 2026 (ETA)', location: 'Garden City Terminal \u2192 UNIS Seabrook', desc: 'Container scheduled for pickup and delivery to warehouse.', sub: '' },
+          { stage: 'Warehouse Receiving', id: 'RN-38199', status: 'pending', date: 'TBD (~Jun 21)', location: 'UNIS Seabrook', desc: 'Awaiting container arrival for unloading and receiving.', sub: 'Expected: 782 EA' },
         ].map((step, i, arr) => (
           <div key={i} className="flex">
-            {/* Left: icon + line */}
             <div className="flex flex-col items-center mr-4">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${stageBg(step.status)}`}>{stageIcon(step.status)}</div>
               {i < arr.length - 1 && <div className={`w-0.5 flex-1 ${step.status === 'done' ? 'bg-green-300' : 'bg-gray-200'}`} />}
             </div>
-            {/* Middle: content */}
             <div className="flex-1 pb-6">
               <div className="flex items-center gap-2">
                 <span className="text-sm font-semibold text-gray-900">{step.stage}</span>
+                {step.id && <span className="text-[11px] font-mono text-primary-600 bg-primary-50 px-1.5 py-0.5 rounded">{step.id}</span>}
                 <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${step.status === 'done' ? 'bg-green-100 text-green-700' : step.status === 'active' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500'}`}>{step.status === 'done' ? 'Completed' : step.status === 'active' ? 'In Progress' : 'Pending'}</span>
               </div>
-              <p className="text-xs text-gray-500 mt-0.5">{step.desc}</p>
-              <p className="text-[11px] text-gray-400 mt-1">{step.sub}</p>
+              <p className="text-xs text-gray-500 mt-1">{step.desc}</p>
+              {step.sub && <p className="text-[11px] text-gray-400 mt-0.5">{step.sub}</p>}
             </div>
-            {/* Right: date */}
-            <div className="shrink-0 text-right pt-0.5">
-              <p className="text-xs text-gray-400">{step.date}</p>
+            <div className="shrink-0 text-right pl-4 pt-0.5">
+              <p className="text-xs text-gray-500">{step.date}</p>
+              {step.location && <p className="text-[10px] text-gray-400 mt-0.5">{step.location}</p>}
             </div>
           </div>
         ))}
@@ -123,9 +122,9 @@ export default function IntlTrackingDetail() {
         <div className="flex border-b border-gray-200">{TABS.map(tab=>(<button key={tab} onClick={()=>setActiveTab(tab)} className={`px-5 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab===tab?'border-primary-600 text-primary-600':'border-transparent text-gray-500 hover:text-gray-700'}`}>{tab}</button>))}</div>
         <div className="p-5">
           {activeTab==='Containers & Drayage'&&(<table className="w-full text-xs"><thead><tr className="bg-gray-50 border-b">{['Container No.','Size','Seal','Drayage Load No.','Status','Pickup Terminal','Dest. Warehouse','LFD','Delivery ETA','Delivered'].map(h=>(<th key={h} className="text-left py-2.5 px-3 font-semibold text-gray-500">{h}</th>))}</tr></thead><tbody>{D.containers.map((c,i)=>(<tr key={i} className="border-b border-gray-100"><td className="py-2.5 px-3 font-mono">{c.containerNo}</td><td className="py-2.5 px-3">{c.size}</td><td className="py-2.5 px-3">{c.seal}</td><td className="py-2.5 px-3 text-primary-600 font-medium cursor-pointer hover:underline" onClick={()=>navigate(`/international/drayage/${c.loadNo}`)}>{c.loadNo}</td><td className="py-2.5 px-3">{c.drayageStatus}</td><td className="py-2.5 px-3">{c.pickupTerminal}</td><td className="py-2.5 px-3">{c.destWarehouse}</td><td className="py-2.5 px-3">{c.lfd}</td><td className="py-2.5 px-3">{c.deliveryEta}</td><td className="py-2.5 px-3">{c.deliveredTime}</td></tr>))}</tbody></table>)}
-          {activeTab==='Items / SKUs'&&(<table className="w-full text-xs"><thead><tr className="bg-gray-50 border-b">{['SKU','Product Name','Variant','Expected','Received','Diff','Damaged','Unit','Status'].map(h=>(<th key={h} className="text-left py-2.5 px-3 font-semibold text-gray-500">{h}</th>))}</tr></thead><tbody>{D.items.map((item,i)=>(<tr key={i} className="border-b border-gray-100"><td className="py-2.5 px-3 font-mono">{item.sku}</td><td className="py-2.5 px-3">{item.name}</td><td className="py-2.5 px-3">{item.variant}</td><td className="py-2.5 px-3">{item.expected}</td><td className="py-2.5 px-3">{item.received}</td><td className="py-2.5 px-3">{item.diff}</td><td className="py-2.5 px-3">{item.damaged}</td><td className="py-2.5 px-3">{item.unit}</td><td className="py-2.5 px-3">{item.status}</td></tr>))}</tbody></table>)}
+          {activeTab==='Items / SKUs'&&(<table className="w-full text-xs"><thead><tr className="bg-gray-50 border-b">{['SKU','Product Name','Variant','Expected','Received','Diff','Damaged','Unit','Status'].map(h=>(<th key={h} className="text-left py-2.5 px-3 font-semibold text-gray-500">{h}</th>))}</tr></thead><tbody>{D.items.map((item,i)=>(<tr key={i} className="border-b border-gray-100"><td className="py-2.5 px-3 font-mono text-primary-600">{item.sku}</td><td className="py-2.5 px-3">{item.name}</td><td className="py-2.5 px-3">{item.variant}</td><td className="py-2.5 px-3 font-medium">{item.expected}</td><td className="py-2.5 px-3 text-green-600 font-medium">{item.received}</td><td className="py-2.5 px-3 text-orange-600">{item.diff}</td><td className="py-2.5 px-3 text-red-600">{item.damaged}</td><td className="py-2.5 px-3">{item.unit}</td><td className="py-2.5 px-3"><span className={item.status==='Received'?'text-green-600 font-medium':item.status==='Receiving'?'text-blue-600':'text-gray-500'}>{item.status}</span></td></tr>))}</tbody></table>)}
           {activeTab==='Customs'&&(<div className="grid grid-cols-3 gap-4 text-sm">{[['Customs Status','Released'],['Entry No.','82G-0101679-0'],['Port of Entry','Savannah, GA'],['Release Date','Jun 10, 2026'],['Customs Broker','JFS'],['Document Status','Completed'],['Exam Status','No Exam'],['Hold Reason','None'],['Required Action','None']].map(([l,v])=>(<div key={l}><p className="text-[10px] text-gray-400">{l}</p><p className="font-medium text-gray-900">{v}</p></div>))}</div>)}
-          {activeTab==='Documents'&&(<><table className="w-full text-xs"><thead><tr className="bg-gray-50 border-b">{['Document Type','Document No.','File Name','Status','Updated','Action'].map(h=>(<th key={h} className="text-left py-2.5 px-3 font-semibold text-gray-500">{h}</th>))}</tr></thead><tbody>{D.documents.map((doc,i)=>(<tr key={i} className="border-b border-gray-100 hover:bg-gray-50"><td className="py-2.5 px-3 font-medium">{doc.type}</td><td className="py-2.5 px-3">{doc.docNo}</td><td className="py-2.5 px-3 text-gray-600">{doc.fileName||'-'}</td><td className="py-2.5 px-3"><span className={doc.status==='Available'?'text-green-600 font-medium':'text-gray-400'}>{doc.status}</span></td><td className="py-2.5 px-3">{doc.time}</td><td className="py-2.5 px-3">{doc.status==='Available'&&(<div className="flex gap-2"><button onClick={()=>setViewDoc(doc.fileName)} className="flex items-center gap-1 text-primary-600 hover:underline"><Eye size={11}/>View</button><button className="flex items-center gap-1 text-gray-500 hover:text-gray-700"><Download size={11}/>Download</button></div>)}</td></tr>))}</tbody></table>{viewDoc&&(<div className="mt-4 border rounded-lg p-6 bg-gray-50 text-center"><p className="text-sm text-gray-600 mb-2">Preview: <strong>{viewDoc}</strong></p><div className="h-40 bg-white border rounded flex items-center justify-center text-gray-400 text-sm">Document preview</div><button onClick={()=>setViewDoc(null)} className="mt-3 text-xs text-gray-500 hover:text-gray-700">Close</button></div>)}</>)}
+          {activeTab==='Documents'&&(<><table className="w-full text-xs"><thead><tr className="bg-gray-50 border-b">{['Document Type','Document No.','File Name','Status','Updated','Action'].map(h=>(<th key={h} className="text-left py-2.5 px-3 font-semibold text-gray-500">{h}</th>))}</tr></thead><tbody>{D.documents.map((doc,i)=>(<tr key={i} className="border-b border-gray-100 hover:bg-gray-50"><td className="py-2.5 px-3 font-medium">{doc.type}</td><td className="py-2.5 px-3">{doc.docNo}</td><td className="py-2.5 px-3">{doc.fileName?<button onClick={()=>setViewDoc(doc.fileName)} className="text-primary-600 hover:underline font-medium">{doc.fileName}</button>:<span className="text-gray-400">-</span>}</td><td className="py-2.5 px-3"><span className={doc.status==='Available'?'text-green-600 font-medium':'text-gray-400'}>{doc.status}</span></td><td className="py-2.5 px-3">{doc.time}</td><td className="py-2.5 px-3">{doc.status==='Available'&&<button onClick={()=>setViewDoc(doc.fileName)} className="flex items-center gap-1 text-primary-600 hover:underline font-medium"><Eye size={11}/>View</button>}</td></tr>))}</tbody></table>{viewDoc&&(<div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-8" onClick={()=>setViewDoc(null)}><div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[80vh] flex flex-col" onClick={e=>e.stopPropagation()}><div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between"><h3 className="text-sm font-semibold text-gray-900">Document Preview</h3><button onClick={()=>setViewDoc(null)} className="text-gray-400 hover:text-gray-600 text-sm">Close</button></div><div className="p-6 flex-1 overflow-auto"><p className="text-sm text-gray-600 mb-4 font-medium">{viewDoc}</p><div className="border border-gray-200 rounded-lg bg-gray-50 h-64 flex items-center justify-center"><div className="text-center text-gray-400"><p className="text-sm mb-1">Document Content Preview</p><p className="text-xs">PDF viewer would render here</p></div></div></div></div></div>)}</>)}
         </div>
       </div>
     </div>
