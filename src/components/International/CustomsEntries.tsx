@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Search, X } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 
 const SAMPLE_DATA = [
   { declarationNo: '82G-0101679-0', date: 'Jun 15, 2026', masterShipment: 'WHLC039GX40070', enteredValue: '$31,720.15', totalDuty: '$8,991.00', importer: 'ADOORN LLC', broker: 'JFS', source: 'NetCHB', mode: 'Vessel Containerized' },
@@ -11,6 +12,7 @@ const SAMPLE_DATA = [
 ]
 
 export default function CustomsEntries() {
+  const navigate = useNavigate()
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold text-gray-900 mb-1">Customs Entries</h1>
@@ -49,7 +51,7 @@ export default function CustomsEntries() {
           <tbody>
             {SAMPLE_DATA.map((row, i) => (
               <tr key={i} className="border-b border-gray-100 hover:bg-gray-50">
-                <td className="py-3 px-4 text-primary-600 font-medium cursor-pointer hover:underline">{row.declarationNo}</td>
+                <td className="py-3 px-4 text-primary-600 font-medium cursor-pointer hover:underline" onClick={() => navigate(`/international/customs/${row.declarationNo}`)}>{row.declarationNo}</td>
                 <td className="py-3 px-4 text-gray-600">{row.date}</td>
                 <td className="py-3 px-4 text-gray-700 font-mono text-xs">{row.masterShipment}</td>
                 <td className="py-3 px-4 text-gray-700">{row.enteredValue}</td>

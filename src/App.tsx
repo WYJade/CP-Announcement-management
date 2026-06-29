@@ -16,9 +16,12 @@ import ReceiptDetail from './components/Inbound/ReceiptDetail'
 import Shipments from './components/Shipping/Shipments'
 import Tracking from './components/Shipping/Tracking'
 import CustomsEntries from './components/International/CustomsEntries'
+import CustomsEntryDetail from './components/International/CustomsEntryDetail'
 import IntlShipments from './components/International/IntlShipments'
+import IntlShipmentDetail from './components/International/IntlShipmentDetail'
 import Containers from './components/International/Containers'
 import DrayageLoads from './components/International/DrayageLoads'
+import DrayageLoadDetail from './components/International/DrayageLoadDetail'
 import AgentWorkstation from './components/Agents/AgentWorkstation'
 import UserProfile from './components/UserProfile/UserProfile'
 
@@ -63,9 +66,12 @@ function App() {
 
         {/* International */}
         <Route path="international/customs" element={<CustomsEntries />} />
+        <Route path="international/customs/:id" element={<CustomsEntryDetail />} />
         <Route path="international/shipments" element={<IntlShipments />} />
+        <Route path="international/shipments/:id" element={<IntlShipmentDetail />} />
         <Route path="international/containers" element={<Containers />} />
         <Route path="international/drayage" element={<DrayageLoads />} />
+        <Route path="international/drayage/:id" element={<DrayageLoadDetail />} />
 
         {/* Agents / AI Native */}
         <Route path="agents" element={<AgentWorkstation />} />
