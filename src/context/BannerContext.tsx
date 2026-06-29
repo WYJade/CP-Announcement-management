@@ -48,9 +48,7 @@ const defaultBanners: BannerConfig[] = [
       { label: 'Location', value: 'Miami, US' },
       { label: 'Time', value: '03:42 AM' },
     ],
-    actions: [
-      { label: 'Review Login History', variant: 'primary', href: '/messages' },
-    ],
+    actions: [],
     dismissType: 'dismissible',
     priority: 85,
     targeting: {},

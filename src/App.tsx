@@ -7,7 +7,6 @@ import InvoiceDetail from './components/Finance/InvoiceDetail'
 import RequestsView from './components/CollaborationCenter/RequestsView'
 import SubmitRequestPage from './components/CollaborationCenter/SubmitRequestPage'
 import WorkItemDetail from './components/CollaborationCenter/WorkItemDetail'
-import MessageCenterPage from './components/MessageCenter/MessageCenterPage'
 import InventoryActivity from './components/Inventory/InventoryActivity'
 import WholesaleOrders from './components/Orders/WholesaleOrders'
 import RetailOrders from './components/Orders/RetailOrders'
@@ -32,7 +31,6 @@ function App() {
         <Route path="dashboard/kpi" element={<KPIDashboard />} />
         <Route path="finance/invoices" element={<InvoiceList />} />
         <Route path="finance/invoice/:invoiceNumber" element={<InvoiceDetail />} />
-        <Route path="messages" element={<MessageCenterPage />} />
 
         {/* Service & Support — Requests */}
         <Route path="support" element={<Navigate to="/support/requests" replace />} />

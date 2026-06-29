@@ -2,15 +2,12 @@ import {
   Home,
   Circle,
   Settings,
-  Bell,
   MessageSquare,
 } from 'lucide-react'
-import { useMessageCenter } from '../../context/MessageCenterContext'
 import { useI18n } from '../../context/I18nContext'
 import LanguageSwitcher from './LanguageSwitcher'
 
 function Header() {
-  const { unreadCount, openPanel } = useMessageCenter()
   const { t } = useI18n()
 
   return (
@@ -29,20 +26,6 @@ function Header() {
 
         {/* Language Switcher */}
         <LanguageSwitcher />
-
-        {/* Message Center Bell */}
-        <button
-          onClick={openPanel}
-          className="p-1.5 rounded-md hover:bg-gray-100 transition-colors relative"
-          title="Message Center"
-        >
-          <Bell size={16} className="text-gray-500" />
-          {unreadCount > 0 && (
-            <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 flex items-center justify-center bg-red-500 text-white text-[10px] font-bold rounded-full">
-              {unreadCount > 9 ? '9+' : unreadCount}
-            </span>
-          )}
-        </button>
 
         <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-primary-600 bg-primary-50 border border-primary-200 rounded-md hover:bg-primary-100 transition-colors">
           <MessageSquare size={14} />

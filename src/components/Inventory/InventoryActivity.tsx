@@ -1,6 +1,5 @@
 import { useState, useMemo } from 'react'
 import { Search, Filter, Download } from 'lucide-react'
-import OrderAlertBanner, { type OrderAlert } from '../common/OrderAlertBanner'
 
 // ─── Inventory alert data ────────────────────────────────────────────────────
 
@@ -102,8 +101,6 @@ export default function InventoryActivity() {
 
   return (
     <div className="p-6 max-w-full">
-      {/* Alert Banner — dismissable, shows one at a time */}
-      <OrderAlertBanner alerts={INVENTORY_ALERTS} />
 
       {/* Page header */}
       <div className="flex items-center justify-between mb-5">

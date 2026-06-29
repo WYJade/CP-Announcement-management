@@ -1,7 +1,5 @@
 import { useState } from 'react'
 import { Search } from 'lucide-react'
-import OrderAlertBanner from '../common/OrderAlertBanner'
-import { INBOUND_ALERTS } from './OrderAlerts'
 
 const STATUS_TABS = ['All', 'Open', 'Scheduled', 'Daily Received', 'MTD Received']
 

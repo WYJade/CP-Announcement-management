@@ -1,7 +1,5 @@
 import { useState } from 'react'
 import { Search } from 'lucide-react'
-import OrderAlertBanner from '../common/OrderAlertBanner'
-import { SHIPPING_ALERTS } from './ShippingAlerts'
 
 const STATUS_TABS = [
   { key: 'all', label: 'All', count: 22740 },
@@ -27,7 +25,6 @@ export default function Shipments() {
 
   return (
     <div className="p-6">
-      <OrderAlertBanner alerts={SHIPPING_ALERTS} />
 
       <div className="flex items-center justify-between mb-5">
         <h1 className="text-2xl font-bold text-gray-900">Shipments</h1>
