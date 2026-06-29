@@ -22,6 +22,8 @@ import IntlShipmentDetail from './components/International/IntlShipmentDetail'
 import Containers from './components/International/Containers'
 import DrayageLoads from './components/International/DrayageLoads'
 import DrayageLoadDetail from './components/International/DrayageLoadDetail'
+import IntlTracking from './components/International/IntlTracking'
+import IntlTrackingDetail from './components/International/IntlTrackingDetail'
 import AgentWorkstation from './components/Agents/AgentWorkstation'
 import UserProfile from './components/UserProfile/UserProfile'
 
@@ -72,6 +74,8 @@ function App() {
         <Route path="international/containers" element={<Containers />} />
         <Route path="international/drayage" element={<DrayageLoads />} />
         <Route path="international/drayage/:id" element={<DrayageLoadDetail />} />
+        <Route path="international/tracking" element={<IntlTracking />} />
+        <Route path="international/tracking/:id" element={<IntlTrackingDetail />} />
 
         {/* Agents / AI Native */}
         <Route path="agents" element={<AgentWorkstation />} />

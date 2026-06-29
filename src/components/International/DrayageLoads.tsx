@@ -44,14 +44,13 @@ export default function DrayageLoads() {
           </div>
         </div>
       )}
-      <h2 className="text-lg font-bold text-gray-900 mb-4">Load List</h2>
+      <h2 className="text-lg font-bold text-gray-900 mb-4">Drayage Load List</h2>
       <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
         <table className="w-full text-sm">
-          <thead><tr className="border-b border-gray-200"><th className="w-8 py-3 px-3"><input type="checkbox" className="rounded" /></th>{['Load #','PortPro Load #','Load Status','Change Status','Container #','Load Type','Pickup Apt'].map(h=>(<th key={h} className="text-left py-3 px-3 text-xs font-semibold text-gray-500">{h}</th>))}</tr></thead>
+          <thead><tr className="border-b border-gray-200">{['Load #','PortPro Load #','Load Status','Change Status','Container #','Load Type','Pickup Apt'].map(h=>(<th key={h} className="text-left py-3 px-3 text-xs font-semibold text-gray-500">{h}</th>))}</tr></thead>
           <tbody>
             {SAMPLE_DATA.map((row, i) => (
               <tr key={i} className="border-b border-gray-100 hover:bg-gray-50">
-                <td className="py-3 px-3"><input type="checkbox" className="rounded" /></td>
                 <td className="py-3 px-3 text-primary-600 font-medium cursor-pointer hover:underline" onClick={() => navigate(`/international/drayage/${row.loadNo}`)}>{row.loadNo}</td>
                 <td className="py-3 px-3 text-gray-500">{row.portproLoad}</td>
                 <td className="py-3 px-3 text-gray-700">{row.loadStatus}</td>
