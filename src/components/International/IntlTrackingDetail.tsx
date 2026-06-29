@@ -63,25 +63,25 @@ export default function IntlTrackingDetail() {
       {/* ─── Stats ─── */}
       <div className="grid grid-cols-4 gap-4 mb-6">
         <div className="bg-white border border-gray-200 rounded-xl p-4">
+          <p className="text-[10px] text-gray-400 uppercase">Cargo Value</p>
+          <p className="text-2xl font-bold text-gray-900 mt-1">$31,720</p>
+          <p className="text-xs text-gray-400 mt-1">Declared &middot; USD</p>
+        </div>
+        <div className="bg-white border border-gray-200 rounded-xl p-4">
+          <p className="text-[10px] text-gray-400 uppercase">Import Duty</p>
+          <p className="text-2xl font-bold text-gray-900 mt-1">$8,991</p>
+          <p className="text-xs text-gray-400 mt-1">Incl. Section 301</p>
+        </div>
+        <div className="bg-white border border-gray-200 rounded-xl p-4">
+          <p className="text-[10px] text-gray-400 uppercase">Weight / Volume</p>
+          <p className="text-2xl font-bold text-gray-900 mt-1">{D.totalWeight}</p>
+          <p className="text-xs text-gray-400 mt-1">40HC &middot; {D.volume}</p>
+        </div>
+        <div className="bg-white border border-gray-200 rounded-xl p-4">
           <p className="text-[10px] text-gray-400 uppercase">Progress</p>
           <p className="text-2xl font-bold text-primary-600 mt-1">{D.progress}%</p>
-          <div className="h-1.5 bg-gray-100 rounded-full mt-2"><div className="h-full bg-primary-500 rounded-full" style={{width:`${D.progress}%`}} /></div>
-          <p className="text-[10px] text-gray-400 mt-2">Drayage in Progress &middot; ETA {D.whEta}</p>
-        </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-4">
-          <p className="text-[10px] text-gray-400 uppercase">Containers</p>
-          <p className="text-2xl font-bold text-gray-900 mt-1">{D.totalContainers}</p>
-          <p className="text-xs text-gray-500 mt-1">40HC &middot; {D.totalWeight} &middot; {D.volume}</p>
-        </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-4">
-          <p className="text-[10px] text-gray-400 uppercase">SKUs / Items</p>
-          <p className="text-2xl font-bold text-gray-900 mt-1">{D.totalSkus}</p>
-          <p className="text-xs text-gray-500 mt-1">Expected: 782 EA &middot; Received: Pending</p>
-        </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-4">
-          <p className="text-[10px] text-gray-400 uppercase">Documents</p>
-          <p className="text-2xl font-bold text-gray-900 mt-1">{D.documents.filter(d=>d.status==='Available').length}/{D.documents.length}</p>
-          <p className="text-xs text-gray-500 mt-1">Available &middot; 1 pending</p>
+          <div className="h-1.5 bg-gray-100 rounded-full mt-2"><div className="h-full bg-green-500 rounded-full" style={{width:`${D.progress}%`}} /></div>
+          <p className="text-[10px] text-gray-400 mt-2">Drayage in Progress &middot; ETA {D.whEta} Seabrook</p>
         </div>
       </div>
 
