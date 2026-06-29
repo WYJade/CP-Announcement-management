@@ -31,17 +31,6 @@ const TRACKING_DATA: TrackingRecord[] = [
   { id: 'SSHAS2608200', shipmentNo: 'SSHAS2608200', hbl: 'SSHAS2608200', status: 'Arrived', containers: ['MSCU7234891', 'TCKU9988776'], currentMilestone: 'Grounded / At Destination', origin: 'Shanghai, CN', destination: 'Long Beach, US', eta: 'Jun 12, 2026', customer: 'PLEASS GLOBAL', receivedTime: '-', lastUpdated: 'Jun 13, 2026 07:00', hasException: false, phase: 'customs' },
 ]
 
-const PHASE_TABS = [
-  { key: 'all', label: 'All' },
-  { key: 'ocean', label: 'Ocean Freight' },
-  { key: 'customs', label: 'Customs Clearance' },
-  { key: 'drayage', label: 'Drayage' },
-  { key: 'warehouse', label: 'Warehouse Receipt' },
-  { key: 'exception', label: 'Exceptions' },
-]
-
-const STATUS_PILLS = ['All', 'Booked', 'In Transit', 'Arrived', 'Customs Released', 'OFD', 'Delivered', 'Exception']
-
 function statusColor(status: string) {
   if (status === 'Exception') return 'bg-red-100 text-red-700'
   if (status === 'Fully Received' || status === 'Delivered') return 'bg-green-100 text-green-700'
@@ -50,6 +39,26 @@ function statusColor(status: string) {
   if (status === 'Customs Released') return 'bg-teal-100 text-teal-700'
   return 'bg-gray-100 text-gray-600'
 }
+
+// ─── Phase-Status Mapping ─────────────────────────────────────────────────────
+
+const PHASE_STATUS_MAP: Record<string, string[]> = {
+  all: ['All', 'Booked', 'In Transit', 'Arrived', 'Customs Released', 'Available', 'Dispatched', 'OFD', 'Delivered', 'Fully Received', 'Exception'],
+  ocean: ['Booked', 'At Origin', 'In Transit'],
+  customs: ['Arrived', 'Customs Filed', 'Customs Released', 'Customs Exception'],
+  drayage: ['Available', 'Dispatched', 'Enroute to Deliver Load', 'Arrived at Deliver Load', 'Dropped-Loaded'],
+  warehouse: ['Warehouse Receiving', 'Partially Received', 'Fully Received'],
+  exception: ['Exception', 'Customs Exception', 'Hold'],
+}
+
+const PHASE_TABS = [
+  { key: 'all', label: 'All' },
+  { key: 'ocean', label: 'Ocean Freight' },
+  { key: 'customs', label: 'Customs Clearance' },
+  { key: 'drayage', label: 'Drayage' },
+  { key: 'warehouse', label: 'Warehouse Receipt' },
+  { key: 'exception', label: 'Exceptions' },
+]
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
@@ -60,9 +69,15 @@ export default function IntlTracking() {
   const [statusFilter, setStatusFilter] = useState('All')
   const [viewMode, setViewMode] = useState<'table' | 'card'>('table')
 
+  // Get statuses for current phase
+  const availableStatuses = PHASE_STATUS_MAP[phaseTab] || PHASE_STATUS_MAP.all
+
   const filtered = TRACKING_DATA.filter(t => {
+    // Phase filter
     if (phaseTab !== 'all' && t.phase !== phaseTab) return false
-    if (statusFilter !== 'All' && t.status !== statusFilter) return false
+    // Status filter
+    if (statusFilter !== 'All' && t.status !== statusFilter && t.currentMilestone !== statusFilter) return false
+    // Search
     if (search) {
       const q = search.toLowerCase()
       return t.shipmentNo.toLowerCase().includes(q) || t.hbl.toLowerCase().includes(q) ||
@@ -71,10 +86,11 @@ export default function IntlTracking() {
     return true
   })
 
-  const statusCounts = STATUS_PILLS.map(s => ({
-    label: s,
-    count: s === 'All' ? TRACKING_DATA.length : TRACKING_DATA.filter(t => t.status === s).length,
-  }))
+  // When phase changes, reset status filter
+  const handlePhaseChange = (phase: string) => {
+    setPhaseTab(phase)
+    setStatusFilter('All')
+  }
 
   return (
     <div className="p-6">
@@ -82,9 +98,9 @@ export default function IntlTracking() {
       <p className="text-sm text-gray-500 mb-5">International logistics full-chain visibility: Supplier &rarr; Ocean &rarr; Customs &rarr; Drayage &rarr; Warehouse</p>
 
       {/* Phase tabs */}
-      <div className="flex gap-1 mb-4 border-b border-gray-200">
+      <div className="flex gap-1 mb-3 border-b border-gray-200">
         {PHASE_TABS.map(tab => (
-          <button key={tab.key} onClick={() => setPhaseTab(tab.key)}
+          <button key={tab.key} onClick={() => handlePhaseChange(tab.key)}
             className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
               phaseTab === tab.key ? 'border-primary-600 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700'
             }`}>
@@ -96,16 +112,22 @@ export default function IntlTracking() {
         ))}
       </div>
 
-      {/* Status distribution bar */}
-      <div className="flex gap-1 mb-4 flex-wrap">
-        {statusCounts.map(s => (
-          <button key={s.label} onClick={() => setStatusFilter(s.label)}
-            className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-colors ${
-              statusFilter === s.label ? 'bg-primary-50 border-primary-300 text-primary-700' : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50'
-            }`}>
-            {s.label} {s.count > 0 && <span className="ml-1 text-[10px] opacity-70">{s.count}</span>}
-          </button>
-        ))}
+      {/* Status pills — dynamically linked to selected phase */}
+      <div className="flex gap-1 mb-4 flex-wrap items-center">
+        <span className="text-[10px] text-gray-400 mr-1 uppercase font-semibold">Status:</span>
+        {availableStatuses.map(s => {
+          const count = s === 'All'
+            ? (phaseTab === 'all' ? TRACKING_DATA.length : TRACKING_DATA.filter(t => t.phase === phaseTab).length)
+            : TRACKING_DATA.filter(t => t.status === s || t.currentMilestone === s).length
+          return (
+            <button key={s} onClick={() => setStatusFilter(s)}
+              className={`px-2.5 py-1 text-xs font-medium rounded-full border transition-colors ${
+                statusFilter === s ? 'bg-primary-50 border-primary-300 text-primary-700' : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50'
+              }`}>
+              {s} <span className="text-[10px] opacity-60">{count}</span>
+            </button>
+          )
+        })}
       </div>
 
       {/* Search + Filters */}
