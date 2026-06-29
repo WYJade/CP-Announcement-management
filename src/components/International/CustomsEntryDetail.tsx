@@ -2,13 +2,7 @@ import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 
-const ENTRIES_DATA: Record<string, {
-  declarationNo: string; date: string; importerName: string; referenceNumber: string;
-  productDescription: string; countryOfOrigin: string; totalEnteredValue: string;
-  totalDuty: string; totalSurcharges: string; carrier: string; locationOfGoods: string;
-  mbl: string; hbl: string;
-  lineItems: { invoiceLineNo: number; line7501: number; productNo: number; productValue: string; adValoremRate: string; dutyAmount: string; surchargeAmount: string; htsNo: string }[];
-}> = {
+const ENTRIES_DATA: Record<string, any> = {
   '82G-0101679-0': {
     declarationNo: '82G-0101679-0', date: 'June 15, 2026', importerName: 'ADOORN LLC',
     referenceNumber: 'SHIP-JUNE12-US', productDescription: 'SECTION 122 - 10% DUTY',
@@ -40,137 +34,105 @@ const ENTRIES_DATA: Record<string, {
   },
 }
 
-// Fallback for entries not in the map
-const DEFAULT_ENTRY = {
-  declarationNo: '', date: 'June 12, 2026', importerName: 'Unknown',
-  referenceNumber: '-', productDescription: '-', countryOfOrigin: '-',
-  totalEnteredValue: '-', totalDuty: '-', totalSurcharges: '-',
-  carrier: '-', locationOfGoods: '-', mbl: '-', hbl: '-', lineItems: [],
-}
+const DEFAULT_ENTRY = { declarationNo: '', date: 'June 12, 2026', importerName: 'Unknown', referenceNumber: '-', productDescription: '-', countryOfOrigin: '-', totalEnteredValue: '-', totalDuty: '-', totalSurcharges: '-', carrier: '-', locationOfGoods: '-', mbl: '-', hbl: '-', lineItems: [] }
 
 export default function CustomsEntryDetail() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState<'details' | 'documents'>('details')
-
   const entry = ENTRIES_DATA[id || ''] || { ...DEFAULT_ENTRY, declarationNo: id || '' }
 
+  const fields = [
+    ['Importer Name', entry.importerName], ['Reference Number', entry.referenceNumber],
+    ['Product Description', entry.productDescription], ['Country of Origin', entry.countryOfOrigin],
+    ['Total Entered Value', entry.totalEnteredValue], ['Total Duty', entry.totalDuty],
+    ['Total Surcharges', entry.totalSurcharges], ['Carrier', entry.carrier],
+    ['Location of Goods', entry.locationOfGoods], ['MBL', entry.mbl], ['HBL', entry.hbl],
+  ]
+
   return (
-    <div className="p-6 max-w-6xl mx-auto">
+    <div className="p-6">
       {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
-        <button onClick={() => navigate('/international/customs')} className="hover:text-gray-700 flex items-center gap-1">
-          <ArrowLeft size={14} /> Customs Entries
-        </button>
-        <span className="text-gray-300">/</span>
-        <span className="text-gray-700 font-medium">View Declaration</span>
+      <div className="flex items-center gap-2 text-sm text-gray-500 mb-5">
+        <button onClick={() => navigate('/international/customs')} className="hover:text-primary-600 flex items-center gap-1"><ArrowLeft size={14} /> Customs Entries</button>
+        <span>/</span>
+        <span className="text-gray-800 font-medium">View Declaration</span>
       </div>
 
-      <div className="grid grid-cols-5 gap-6">
-        {/* Left - Declaration Details */}
-        <div className="col-span-2">
-          <h1 className="text-xl font-bold text-gray-900 mb-1">Entry #: {entry.declarationNo}</h1>
-          <p className="text-sm text-gray-500 mb-6">Date: {entry.date}</p>
-
-          <div className="space-y-4">
-            {[
-              ['Importer Name', entry.importerName],
-              ['Reference Number', entry.referenceNumber],
-              ['Product Description', entry.productDescription],
-              ['Country of Origin', entry.countryOfOrigin],
-              ['Total Entered Value', entry.totalEnteredValue],
-              ['Total Duty', entry.totalDuty],
-              ['Total Surcharges', entry.totalSurcharges],
-              ['Carrier', entry.carrier],
-              ['Location of Goods', entry.locationOfGoods],
-              ['MBL', entry.mbl],
-              ['HBL', entry.hbl],
-            ].map(([label, value]) => (
-              <div key={label} className="flex items-start">
-                <span className="text-sm text-gray-500 w-40 shrink-0">{label}</span>
-                <span className="text-sm font-medium text-gray-900">{value}</span>
-              </div>
-            ))}
-          </div>
+      {/* Header + Tabs inline */}
+      <div className="flex items-end justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Entry #: {entry.declarationNo}</h1>
+          <p className="text-sm text-gray-400 mt-0.5">Date: {entry.date}</p>
         </div>
+        <div className="flex gap-4">
+          <button onClick={() => setActiveTab('details')} className={`text-sm font-medium pb-1 border-b-2 ${activeTab === 'details' ? 'border-primary-600 text-primary-600' : 'border-transparent text-gray-400'}`}>Declaration Details</button>
+          <button onClick={() => setActiveTab('documents')} className={`text-sm font-medium pb-1 border-b-2 ${activeTab === 'documents' ? 'border-primary-600 text-primary-600' : 'border-transparent text-gray-400'}`}>Documents</button>
+        </div>
+      </div>
 
-        {/* Right - Tabs (Declaration Details / Documents) */}
-        <div className="col-span-3">
-          <div className="flex gap-4 border-b border-gray-200 mb-4">
-            <button onClick={() => setActiveTab('details')}
-              className={`pb-2 text-sm font-medium border-b-2 transition-colors ${activeTab === 'details' ? 'border-primary-600 text-primary-600' : 'border-transparent text-gray-500'}`}>
-              Declaration Details
-            </button>
-            <button onClick={() => setActiveTab('documents')}
-              className={`pb-2 text-sm font-medium border-b-2 transition-colors ${activeTab === 'documents' ? 'border-primary-600 text-primary-600' : 'border-transparent text-gray-500'}`}>
-              Documents
-            </button>
-          </div>
-
-          {activeTab === 'details' && (
-            <>
-              {/* Map placeholder */}
-              <div className="bg-gray-100 rounded-lg h-40 mb-4 flex items-center justify-center text-gray-400 text-sm">
-                <div className="text-center">
-                  <div className="w-full h-32 bg-gradient-to-br from-green-50 to-blue-50 rounded-lg flex items-center justify-center">
-                    <span className="text-xs text-gray-400">Origin: {entry.countryOfOrigin} → Destination: US</span>
-                  </div>
+      {activeTab === 'details' && (
+        <div className="flex gap-8">
+          {/* Left: Key fields */}
+          <div className="w-[340px] shrink-0">
+            <div className="space-y-4">
+              {fields.map(([label, value]) => (
+                <div key={label as string} className="flex">
+                  <span className="text-sm text-gray-500 w-[160px] shrink-0">{label}</span>
+                  <span className="text-sm font-semibold text-gray-900">{value}</span>
                 </div>
-              </div>
-
-              {/* Line items table */}
-              {entry.lineItems.length > 0 && (
-                <div className="border border-gray-200 rounded-lg overflow-hidden">
-                  <table className="w-full text-xs">
-                    <thead>
-                      <tr className="bg-gray-50 border-b border-gray-200">
-                        {['Invoice Line No', '7501 Line No', 'Product No', 'Product Value', 'Ad Valorem Rate', 'Duty Amount', 'Surcharge Amount', 'HTS No'].map(h => (
-                          <th key={h} className="text-left py-2 px-2 font-semibold text-gray-500">{h}</th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {entry.lineItems.map((item, i) => (
-                        <tr key={i} className="border-b border-gray-100">
-                          <td className="py-2 px-2 text-gray-700">{item.invoiceLineNo}</td>
-                          <td className="py-2 px-2 text-gray-700">{item.line7501}</td>
-                          <td className="py-2 px-2 text-gray-700">{item.productNo}</td>
-                          <td className="py-2 px-2 text-gray-700">{item.productValue}</td>
-                          <td className="py-2 px-2 text-gray-700">{item.adValoremRate}</td>
-                          <td className="py-2 px-2 text-gray-700">{item.dutyAmount}</td>
-                          <td className="py-2 px-2 text-gray-700">{item.surchargeAmount}</td>
-                          <td className="py-2 px-2 text-gray-700">{item.htsNo}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </>
-          )}
-
-          {activeTab === 'documents' && (
-            <div className="border border-gray-200 rounded-lg overflow-hidden">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="bg-gray-50 border-b border-gray-200">
-                    <th className="text-left py-3 px-4 font-semibold text-gray-500">File Name</th>
-                    <th className="text-left py-3 px-4 font-semibold text-gray-500">Entry Date</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td colSpan={2} className="text-center py-8 text-gray-400 text-sm">No data available to display</td>
-                  </tr>
-                </tbody>
-              </table>
-              <div className="flex items-center justify-end px-4 py-2 border-t border-gray-100 text-xs text-gray-400">
-                Page Size: 15 | 0 to 0 of 0 | Page 0 of 0
-              </div>
+              ))}
             </div>
-          )}
+          </div>
+
+          {/* Right: Map + Line items */}
+          <div className="flex-1 space-y-5">
+            {/* Map placeholder */}
+            <div className="bg-gradient-to-br from-blue-50 to-green-50 border border-gray-200 rounded-lg h-36 flex items-center justify-center">
+              <span className="text-sm text-gray-400">Origin: {entry.countryOfOrigin} &rarr; Destination: US</span>
+            </div>
+
+            {/* Line items */}
+            {entry.lineItems.length > 0 && (
+              <div className="border border-gray-200 rounded-lg overflow-hidden">
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="bg-gray-50 border-b border-gray-200">
+                      {['Invoice Line No', '7501 Line No', 'Product No', 'Product Value', 'Ad Valorem Rate', 'Duty Amount', 'Surcharge Amount', 'HTS No'].map(h => (
+                        <th key={h} className="text-left py-2.5 px-3 font-semibold text-gray-500 whitespace-nowrap">{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {entry.lineItems.map((item: any, i: number) => (
+                      <tr key={i} className="border-b border-gray-100 hover:bg-gray-50">
+                        <td className="py-2 px-3 text-gray-700">{item.invoiceLineNo}</td>
+                        <td className="py-2 px-3 text-gray-700">{item.line7501}</td>
+                        <td className="py-2 px-3 text-gray-700">{item.productNo}</td>
+                        <td className="py-2 px-3 text-gray-700">{item.productValue}</td>
+                        <td className="py-2 px-3 text-gray-700">{item.adValoremRate}</td>
+                        <td className="py-2 px-3 text-gray-700">{item.dutyAmount}</td>
+                        <td className="py-2 px-3 text-gray-700">{item.surchargeAmount}</td>
+                        <td className="py-2 px-3 text-gray-700">{item.htsNo}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      )}
+
+      {activeTab === 'documents' && (
+        <div className="border border-gray-200 rounded-lg">
+          <table className="w-full text-sm">
+            <thead><tr className="bg-gray-50 border-b"><th className="text-left py-3 px-4 font-semibold text-gray-500">File Name</th><th className="text-left py-3 px-4 font-semibold text-gray-500">Entry Date</th></tr></thead>
+            <tbody><tr><td colSpan={2} className="text-center py-10 text-gray-400">No data available to display</td></tr></tbody>
+          </table>
+          <div className="text-right px-4 py-2 text-xs text-gray-400 border-t">Page Size: 15 | 0 to 0 of 0 | Page 0 of 0</div>
+        </div>
+      )}
     </div>
   )
 }

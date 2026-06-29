@@ -1,63 +1,6 @@
 import { useState, useMemo } from 'react'
 import { Search, Filter, Download } from 'lucide-react'
 
-// ─── Inventory alert data ────────────────────────────────────────────────────
-
-const INVENTORY_ALERTS: OrderAlert[] = [
-  {
-    id: 'inv-alert-1',
-    type: 'low-stock',
-    title: '库存不足提醒',
-    message: 'SKU TCORE-CABLE 当前可用库存仅剩 48 件，已低于安全库存阈值（50 件）。建议尽快安排补货，避免影响订单履约。',
-    refId: 'TCORE-CABLE',
-    severity: 'high',
-    actionLabel: '查看详情',
-    actionPath: '/support/item/WI-014',
-    secondaryActionLabel: '安排补货',
-    secondaryActionPath: '/support/requests/new',
-  },
-  {
-    id: 'inv-alert-2',
-    type: 'slow-moving',
-    title: '库存积压预警',
-    message: 'SKU FW-DENIM-001 已在仓库存放超过 180 天无出库记录，当前库存 850 件。持续存储将产生额外费用，建议制定处置计划。',
-    refId: 'FW-DENIM-001',
-    severity: 'medium',
-    actionLabel: '查看处置选项',
-    actionPath: '/support/item/WI-002',
-  },
-  {
-    id: 'inv-alert-3',
-    type: 'data-anomaly',
-    title: '库存数据异常',
-    message: 'SKU FW-2024-BLK 近期多次出库数量与订单预期不符，系统检测到潜在差异。已自动发起盘点请求，您可跟踪处理进度。',
-    refId: 'FW-2024-BLK',
-    severity: 'medium',
-    actionLabel: '跟踪盘点进度',
-    actionPath: '/support/item/WI-024',
-  },
-  {
-    id: 'inv-alert-4',
-    type: 'adjustment-approval',
-    title: '库存调整待确认',
-    message: 'SKU TCORE-CABLE 盘点结果已出：系统 100 件，实盘 96 件，差异 -4 件。请您审批库存调整方案，或选择继续调查。',
-    refId: 'TCORE-CABLE',
-    severity: 'high',
-    actionLabel: '去审批',
-    actionPath: '/support/item/WI-008',
-  },
-  {
-    id: 'inv-alert-5',
-    type: 'low-stock',
-    title: '库存冻结通知',
-    message: 'SKU FW-2024-RED 当前有 300 件处于冻结状态（海关文件待补充），无法正常出库。请尽快补充相关文件以解冻库存。',
-    refId: 'FW-2024-RED',
-    severity: 'high',
-    actionLabel: '查看详情',
-    actionPath: '/support/item/WI-004',
-  },
-]
-
 // ─── Sample inventory data ───────────────────────────────────────────────────
 
 interface InventoryRecord {
