@@ -151,7 +151,10 @@ export default function IntlTracking() {
                 phaseTab === tab.key ? 'border-primary-600 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700'
               }`}>
               {tab.label}
-              {tab.key === 'exception' && count > 0 && <span className="ml-1.5 bg-red-500 text-white text-[9px] font-bold px-1.5 rounded-full">{count}</span>}
+              {tab.key === 'exception' && count > 0
+                ? <span className="ml-1.5 bg-red-500 text-white text-[9px] font-bold px-1.5 rounded-full">{count}</span>
+                : tab.key !== 'exception' && <span className="ml-1 text-[10px] opacity-60">{count}</span>
+              }
             </button>
           )
         })}
