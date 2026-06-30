@@ -52,14 +52,14 @@ export default function IntlTrackingDetail() {
       {/* ═══ Tab 1: Overview (left: summary+stats, right: timeline) ═══ */}
       {activeTab === 'Overview' && (
         <div className="flex gap-5">
-          {/* Left: Summary + Stats */}
-          <div className="w-[340px] shrink-0 space-y-4">
+          {/* Left: Info sidebar - single column */}
+          <div className="w-[280px] shrink-0 space-y-4">
             <div className="bg-white border border-gray-200 rounded-xl p-5">
-              <div className="flex items-start justify-between mb-3">
-                <div><p className="text-[10px] text-gray-400 uppercase">Customer</p><h2 className="text-lg font-bold text-gray-900">{D.customer}</h2></div>
-                <span className="px-2.5 py-0.5 text-[10px] font-semibold bg-blue-100 text-blue-700 rounded-full">{D.status}</span>
+              <div className="flex items-start justify-between mb-4">
+                <div><p className="text-[9px] text-gray-400 uppercase">Customer</p><h2 className="text-lg font-bold text-gray-900">{D.customer}</h2></div>
+                <span className="px-2 py-0.5 text-[10px] font-semibold bg-blue-100 text-blue-700 rounded-full">{D.status}</span>
               </div>
-              <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 text-xs">
+              <div className="space-y-2.5 text-xs">
                 <div><p className="text-[9px] text-gray-400">Shipment No.</p><p className="font-semibold text-gray-900">{D.shipmentNo}</p></div>
                 <div><p className="text-[9px] text-gray-400">HBL</p><p className="font-semibold text-gray-900">{D.hbl}</p></div>
                 <div><p className="text-[9px] text-gray-400">MBL</p><p className="font-semibold text-gray-900">{D.mbl}</p></div>
@@ -72,27 +72,18 @@ export default function IntlTrackingDetail() {
                 <div><p className="text-[9px] text-gray-400">Warehouse ETA</p><p className="font-semibold text-primary-600">{D.whEta}</p></div>
               </div>
             </div>
-            {/* Stats */}
             <div className="bg-white border border-gray-200 rounded-xl p-4"><p className="text-[9px] text-gray-400 uppercase">Cargo Value</p><p className="text-lg font-bold text-gray-900">$31,720</p><p className="text-[9px] text-gray-400">Declared USD</p></div>
             <div className="bg-white border border-gray-200 rounded-xl p-4"><p className="text-[9px] text-gray-400 uppercase">Import Duty</p><p className="text-lg font-bold text-gray-900">$8,991</p><p className="text-[9px] text-gray-400">Incl. Section 301</p></div>
             <div className="bg-white border border-gray-200 rounded-xl p-4"><p className="text-[9px] text-gray-400 uppercase">Weight / Volume</p><p className="text-lg font-bold text-gray-900">{D.totalWeight}</p><p className="text-[9px] text-gray-400">40HC &middot; {D.volume}</p></div>
+            <div className="bg-white border border-gray-200 rounded-xl p-4"><p className="text-[9px] text-gray-400 uppercase">Progress</p><p className="text-lg font-bold text-primary-600">{D.progress}%</p><div className="h-1.5 bg-gray-100 rounded-full mt-1"><div className="h-full bg-green-500 rounded-full" style={{width:`${D.progress}%`}} /></div><p className="text-[9px] text-gray-400 mt-1">Drayage &middot; ETA {D.whEta} Seabrook</p></div>
           </div>
 
-          {/* Right: Progress bar + Business Milestone Timeline */}
+          {/* Right: Business Milestone Timeline */}
           <div className="flex-1">
-            {/* Progress bar at top */}
-            <div className="bg-white border border-green-200 rounded-xl p-4 mb-4">
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-xs font-semibold text-gray-700">Overall Progress</p>
-                <p className="text-sm font-bold text-primary-600">{D.progress}%</p>
-              </div>
-              <div className="h-2 bg-gray-100 rounded-full"><div className="h-full bg-green-500 rounded-full" style={{width:`${D.progress}%`}} /></div>
-              <p className="text-[10px] text-gray-400 mt-1.5">Drayage &middot; ETA {D.whEta} Seabrook</p>
-            </div>
-
-            {/* Timeline with sub-statuses mapped to phases */}
             <div className="bg-white border border-gray-200 rounded-xl p-6">
-              <h3 className="text-sm font-bold text-gray-900 mb-5">Business Milestone Timeline</h3>
+              <div className="flex items-center justify-between mb-5">
+                <h3 className="text-sm font-bold text-gray-900">Business Milestone Timeline</h3>
+              </div>
               {[
                 { stage: 'Supplier Dispatch', id: '', status: 'done', date: 'Apr 15, 2026', location: 'Hai Phong, Vietnam', desc: 'Supplier dispatch completed. Cargo loaded and ready for shipment.', sub: 'WIN WIN CORP', phaseColor: 'border-l-gray-400', statuses: ['Booked'] },
                 { stage: 'International Transportation', id: 'SSGNS2607829', status: 'done', date: 'Apr 22, 2026', location: 'Haiphong, VN', desc: 'Container loaded and vessel departed.', sub: 'WAN HAI A10 / E013 \u00b7 Haiphong, VN \u2192 Savannah, US \u00b7 POD ETA: Jun 13', phaseColor: 'border-l-blue-400', statuses: ['Booked', 'In Transit', 'Arrived'] },
