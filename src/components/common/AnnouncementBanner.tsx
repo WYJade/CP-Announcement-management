@@ -188,60 +188,24 @@ function BannerPopupItem({
           </div>
         )}
 
-        {/* Action Buttons */}
-        {banner.actions && banner.actions.length > 0 && (
-          <div className="flex items-center gap-2 mt-2.5">
-            {banner.actions.map((action) => {
-              const baseClasses =
-                'text-xs font-medium rounded-md transition-colors inline-flex items-center gap-1 cursor-pointer'
-              if (action.variant === 'primary') {
-                return (
-                  <button
-                    key={action.label}
-                    onClick={() => handleActionClick(action)}
-                    className={`${baseClasses} px-3 py-1.5 bg-primary-600 text-white hover:bg-primary-700`}
-                  >
-                    {action.label}
-                  </button>
-                )
-              }
-              if (action.variant === 'secondary') {
-                return (
-                  <button
-                    key={action.label}
-                    onClick={() => handleActionClick(action)}
-                    className={`${baseClasses} px-3 py-1.5 border border-gray-300 text-gray-700 hover:bg-gray-50`}
-                  >
-                    {action.label}
-                  </button>
-                )
-              }
-              return (
-                <button
-                  key={action.label}
-                  onClick={() => handleActionClick(action)}
-                  className={`${baseClasses} text-primary-600 hover:text-primary-700 underline underline-offset-2`}
-                >
-                  {action.label}
-                  <ExternalLink size={10} />
-                </button>
-              )
-            })}
-          </div>
-        )}
-
-        {/* Acknowledge CTA for acknowledge-type banners */}
-        {banner.dismissType === 'acknowledge' && (
-          <div className="mt-2.5">
-            <button
-              onClick={handleAcknowledge}
-              className="text-xs font-medium px-3 py-1.5 bg-gray-800 text-white rounded-md hover:bg-gray-900 transition-colors"
-            >
-              I Acknowledge
-            </button>
-          </div>
-        )}
+        {/* Action Buttons - moved to right side */}
       </div>
+
+      {/* Right: Action Buttons */}
+      {banner.actions && banner.actions.length > 0 && (
+        <div className="flex items-center gap-2 shrink-0">
+          {banner.actions.map((action) => {
+            const baseClasses = 'text-xs font-medium rounded-md transition-colors inline-flex items-center gap-1 cursor-pointer'
+            if (action.variant === 'primary') {
+              return (<button key={action.label} onClick={() => handleActionClick(action)} className={`${baseClasses} px-3 py-1.5 bg-primary-600 text-white hover:bg-primary-700`}>{action.label}</button>)
+            }
+            if (action.variant === 'secondary') {
+              return (<button key={action.label} onClick={() => handleActionClick(action)} className={`${baseClasses} px-3 py-1.5 border border-gray-300 text-gray-700 hover:bg-gray-50`}>{action.label}</button>)
+            }
+            return (<button key={action.label} onClick={() => handleActionClick(action)} className={`${baseClasses} text-primary-600 hover:text-primary-700 underline underline-offset-2`}>{action.label}<ExternalLink size={10} /></button>)
+          })}
+        </div>
+      )}
 
       {/* Close Button */}
       {canDismiss && (
