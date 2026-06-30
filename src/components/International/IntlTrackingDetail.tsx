@@ -28,125 +28,103 @@ const D = {
 }
 
 const TABS = ['Containers & Drayage', 'Items SKUs', 'Customs', 'Documents']
+const MAIN_TABS = ['Overview', 'Milestone Timeline', 'Detail']
 function stageBg(s: string) { return s === 'done' ? 'bg-green-500' : s === 'active' ? 'bg-blue-500 ring-4 ring-blue-100' : 'bg-gray-200' }
 function stageIcon(s: string) { return s === 'done' ? <CheckCircle2 size={14} className="text-white" /> : s === 'active' ? <Truck size={14} className="text-white" /> : <Circle size={12} className="text-gray-400" /> }
 
 export default function IntlTrackingDetail() {
   const navigate = useNavigate()
-  const [activeTab, setActiveTab] = useState(TABS[0])
+  const [activeTab, setActiveTab] = useState(MAIN_TABS[0])
+  const [detailTab, setDetailTab] = useState(TABS[0])
   const [viewDoc, setViewDoc] = useState<string | null>(null)
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
       <button onClick={() => navigate('/international/tracking')} className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 mb-5"><ArrowLeft size={14} /> Back to End-to-End Tracking</button>
 
-      {/* ─── Summary (left) + Stats (right) side by side ─── */}
-      <div className="grid grid-cols-3 gap-5 mb-6">
-        {/* Left: Summary - 2 cols wide */}
-        <div className="col-span-2 bg-white border border-gray-200 rounded-xl p-6">
-          <div className="flex items-start justify-between mb-4">
-            <div><p className="text-[10px] text-gray-400 uppercase tracking-wider">Customer</p><h1 className="text-xl font-bold text-gray-900">{D.customer}</h1></div>
-            <span className="px-3 py-1 text-xs font-semibold bg-blue-100 text-blue-700 rounded-full">{D.status}</span>
-          </div>
-          <div className="grid grid-cols-4 gap-x-5 gap-y-3 text-sm">
-            <div><p className="text-[10px] text-gray-400">Shipment No.</p><p className="font-semibold">{D.shipmentNo}</p></div>
-            <div><p className="text-[10px] text-gray-400">HBL</p><p className="font-semibold">{D.hbl}</p></div>
-            <div><p className="text-[10px] text-gray-400">MBL</p><p className="font-semibold">{D.mbl}</p></div>
-            <div><p className="text-[10px] text-gray-400">Container</p><p className="font-semibold">{D.container}</p></div>
-            <div><p className="text-[10px] text-gray-400">Current Milestone</p><p className="text-gray-700">{D.milestone}</p></div>
-            <div><p className="text-[10px] text-gray-400">Origin</p><p className="text-gray-700">{D.origin}</p></div>
-            <div><p className="text-[10px] text-gray-400">Destination</p><p className="text-gray-700">{D.destination}</p></div>
-            <div><p className="text-[10px] text-gray-400">Carrier / Vessel</p><p className="text-gray-700">{D.vessel}</p></div>
-            <div><p className="text-[10px] text-gray-400">POD ETA</p><p className="text-gray-700">{D.podEta}</p></div>
-            <div><p className="text-[10px] text-gray-400">Warehouse ETA</p><p className="font-semibold text-primary-600">{D.whEta}</p></div>
-          </div>
-        </div>
-
-        {/* Right: Stats - 1 col */}
-        <div className="space-y-3">
-          <div className="bg-white border border-gray-200 rounded-xl p-4">
-            <p className="text-[10px] text-gray-400 uppercase">Cargo Value</p>
-            <p className="text-xl font-bold text-gray-900 mt-0.5">$31,720</p>
-            <p className="text-[10px] text-gray-400">Declared USD</p>
-          </div>
-          <div className="bg-white border border-gray-200 rounded-xl p-4">
-            <p className="text-[10px] text-gray-400 uppercase">Import Duty</p>
-            <p className="text-xl font-bold text-gray-900 mt-0.5">$8,991</p>
-            <p className="text-[10px] text-gray-400">Incl. Section 301</p>
-          </div>
-          <div className="bg-white border border-gray-200 rounded-xl p-4">
-            <p className="text-[10px] text-gray-400 uppercase">Weight / Volume</p>
-            <p className="text-xl font-bold text-gray-900 mt-0.5">{D.totalWeight}</p>
-            <p className="text-[10px] text-gray-400">40HC &middot; {D.volume}</p>
-          </div>
-          <div className="bg-white border border-green-200 rounded-xl p-4">
-            <p className="text-[10px] text-gray-400 uppercase">Progress</p>
-            <p className="text-xl font-bold text-primary-600 mt-0.5">{D.progress}%</p>
-            <div className="h-1.5 bg-gray-100 rounded-full mt-1.5"><div className="h-full bg-green-500 rounded-full" style={{width:`${D.progress}%`}} /></div>
-            <p className="text-[10px] text-gray-400 mt-1.5">Drayage &middot; ETA {D.whEta} Seabrook</p>
-          </div>
-        </div>
-      </div>
-
-      {/* ─── Business Milestone Timeline ─── */}
-      <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
-        <h3 className="text-sm font-bold text-gray-900 mb-5">Business Milestone Timeline</h3>
-        {[
-          { stage: 'Supplier Dispatch', id: '', status: 'done', date: 'Apr 15, 2026', location: 'Hai Phong, Vietnam', desc: 'Supplier dispatch completed. Cargo loaded and ready for shipment.', sub: 'WIN WIN CORP' },
-          { stage: 'International Transportation', id: 'SSGNS2607829', status: 'done', date: 'Apr 22, 2026', location: 'Haiphong, VN', desc: 'Container loaded and vessel departed.', sub: 'WAN HAI A10 / E013 \u00b7 Haiphong, VN \u2192 Savannah, US \u00b7 POD ETA: Jun 13' },
-          { stage: 'Customs Clearance', id: '82G-0101679-0', status: 'done', date: 'Jun 10, 2026', location: 'Savannah, GA', desc: 'Customs entry released. All documents cleared.', sub: 'Broker: JFS' },
-          { stage: 'Drayage', id: 'UNIS_SAV_M012771', status: 'active', date: 'Jun 19, 2026 (ETA)', location: 'Garden City Terminal \u2192 UNIS Seabrook', desc: 'Container scheduled for pickup and delivery to warehouse.', sub: '' },
-          { stage: 'Warehouse Receiving', id: 'RN-38199', status: 'pending', date: 'TBD (~Jun 21)', location: 'UNIS Seabrook', desc: 'Awaiting container arrival for unloading and receiving.', sub: 'Expected: 782 EA' },
-        ].map((step, i, arr) => (
-          <div key={i} className="flex">
-            <div className="flex flex-col items-center mr-4">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${stageBg(step.status)}`}>{stageIcon(step.status)}</div>
-              {i < arr.length - 1 && <div className={`w-0.5 flex-1 ${step.status === 'done' ? 'bg-green-300' : 'bg-gray-200'}`} />}
-            </div>
-            <div className="flex-1 pb-6">
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-semibold text-gray-900">{step.stage}</span>
-                {step.id && <span className="text-[11px] font-mono text-primary-600 bg-primary-50 px-1.5 py-0.5 rounded">{step.id}</span>}
-                <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${step.status === 'done' ? 'bg-green-100 text-green-700' : step.status === 'active' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500'}`}>{step.status === 'done' ? 'Completed' : step.status === 'active' ? 'In Progress' : 'Pending'}</span>
-              </div>
-              <p className="text-xs text-gray-500 mt-1">{step.desc}</p>
-              {step.sub && <p className="text-[11px] text-gray-400 mt-0.5">{step.sub}</p>}
-            </div>
-            <div className="shrink-0 text-right pl-4 pt-0.5">
-              <p className="text-xs text-gray-500">{step.date}</p>
-              {step.location && <p className="text-[10px] text-gray-400 mt-0.5">{step.location}</p>}
-            </div>
-          </div>
+      {/* Main 3 Tabs */}
+      <div className="flex gap-6 mb-5 border-b border-gray-200">
+        {MAIN_TABS.map(tab => (
+          <button key={tab} onClick={() => setActiveTab(tab)} className={`pb-2.5 text-sm font-semibold border-b-2 transition-colors ${activeTab === tab ? 'border-primary-600 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>{tab}</button>
         ))}
       </div>
 
-      {/* ─── Tabs as anchors ─── */}
-      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-        <div className="flex border-b border-gray-200 sticky top-14 bg-white z-10">{TABS.map(tab=>(<a key={tab} href={`#${tab.split(' ').join('-').split('/').join('-').toLowerCase()}`} className={`px-5 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab===tab?'border-primary-600 text-primary-600':'border-transparent text-gray-500 hover:text-gray-700'}`} onClick={()=>setActiveTab(tab)}>{tab}</a>))}</div>
-
-        {/* All sections displayed */}
-        <div className="p-5 space-y-8">
-          <section id="containers-&-drayage">
-            <h4 className="text-sm font-bold text-gray-900 mb-3">Containers & Drayage</h4>
-            <table className="w-full text-xs"><thead><tr className="bg-gray-50 border-b">{['Container No.','Size','Seal','Drayage Load No.','Status','Pickup Terminal','Dest. Warehouse','LFD','Delivery ETA','Delivered'].map(h=>(<th key={h} className="text-left py-2.5 px-3 font-semibold text-gray-500">{h}</th>))}</tr></thead><tbody>{D.containers.map((c,i)=>(<tr key={i} className="border-b border-gray-100"><td className="py-2.5 px-3 font-mono">{c.containerNo}</td><td className="py-2.5 px-3">{c.size}</td><td className="py-2.5 px-3">{c.seal}</td><td className="py-2.5 px-3 text-primary-600 font-medium cursor-pointer hover:underline" onClick={()=>navigate(`/international/drayage/${c.loadNo}`)}>{c.loadNo}</td><td className="py-2.5 px-3">{c.drayageStatus}</td><td className="py-2.5 px-3">{c.pickupTerminal}</td><td className="py-2.5 px-3">{c.destWarehouse}</td><td className="py-2.5 px-3">{c.lfd}</td><td className="py-2.5 px-3">{c.deliveryEta}</td><td className="py-2.5 px-3">{c.deliveredTime}</td></tr>))}</tbody></table>
-          </section>
-
-          <section id="items-skus">
-            <h4 className="text-sm font-bold text-gray-900 mb-3">Items / SKUs</h4>
-            <table className="w-full text-xs"><thead><tr className="bg-gray-50 border-b">{['SKU','Product Name','Variant','Expected','Received','Diff','Damaged','Unit','Status'].map(h=>(<th key={h} className="text-left py-2.5 px-3 font-semibold text-gray-500">{h}</th>))}</tr></thead><tbody>{D.items.map((item,i)=>(<tr key={i} className="border-b border-gray-100"><td className="py-2.5 px-3 font-mono text-primary-600">{item.sku}</td><td className="py-2.5 px-3">{item.name}</td><td className="py-2.5 px-3">{item.variant}</td><td className="py-2.5 px-3 font-medium">{item.expected}</td><td className="py-2.5 px-3 text-green-600 font-medium">{item.received}</td><td className="py-2.5 px-3 text-orange-600">{item.diff}</td><td className="py-2.5 px-3 text-red-600">{item.damaged}</td><td className="py-2.5 px-3">{item.unit}</td><td className="py-2.5 px-3"><span className={item.status==='Received'?'text-green-600 font-medium':'text-gray-500'}>{item.status}</span></td></tr>))}</tbody></table>
-          </section>
-
-          <section id="customs">
-            <h4 className="text-sm font-bold text-gray-900 mb-3">Customs</h4>
-            <div className="grid grid-cols-3 gap-4 text-sm">{[['Customs Status','Released'],['Entry No.','82G-0101679-0'],['Port of Entry','Savannah, GA'],['Release Date','Jun 10, 2026'],['Customs Broker','JFS'],['Document Status','Completed'],['Exam Status','No Exam'],['Hold Reason','None'],['Required Action','None']].map(([l,v])=>(<div key={l}><p className="text-[10px] text-gray-400">{l}</p><p className="font-medium text-gray-900">{v}</p></div>))}</div>
-          </section>
-
-          <section id="documents">
-            <h4 className="text-sm font-bold text-gray-900 mb-3">Documents</h4>
-            <table className="w-full text-xs"><thead><tr className="bg-gray-50 border-b">{['Document Type','Document No.','File Name','Status','Updated','Action'].map(h=>(<th key={h} className="text-left py-2.5 px-3 font-semibold text-gray-500">{h}</th>))}</tr></thead><tbody>{D.documents.map((doc,i)=>(<tr key={i} className="border-b border-gray-100 hover:bg-gray-50"><td className="py-2.5 px-3 font-medium">{doc.type}</td><td className="py-2.5 px-3">{doc.docNo}</td><td className="py-2.5 px-3">{doc.fileName?<button onClick={()=>setViewDoc(doc.fileName)} className="text-primary-600 hover:underline font-medium">{doc.fileName}</button>:<span className="text-gray-400">-</span>}</td><td className="py-2.5 px-3"><span className={doc.status==='Available'?'text-green-600 font-medium':'text-gray-400'}>{doc.status}</span></td><td className="py-2.5 px-3">{doc.time}</td><td className="py-2.5 px-3">{doc.status==='Available'&&<button onClick={()=>setViewDoc(doc.fileName)} className="flex items-center gap-1 text-primary-600 hover:underline font-medium"><Eye size={11}/>View</button>}</td></tr>))}</tbody></table>
-          </section>
+      {/* ═══ Tab 1: Overview ═══ */}
+      {activeTab === 'Overview' && (
+        <div className="grid grid-cols-3 gap-5">
+          <div className="col-span-2 bg-white border border-gray-200 rounded-xl p-6">
+            <div className="flex items-start justify-between mb-4">
+              <div><p className="text-[10px] text-gray-400 uppercase tracking-wider">Customer</p><h1 className="text-xl font-bold text-gray-900">{D.customer}</h1></div>
+              <span className="px-3 py-1 text-xs font-semibold bg-blue-100 text-blue-700 rounded-full">{D.status}</span>
+            </div>
+            <div className="grid grid-cols-4 gap-x-5 gap-y-3 text-sm">
+              <div><p className="text-[10px] text-gray-400">Shipment No.</p><p className="font-semibold">{D.shipmentNo}</p></div>
+              <div><p className="text-[10px] text-gray-400">HBL</p><p className="font-semibold">{D.hbl}</p></div>
+              <div><p className="text-[10px] text-gray-400">MBL</p><p className="font-semibold">{D.mbl}</p></div>
+              <div><p className="text-[10px] text-gray-400">Container</p><p className="font-semibold">{D.container}</p></div>
+              <div><p className="text-[10px] text-gray-400">Current Milestone</p><p className="text-gray-700">{D.milestone}</p></div>
+              <div><p className="text-[10px] text-gray-400">Origin</p><p className="text-gray-700">{D.origin}</p></div>
+              <div><p className="text-[10px] text-gray-400">Destination</p><p className="text-gray-700">{D.destination}</p></div>
+              <div><p className="text-[10px] text-gray-400">Carrier / Vessel</p><p className="text-gray-700">{D.vessel}</p></div>
+              <div><p className="text-[10px] text-gray-400">POD ETA</p><p className="text-gray-700">{D.podEta}</p></div>
+              <div><p className="text-[10px] text-gray-400">Warehouse ETA</p><p className="font-semibold text-primary-600">{D.whEta}</p></div>
+            </div>
+          </div>
+          <div className="space-y-3">
+            <div className="bg-white border border-gray-200 rounded-xl p-4"><p className="text-[10px] text-gray-400 uppercase">Cargo Value</p><p className="text-xl font-bold text-gray-900 mt-0.5">$31,720</p><p className="text-[10px] text-gray-400">Declared USD</p></div>
+            <div className="bg-white border border-gray-200 rounded-xl p-4"><p className="text-[10px] text-gray-400 uppercase">Import Duty</p><p className="text-xl font-bold text-gray-900 mt-0.5">$8,991</p><p className="text-[10px] text-gray-400">Incl. Section 301</p></div>
+            <div className="bg-white border border-gray-200 rounded-xl p-4"><p className="text-[10px] text-gray-400 uppercase">Weight / Volume</p><p className="text-xl font-bold text-gray-900 mt-0.5">{D.totalWeight}</p><p className="text-[10px] text-gray-400">40HC &middot; {D.volume}</p></div>
+            <div className="bg-white border border-green-200 rounded-xl p-4"><p className="text-[10px] text-gray-400 uppercase">Progress</p><p className="text-xl font-bold text-primary-600 mt-0.5">{D.progress}%</p><div className="h-1.5 bg-gray-100 rounded-full mt-1.5"><div className="h-full bg-green-500 rounded-full" style={{width:`${D.progress}%`}} /></div><p className="text-[10px] text-gray-400 mt-1.5">Drayage &middot; ETA {D.whEta} Seabrook</p></div>
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* ═══ Tab 2: Milestone Timeline ═══ */}
+      {activeTab === 'Milestone Timeline' && (
+        <div className="bg-white border border-gray-200 rounded-xl p-6">
+          <h3 className="text-sm font-bold text-gray-900 mb-5">Business Milestone Timeline</h3>
+          {[
+            { stage: 'Supplier Dispatch', id: '', status: 'done', date: 'Apr 15, 2026', location: 'Hai Phong, Vietnam', desc: 'Supplier dispatch completed. Cargo loaded and ready for shipment.', sub: 'WIN WIN CORP' },
+            { stage: 'International Transportation', id: 'SSGNS2607829', status: 'done', date: 'Apr 22, 2026', location: 'Haiphong, VN', desc: 'Container loaded and vessel departed.', sub: 'WAN HAI A10 / E013 \u00b7 Haiphong, VN \u2192 Savannah, US \u00b7 POD ETA: Jun 13' },
+            { stage: 'Customs Clearance', id: '82G-0101679-0', status: 'done', date: 'Jun 10, 2026', location: 'Savannah, GA', desc: 'Customs entry released. All documents cleared.', sub: 'Broker: JFS' },
+            { stage: 'Drayage', id: 'UNIS_SAV_M012771', status: 'active', date: 'Jun 19, 2026 (ETA)', location: 'Garden City Terminal \u2192 UNIS Seabrook', desc: 'Container scheduled for pickup and delivery to warehouse.', sub: '' },
+            { stage: 'Warehouse Receiving', id: 'RN-38199', status: 'pending', date: 'TBD (~Jun 21)', location: 'UNIS Seabrook', desc: 'Awaiting container arrival for unloading and receiving.', sub: 'Expected: 782 EA' },
+          ].map((step, i, arr) => (
+            <div key={i} className="flex">
+              <div className="flex flex-col items-center mr-4">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${stageBg(step.status)}`}>{stageIcon(step.status)}</div>
+                {i < arr.length - 1 && <div className={`w-0.5 flex-1 ${step.status === 'done' ? 'bg-green-300' : 'bg-gray-200'}`} />}
+              </div>
+              <div className="flex-1 pb-6">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-semibold text-gray-900">{step.stage}</span>
+                  {step.id && <span className="text-[11px] font-mono text-primary-600 bg-primary-50 px-1.5 py-0.5 rounded">{step.id}</span>}
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${step.status === 'done' ? 'bg-green-100 text-green-700' : step.status === 'active' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500'}`}>{step.status === 'done' ? 'Completed' : step.status === 'active' ? 'In Progress' : 'Pending'}</span>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">{step.desc}</p>
+                {step.sub && <p className="text-[11px] text-gray-400 mt-0.5">{step.sub}</p>}
+              </div>
+              <div className="shrink-0 text-right pl-4 pt-0.5">
+                <p className="text-xs text-gray-500">{step.date}</p>
+                {step.location && <p className="text-[10px] text-gray-400 mt-0.5">{step.location}</p>}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ═══ Tab 3: Detail (with sub-tabs) ═══ */}
+      {activeTab === 'Detail' && (
+        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+          <div className="flex border-b border-gray-200">{TABS.map(tab=>(<button key={tab} onClick={()=>setDetailTab(tab)} className={`px-5 py-3 text-sm font-medium border-b-2 transition-colors ${detailTab===tab?'border-primary-600 text-primary-600':'border-transparent text-gray-500 hover:text-gray-700'}`}>{tab}</button>))}</div>
+          <div className="p-5">
+            {detailTab==='Containers & Drayage'&&(<table className="w-full text-xs"><thead><tr className="bg-gray-50 border-b">{['Container No.','Size','Seal','Drayage Load No.','Status','Pickup Terminal','Dest. Warehouse','LFD','Delivery ETA','Delivered'].map(h=>(<th key={h} className="text-left py-2.5 px-3 font-semibold text-gray-500">{h}</th>))}</tr></thead><tbody>{D.containers.map((c,i)=>(<tr key={i} className="border-b border-gray-100"><td className="py-2.5 px-3 font-mono">{c.containerNo}</td><td className="py-2.5 px-3">{c.size}</td><td className="py-2.5 px-3">{c.seal}</td><td className="py-2.5 px-3 text-primary-600 font-medium cursor-pointer hover:underline" onClick={()=>navigate(`/international/drayage/${c.loadNo}`)}>{c.loadNo}</td><td className="py-2.5 px-3">{c.drayageStatus}</td><td className="py-2.5 px-3">{c.pickupTerminal}</td><td className="py-2.5 px-3">{c.destWarehouse}</td><td className="py-2.5 px-3">{c.lfd}</td><td className="py-2.5 px-3">{c.deliveryEta}</td><td className="py-2.5 px-3">{c.deliveredTime}</td></tr>))}</tbody></table>)}
+            {detailTab==='Items SKUs'&&(<table className="w-full text-xs"><thead><tr className="bg-gray-50 border-b">{['SKU','Product Name','Variant','Expected','Received','Diff','Damaged','Unit','Status'].map(h=>(<th key={h} className="text-left py-2.5 px-3 font-semibold text-gray-500">{h}</th>))}</tr></thead><tbody>{D.items.map((item,i)=>(<tr key={i} className="border-b border-gray-100"><td className="py-2.5 px-3 font-mono text-primary-600">{item.sku}</td><td className="py-2.5 px-3">{item.name}</td><td className="py-2.5 px-3">{item.variant}</td><td className="py-2.5 px-3 font-medium">{item.expected}</td><td className="py-2.5 px-3 text-green-600 font-medium">{item.received}</td><td className="py-2.5 px-3 text-orange-600">{item.diff}</td><td className="py-2.5 px-3 text-red-600">{item.damaged}</td><td className="py-2.5 px-3">{item.unit}</td><td className="py-2.5 px-3"><span className="text-green-600 font-medium">{item.status}</span></td></tr>))}</tbody></table>)}
+            {detailTab==='Customs'&&(<div className="grid grid-cols-3 gap-4 text-sm">{[['Customs Status','Released'],['Entry No.','82G-0101679-0'],['Port of Entry','Savannah, GA'],['Release Date','Jun 10, 2026'],['Customs Broker','JFS'],['Document Status','Completed'],['Exam Status','No Exam'],['Hold Reason','None'],['Required Action','None']].map(([l,v])=>(<div key={l}><p className="text-[10px] text-gray-400">{l}</p><p className="font-medium text-gray-900">{v}</p></div>))}</div>)}
+            {detailTab==='Documents'&&(<table className="w-full text-xs"><thead><tr className="bg-gray-50 border-b">{['Document Type','Document No.','File Name','Status','Updated','Action'].map(h=>(<th key={h} className="text-left py-2.5 px-3 font-semibold text-gray-500">{h}</th>))}</tr></thead><tbody>{D.documents.map((doc,i)=>(<tr key={i} className="border-b border-gray-100 hover:bg-gray-50"><td className="py-2.5 px-3 font-medium">{doc.type}</td><td className="py-2.5 px-3">{doc.docNo}</td><td className="py-2.5 px-3">{doc.fileName?<button onClick={()=>setViewDoc(doc.fileName)} className="text-primary-600 hover:underline font-medium">{doc.fileName}</button>:<span className="text-gray-400">-</span>}</td><td className="py-2.5 px-3"><span className={doc.status==='Available'?'text-green-600 font-medium':'text-gray-400'}>{doc.status}</span></td><td className="py-2.5 px-3">{doc.time}</td><td className="py-2.5 px-3">{doc.status==='Available'&&<button onClick={()=>setViewDoc(doc.fileName)} className="text-primary-600 hover:underline font-medium flex items-center gap-1"><Eye size={11}/>View</button>}</td></tr>))}</tbody></table>)}
+          </div>
+        </div>
+      )}
 
       {/* Doc preview modal */}
       {viewDoc&&(<div className="fixed inset-0 bg-black bg-opacity-40 z-50 flex items-center justify-center p-8" onClick={()=>setViewDoc(null)}><div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl" onClick={e=>e.stopPropagation()}><div className="px-5 py-4 border-b flex items-center justify-between"><h3 className="text-sm font-semibold">{viewDoc}</h3><button onClick={()=>setViewDoc(null)} className="text-gray-400 hover:text-gray-600 text-sm">Close</button></div><div className="p-6"><div className="border rounded-lg bg-gray-50 h-48 flex items-center justify-center text-gray-400 text-sm">Document preview</div></div></div></div>)}
