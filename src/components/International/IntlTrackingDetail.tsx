@@ -52,8 +52,8 @@ export default function IntlTrackingDetail() {
       {/* ═══ Tab 1: Overview (left: summary+stats, right: timeline) ═══ */}
       {activeTab === 'Overview' && (
         <div className="flex gap-5">
-          {/* Left: Info sidebar - single column */}
-          <div className="w-[280px] shrink-0 space-y-4">
+          {/* Left: Info sidebar - single column, resizable */}
+          <div className="w-[280px] shrink-0 space-y-4 overflow-auto resize-x min-w-[220px] max-w-[400px] pr-2" style={{resize:'horizontal'}}>
             <div className="bg-white border border-gray-200 rounded-xl p-5">
               <div className="flex items-start justify-between mb-4">
                 <div><p className="text-[9px] text-gray-400 uppercase">Customer</p><h2 className="text-lg font-bold text-gray-900">{D.customer}</h2></div>
@@ -75,11 +75,20 @@ export default function IntlTrackingDetail() {
             <div className="bg-white border border-gray-200 rounded-xl p-4"><p className="text-[9px] text-gray-400 uppercase">Cargo Value</p><p className="text-lg font-bold text-gray-900">$31,720</p><p className="text-[9px] text-gray-400">Declared USD</p></div>
             <div className="bg-white border border-gray-200 rounded-xl p-4"><p className="text-[9px] text-gray-400 uppercase">Import Duty</p><p className="text-lg font-bold text-gray-900">$8,991</p><p className="text-[9px] text-gray-400">Incl. Section 301</p></div>
             <div className="bg-white border border-gray-200 rounded-xl p-4"><p className="text-[9px] text-gray-400 uppercase">Weight / Volume</p><p className="text-lg font-bold text-gray-900">{D.totalWeight}</p><p className="text-[9px] text-gray-400">40HC &middot; {D.volume}</p></div>
-            <div className="bg-white border border-gray-200 rounded-xl p-4"><p className="text-[9px] text-gray-400 uppercase">Progress</p><p className="text-lg font-bold text-primary-600">{D.progress}%</p><div className="h-1.5 bg-gray-100 rounded-full mt-1"><div className="h-full bg-green-500 rounded-full" style={{width:`${D.progress}%`}} /></div><p className="text-[9px] text-gray-400 mt-1">Drayage &middot; ETA {D.whEta} Seabrook</p></div>
           </div>
 
           {/* Right: Business Milestone Timeline */}
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
+            {/* Progress bar - same width as timeline */}
+            <div className="bg-white border border-green-200 rounded-xl p-4 mb-4">
+              <div className="flex items-center justify-between mb-1.5">
+                <p className="text-xs font-semibold text-gray-700">Overall Progress</p>
+                <p className="text-sm font-bold text-primary-600">{D.progress}%</p>
+              </div>
+              <div className="h-2 bg-gray-100 rounded-full"><div className="h-full bg-green-500 rounded-full transition-all" style={{width:`${D.progress}%`}} /></div>
+              <p className="text-[10px] text-gray-400 mt-1.5">Drayage &middot; ETA {D.whEta} Seabrook</p>
+            </div>
+
             <div className="bg-white border border-gray-200 rounded-xl p-6">
               <div className="flex items-center justify-between mb-5">
                 <h3 className="text-sm font-bold text-gray-900">Business Milestone Timeline</h3>
