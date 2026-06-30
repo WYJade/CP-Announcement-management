@@ -28,7 +28,7 @@ const D = {
 }
 
 const TABS = ['Containers & Drayage', 'Items SKUs', 'Customs', 'Documents']
-const MAIN_TABS = ['Overview', 'Milestone Timeline', 'Detail']
+const MAIN_TABS = ['Overview', 'Detail']
 function stageBg(s: string) { return s === 'done' ? 'bg-green-500' : s === 'active' ? 'bg-blue-500 ring-4 ring-blue-100' : 'bg-gray-200' }
 function stageIcon(s: string) { return s === 'done' ? <CheckCircle2 size={14} className="text-white" /> : s === 'active' ? <Truck size={14} className="text-white" /> : <Circle size={12} className="text-gray-400" /> }
 
@@ -49,67 +49,67 @@ export default function IntlTrackingDetail() {
         ))}
       </div>
 
-      {/* ═══ Tab 1: Overview ═══ */}
+      {/* ═══ Tab 1: Overview (left: summary+stats, right: timeline) ═══ */}
       {activeTab === 'Overview' && (
-        <div className="grid grid-cols-3 gap-5">
-          <div className="col-span-2 bg-white border border-gray-200 rounded-xl p-6">
-            <div className="flex items-start justify-between mb-4">
-              <div><p className="text-[10px] text-gray-400 uppercase tracking-wider">Customer</p><h1 className="text-xl font-bold text-gray-900">{D.customer}</h1></div>
-              <span className="px-3 py-1 text-xs font-semibold bg-blue-100 text-blue-700 rounded-full">{D.status}</span>
+        <div className="flex gap-5">
+          {/* Left: Summary + Stats */}
+          <div className="w-[340px] shrink-0 space-y-4">
+            <div className="bg-white border border-gray-200 rounded-xl p-5">
+              <div className="flex items-start justify-between mb-3">
+                <div><p className="text-[10px] text-gray-400 uppercase">Customer</p><h2 className="text-lg font-bold text-gray-900">{D.customer}</h2></div>
+                <span className="px-2.5 py-0.5 text-[10px] font-semibold bg-blue-100 text-blue-700 rounded-full">{D.status}</span>
+              </div>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 text-xs">
+                <div><p className="text-[9px] text-gray-400">Shipment No.</p><p className="font-semibold text-gray-900">{D.shipmentNo}</p></div>
+                <div><p className="text-[9px] text-gray-400">HBL</p><p className="font-semibold text-gray-900">{D.hbl}</p></div>
+                <div><p className="text-[9px] text-gray-400">MBL</p><p className="font-semibold text-gray-900">{D.mbl}</p></div>
+                <div><p className="text-[9px] text-gray-400">Container</p><p className="font-semibold text-gray-900">{D.container}</p></div>
+                <div><p className="text-[9px] text-gray-400">Origin</p><p className="text-gray-700">{D.origin}</p></div>
+                <div><p className="text-[9px] text-gray-400">Destination</p><p className="text-gray-700">{D.destination}</p></div>
+                <div><p className="text-[9px] text-gray-400">Carrier / Vessel</p><p className="text-gray-700">{D.vessel}</p></div>
+                <div><p className="text-[9px] text-gray-400">Current Milestone</p><p className="text-gray-700">{D.milestone}</p></div>
+                <div><p className="text-[9px] text-gray-400">POD ETA</p><p className="text-gray-700">{D.podEta}</p></div>
+                <div><p className="text-[9px] text-gray-400">Warehouse ETA</p><p className="font-semibold text-primary-600">{D.whEta}</p></div>
+              </div>
             </div>
-            <div className="grid grid-cols-4 gap-x-5 gap-y-3 text-sm">
-              <div><p className="text-[10px] text-gray-400">Shipment No.</p><p className="font-semibold">{D.shipmentNo}</p></div>
-              <div><p className="text-[10px] text-gray-400">HBL</p><p className="font-semibold">{D.hbl}</p></div>
-              <div><p className="text-[10px] text-gray-400">MBL</p><p className="font-semibold">{D.mbl}</p></div>
-              <div><p className="text-[10px] text-gray-400">Container</p><p className="font-semibold">{D.container}</p></div>
-              <div><p className="text-[10px] text-gray-400">Current Milestone</p><p className="text-gray-700">{D.milestone}</p></div>
-              <div><p className="text-[10px] text-gray-400">Origin</p><p className="text-gray-700">{D.origin}</p></div>
-              <div><p className="text-[10px] text-gray-400">Destination</p><p className="text-gray-700">{D.destination}</p></div>
-              <div><p className="text-[10px] text-gray-400">Carrier / Vessel</p><p className="text-gray-700">{D.vessel}</p></div>
-              <div><p className="text-[10px] text-gray-400">POD ETA</p><p className="text-gray-700">{D.podEta}</p></div>
-              <div><p className="text-[10px] text-gray-400">Warehouse ETA</p><p className="font-semibold text-primary-600">{D.whEta}</p></div>
-            </div>
+            {/* Stats */}
+            <div className="bg-white border border-gray-200 rounded-xl p-4"><p className="text-[9px] text-gray-400 uppercase">Cargo Value</p><p className="text-lg font-bold text-gray-900">$31,720</p><p className="text-[9px] text-gray-400">Declared USD</p></div>
+            <div className="bg-white border border-gray-200 rounded-xl p-4"><p className="text-[9px] text-gray-400 uppercase">Import Duty</p><p className="text-lg font-bold text-gray-900">$8,991</p><p className="text-[9px] text-gray-400">Incl. Section 301</p></div>
+            <div className="bg-white border border-gray-200 rounded-xl p-4"><p className="text-[9px] text-gray-400 uppercase">Weight / Volume</p><p className="text-lg font-bold text-gray-900">{D.totalWeight}</p><p className="text-[9px] text-gray-400">40HC &middot; {D.volume}</p></div>
+            <div className="bg-white border border-green-200 rounded-xl p-4"><p className="text-[9px] text-gray-400 uppercase">Progress</p><p className="text-lg font-bold text-primary-600">{D.progress}%</p><div className="h-1.5 bg-gray-100 rounded-full mt-1"><div className="h-full bg-green-500 rounded-full" style={{width:`${D.progress}%`}} /></div><p className="text-[9px] text-gray-400 mt-1">Drayage &middot; ETA {D.whEta} Seabrook</p></div>
           </div>
-          <div className="space-y-3">
-            <div className="bg-white border border-gray-200 rounded-xl p-4"><p className="text-[10px] text-gray-400 uppercase">Cargo Value</p><p className="text-xl font-bold text-gray-900 mt-0.5">$31,720</p><p className="text-[10px] text-gray-400">Declared USD</p></div>
-            <div className="bg-white border border-gray-200 rounded-xl p-4"><p className="text-[10px] text-gray-400 uppercase">Import Duty</p><p className="text-xl font-bold text-gray-900 mt-0.5">$8,991</p><p className="text-[10px] text-gray-400">Incl. Section 301</p></div>
-            <div className="bg-white border border-gray-200 rounded-xl p-4"><p className="text-[10px] text-gray-400 uppercase">Weight / Volume</p><p className="text-xl font-bold text-gray-900 mt-0.5">{D.totalWeight}</p><p className="text-[10px] text-gray-400">40HC &middot; {D.volume}</p></div>
-            <div className="bg-white border border-green-200 rounded-xl p-4"><p className="text-[10px] text-gray-400 uppercase">Progress</p><p className="text-xl font-bold text-primary-600 mt-0.5">{D.progress}%</p><div className="h-1.5 bg-gray-100 rounded-full mt-1.5"><div className="h-full bg-green-500 rounded-full" style={{width:`${D.progress}%`}} /></div><p className="text-[10px] text-gray-400 mt-1.5">Drayage &middot; ETA {D.whEta} Seabrook</p></div>
-          </div>
-        </div>
-      )}
 
-      {/* ═══ Tab 2: Milestone Timeline ═══ */}
-      {activeTab === 'Milestone Timeline' && (
-        <div className="bg-white border border-gray-200 rounded-xl p-6">
-          <h3 className="text-sm font-bold text-gray-900 mb-5">Business Milestone Timeline</h3>
-          {[
-            { stage: 'Supplier Dispatch', id: '', status: 'done', date: 'Apr 15, 2026', location: 'Hai Phong, Vietnam', desc: 'Supplier dispatch completed. Cargo loaded and ready for shipment.', sub: 'WIN WIN CORP' },
-            { stage: 'International Transportation', id: 'SSGNS2607829', status: 'done', date: 'Apr 22, 2026', location: 'Haiphong, VN', desc: 'Container loaded and vessel departed.', sub: 'WAN HAI A10 / E013 \u00b7 Haiphong, VN \u2192 Savannah, US \u00b7 POD ETA: Jun 13' },
-            { stage: 'Customs Clearance', id: '82G-0101679-0', status: 'done', date: 'Jun 10, 2026', location: 'Savannah, GA', desc: 'Customs entry released. All documents cleared.', sub: 'Broker: JFS' },
-            { stage: 'Drayage', id: 'UNIS_SAV_M012771', status: 'active', date: 'Jun 19, 2026 (ETA)', location: 'Garden City Terminal \u2192 UNIS Seabrook', desc: 'Container scheduled for pickup and delivery to warehouse.', sub: '' },
-            { stage: 'Warehouse Receiving', id: 'RN-38199', status: 'pending', date: 'TBD (~Jun 21)', location: 'UNIS Seabrook', desc: 'Awaiting container arrival for unloading and receiving.', sub: 'Expected: 782 EA' },
-          ].map((step, i, arr) => (
-            <div key={i} className="flex">
-              <div className="flex flex-col items-center mr-4">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${stageBg(step.status)}`}>{stageIcon(step.status)}</div>
-                {i < arr.length - 1 && <div className={`w-0.5 flex-1 ${step.status === 'done' ? 'bg-green-300' : 'bg-gray-200'}`} />}
-              </div>
-              <div className="flex-1 pb-6">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-semibold text-gray-900">{step.stage}</span>
-                  {step.id && <span className="text-[11px] font-mono text-primary-600 bg-primary-50 px-1.5 py-0.5 rounded">{step.id}</span>}
-                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${step.status === 'done' ? 'bg-green-100 text-green-700' : step.status === 'active' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500'}`}>{step.status === 'done' ? 'Completed' : step.status === 'active' ? 'In Progress' : 'Pending'}</span>
+          {/* Right: Business Milestone Timeline */}
+          <div className="flex-1 bg-white border border-gray-200 rounded-xl p-6">
+            <h3 className="text-sm font-bold text-gray-900 mb-5">Business Milestone Timeline</h3>
+            {[
+              { stage: 'Supplier Dispatch', id: '', status: 'done', date: 'Apr 15, 2026', location: 'Hai Phong, Vietnam', desc: 'Supplier dispatch completed. Cargo loaded and ready for shipment.', sub: 'WIN WIN CORP' },
+              { stage: 'International Transportation', id: 'SSGNS2607829', status: 'done', date: 'Apr 22, 2026', location: 'Haiphong, VN', desc: 'Container loaded and vessel departed.', sub: 'WAN HAI A10 / E013 \u00b7 Haiphong, VN \u2192 Savannah, US \u00b7 POD ETA: Jun 13' },
+              { stage: 'Customs Clearance', id: '82G-0101679-0', status: 'done', date: 'Jun 10, 2026', location: 'Savannah, GA', desc: 'Customs entry released. All documents cleared.', sub: 'Broker: JFS' },
+              { stage: 'Drayage', id: 'UNIS_SAV_M012771', status: 'active', date: 'Jun 19, 2026 (ETA)', location: 'Garden City Terminal \u2192 UNIS Seabrook', desc: 'Container scheduled for pickup and delivery to warehouse.', sub: '' },
+              { stage: 'Warehouse Receiving', id: 'RN-38199', status: 'pending', date: 'TBD (~Jun 21)', location: 'UNIS Seabrook', desc: 'Awaiting container arrival for unloading and receiving.', sub: 'Expected: 782 EA' },
+            ].map((step, i, arr) => (
+              <div key={i} className="flex">
+                <div className="flex flex-col items-center mr-4">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${stageBg(step.status)}`}>{stageIcon(step.status)}</div>
+                  {i < arr.length - 1 && <div className={`w-0.5 flex-1 ${step.status === 'done' ? 'bg-green-300' : 'bg-gray-200'}`} />}
                 </div>
-                <p className="text-xs text-gray-500 mt-1">{step.desc}</p>
-                {step.sub && <p className="text-[11px] text-gray-400 mt-0.5">{step.sub}</p>}
+                <div className="flex-1 pb-6">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-semibold text-gray-900">{step.stage}</span>
+                    {step.id && <span className="text-[11px] font-mono text-primary-600 bg-primary-50 px-1.5 py-0.5 rounded">{step.id}</span>}
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${step.status === 'done' ? 'bg-green-100 text-green-700' : step.status === 'active' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500'}`}>{step.status === 'done' ? 'Completed' : step.status === 'active' ? 'In Progress' : 'Pending'}</span>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">{step.desc}</p>
+                  {step.sub && <p className="text-[11px] text-gray-400 mt-0.5">{step.sub}</p>}
+                </div>
+                <div className="shrink-0 text-right pl-4 pt-0.5">
+                  <p className="text-xs text-gray-500">{step.date}</p>
+                  {step.location && <p className="text-[10px] text-gray-400 mt-0.5">{step.location}</p>}
+                </div>
               </div>
-              <div className="shrink-0 text-right pl-4 pt-0.5">
-                <p className="text-xs text-gray-500">{step.date}</p>
-                {step.location && <p className="text-[10px] text-gray-400 mt-0.5">{step.location}</p>}
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       )}
 
