@@ -27,7 +27,7 @@ const D = {
   ],
 }
 
-const TABS = ['Containers & Drayage', 'Items / SKUs', 'Customs', 'Documents']
+const TABS = ['Containers & Drayage', 'Items SKUs', 'Customs', 'Documents']
 function stageBg(s: string) { return s === 'done' ? 'bg-green-500' : s === 'active' ? 'bg-blue-500 ring-4 ring-blue-100' : 'bg-gray-200' }
 function stageIcon(s: string) { return s === 'done' ? <CheckCircle2 size={14} className="text-white" /> : s === 'active' ? <Truck size={14} className="text-white" /> : <Circle size={12} className="text-gray-400" /> }
 
@@ -122,7 +122,7 @@ export default function IntlTrackingDetail() {
 
       {/* ─── Tabs as anchors ─── */}
       <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-        <div className="flex border-b border-gray-200 sticky top-14 bg-white z-10">{TABS.map(tab=>(<a key={tab} href={`#${tab.replace(/\s|\//g,'-').toLowerCase()}`} className={`px-5 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab===tab?'border-primary-600 text-primary-600':'border-transparent text-gray-500 hover:text-gray-700'}`} onClick={()=>setActiveTab(tab)}>{tab}</a>))}</div>
+        <div className="flex border-b border-gray-200 sticky top-14 bg-white z-10">{TABS.map(tab=>(<a key={tab} href={`#${tab.split(' ').join('-').split('/').join('-').toLowerCase()}`} className={`px-5 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab===tab?'border-primary-600 text-primary-600':'border-transparent text-gray-500 hover:text-gray-700'}`} onClick={()=>setActiveTab(tab)}>{tab}</a>))}</div>
 
         {/* All sections displayed */}
         <div className="p-5 space-y-8">
@@ -131,7 +131,7 @@ export default function IntlTrackingDetail() {
             <table className="w-full text-xs"><thead><tr className="bg-gray-50 border-b">{['Container No.','Size','Seal','Drayage Load No.','Status','Pickup Terminal','Dest. Warehouse','LFD','Delivery ETA','Delivered'].map(h=>(<th key={h} className="text-left py-2.5 px-3 font-semibold text-gray-500">{h}</th>))}</tr></thead><tbody>{D.containers.map((c,i)=>(<tr key={i} className="border-b border-gray-100"><td className="py-2.5 px-3 font-mono">{c.containerNo}</td><td className="py-2.5 px-3">{c.size}</td><td className="py-2.5 px-3">{c.seal}</td><td className="py-2.5 px-3 text-primary-600 font-medium cursor-pointer hover:underline" onClick={()=>navigate(`/international/drayage/${c.loadNo}`)}>{c.loadNo}</td><td className="py-2.5 px-3">{c.drayageStatus}</td><td className="py-2.5 px-3">{c.pickupTerminal}</td><td className="py-2.5 px-3">{c.destWarehouse}</td><td className="py-2.5 px-3">{c.lfd}</td><td className="py-2.5 px-3">{c.deliveryEta}</td><td className="py-2.5 px-3">{c.deliveredTime}</td></tr>))}</tbody></table>
           </section>
 
-          <section id="items-/-skus">
+          <section id="items-skus">
             <h4 className="text-sm font-bold text-gray-900 mb-3">Items / SKUs</h4>
             <table className="w-full text-xs"><thead><tr className="bg-gray-50 border-b">{['SKU','Product Name','Variant','Expected','Received','Diff','Damaged','Unit','Status'].map(h=>(<th key={h} className="text-left py-2.5 px-3 font-semibold text-gray-500">{h}</th>))}</tr></thead><tbody>{D.items.map((item,i)=>(<tr key={i} className="border-b border-gray-100"><td className="py-2.5 px-3 font-mono text-primary-600">{item.sku}</td><td className="py-2.5 px-3">{item.name}</td><td className="py-2.5 px-3">{item.variant}</td><td className="py-2.5 px-3 font-medium">{item.expected}</td><td className="py-2.5 px-3 text-green-600 font-medium">{item.received}</td><td className="py-2.5 px-3 text-orange-600">{item.diff}</td><td className="py-2.5 px-3 text-red-600">{item.damaged}</td><td className="py-2.5 px-3">{item.unit}</td><td className="py-2.5 px-3"><span className={item.status==='Received'?'text-green-600 font-medium':'text-gray-500'}>{item.status}</span></td></tr>))}</tbody></table>
           </section>
@@ -149,9 +149,7 @@ export default function IntlTrackingDetail() {
       </div>
 
       {/* Doc preview modal */}
-      {viewDoc&&(<div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-8" onClick={()=>setViewDoc(null)}><div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl" onClick={e=>e.stopPropagation()}><div className="px-5 py-4 border-b flex items-center justify-between"><h3 className="text-sm font-semibold">{viewDoc}</h3><button onClick={()=>setViewDoc(null)} className="text-gray-400 hover:text-gray-600 text-sm">Close</button></div><div className="p-6"><div className="border rounded-lg bg-gray-50 h-48 flex items-center justify-center text-gray-400 text-sm">Document preview</div></div></div></div>)}
-        </div>
-      </div>
+      {viewDoc&&(<div className="fixed inset-0 bg-black bg-opacity-40 z-50 flex items-center justify-center p-8" onClick={()=>setViewDoc(null)}><div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl" onClick={e=>e.stopPropagation()}><div className="px-5 py-4 border-b flex items-center justify-between"><h3 className="text-sm font-semibold">{viewDoc}</h3><button onClick={()=>setViewDoc(null)} className="text-gray-400 hover:text-gray-600 text-sm">Close</button></div><div className="p-6"><div className="border rounded-lg bg-gray-50 h-48 flex items-center justify-center text-gray-400 text-sm">Document preview</div></div></div></div>)}
     </div>
   )
 }
