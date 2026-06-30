@@ -141,19 +141,20 @@ export default function IntlTracking() {
       <h1 className="text-2xl font-bold text-gray-900 mb-1">End-to-End Tracking</h1>
       <p className="text-sm text-gray-500 mb-5">International logistics full-chain visibility: Supplier &rarr; Ocean &rarr; Customs &rarr; Drayage &rarr; Warehouse</p>
 
-      {/* Phase tabs */}
+      {/* Phase tabs with counts */}
       <div className="flex gap-1 mb-3 border-b border-gray-200">
-        {PHASE_TABS.map(tab => (
-          <button key={tab.key} onClick={() => handlePhaseChange(tab.key)}
-            className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
-              phaseTab === tab.key ? 'border-primary-600 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700'
-            }`}>
-            {tab.label}
-            {tab.key === 'exception' && TRACKING_DATA.filter(t => t.status === 'Exception').length > 0 && (
-              <span className="ml-1.5 bg-red-500 text-white text-[9px] font-bold px-1.5 rounded-full">{TRACKING_DATA.filter(t => t.status === 'Exception').length}</span>
-            )}
-          </button>
-        ))}
+        {PHASE_TABS.map(tab => {
+          const count = tab.key === 'all' ? TRACKING_DATA.length : TRACKING_DATA.filter(t => (PHASE_STATUSES[tab.key] || []).includes(t.status)).length
+          return (
+            <button key={tab.key} onClick={() => handlePhaseChange(tab.key)}
+              className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
+                phaseTab === tab.key ? 'border-primary-600 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700'
+              }`}>
+              {tab.label}
+              {tab.key === 'exception' && count > 0 && <span className="ml-1.5 bg-red-500 text-white text-[9px] font-bold px-1.5 rounded-full">{count}</span>}
+            </button>
+          )
+        })}
       </div>
 
       {/* Status pills — unified with phase, always consistent */}

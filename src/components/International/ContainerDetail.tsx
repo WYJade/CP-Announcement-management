@@ -14,7 +14,7 @@ export default function ContainerDetail() {
   const [activeTab, setActiveTab] = useState('Details')
   const d = CONTAINER_DATA[id || ''] || { ...DEFAULT, containerNo: id || '' }
 
-  const TABS = ['Details', 'Availability', 'Appointment', 'Load']
+  const TABS = ['Details', 'Availability', 'Load']
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
@@ -68,11 +68,6 @@ export default function ContainerDetail() {
             ))}
           </div>
         </div>
-      )}
-
-      {/* Appointment tab */}
-      {activeTab === 'Appointment' && (
-        <div className="text-center py-10 text-gray-400 text-sm">No appointment data available</div>
       )}
 
       {/* Load tab */}
