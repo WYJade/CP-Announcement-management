@@ -40,48 +40,51 @@ export default function IntlTrackingDetail() {
     <div className="p-6 max-w-5xl mx-auto">
       <button onClick={() => navigate('/international/tracking')} className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 mb-5"><ArrowLeft size={14} /> Back to End-to-End Tracking</button>
 
-      {/* ─── Summary ─── */}
-      <div className="bg-white border border-gray-200 rounded-xl p-6 mb-5">
-        <div className="flex items-start justify-between mb-4">
-          <div><p className="text-[10px] text-gray-400 uppercase tracking-wider">Customer</p><h1 className="text-xl font-bold text-gray-900">{D.customer}</h1></div>
-          <span className="px-3 py-1 text-xs font-semibold bg-blue-100 text-blue-700 rounded-full">{D.status}</span>
+      {/* ─── Summary (left) + Stats (right) side by side ─── */}
+      <div className="grid grid-cols-3 gap-5 mb-6">
+        {/* Left: Summary - 2 cols wide */}
+        <div className="col-span-2 bg-white border border-gray-200 rounded-xl p-6">
+          <div className="flex items-start justify-between mb-4">
+            <div><p className="text-[10px] text-gray-400 uppercase tracking-wider">Customer</p><h1 className="text-xl font-bold text-gray-900">{D.customer}</h1></div>
+            <span className="px-3 py-1 text-xs font-semibold bg-blue-100 text-blue-700 rounded-full">{D.status}</span>
+          </div>
+          <div className="grid grid-cols-4 gap-x-5 gap-y-3 text-sm">
+            <div><p className="text-[10px] text-gray-400">Shipment No.</p><p className="font-semibold">{D.shipmentNo}</p></div>
+            <div><p className="text-[10px] text-gray-400">HBL</p><p className="font-semibold">{D.hbl}</p></div>
+            <div><p className="text-[10px] text-gray-400">MBL</p><p className="font-semibold">{D.mbl}</p></div>
+            <div><p className="text-[10px] text-gray-400">Container</p><p className="font-semibold">{D.container}</p></div>
+            <div><p className="text-[10px] text-gray-400">Current Milestone</p><p className="text-gray-700">{D.milestone}</p></div>
+            <div><p className="text-[10px] text-gray-400">Origin</p><p className="text-gray-700">{D.origin}</p></div>
+            <div><p className="text-[10px] text-gray-400">Destination</p><p className="text-gray-700">{D.destination}</p></div>
+            <div><p className="text-[10px] text-gray-400">Carrier / Vessel</p><p className="text-gray-700">{D.vessel}</p></div>
+            <div><p className="text-[10px] text-gray-400">POD ETA</p><p className="text-gray-700">{D.podEta}</p></div>
+            <div><p className="text-[10px] text-gray-400">Warehouse ETA</p><p className="font-semibold text-primary-600">{D.whEta}</p></div>
+          </div>
         </div>
-        <div className="grid grid-cols-5 gap-x-6 gap-y-3 text-sm">
-          <div><p className="text-[10px] text-gray-400">Shipment No.</p><p className="font-semibold">{D.shipmentNo}</p></div>
-          <div><p className="text-[10px] text-gray-400">HBL</p><p className="font-semibold">{D.hbl}</p></div>
-          <div><p className="text-[10px] text-gray-400">MBL</p><p className="font-semibold">{D.mbl}</p></div>
-          <div><p className="text-[10px] text-gray-400">Container</p><p className="font-semibold">{D.container}</p></div>
-          <div><p className="text-[10px] text-gray-400">Carrier / Vessel</p><p className="font-semibold">{D.vessel}</p></div>
-          <div><p className="text-[10px] text-gray-400">Current Milestone</p><p className="text-gray-700">{D.milestone}</p></div>
-          <div><p className="text-[10px] text-gray-400">Origin</p><p className="text-gray-700">{D.origin}</p></div>
-          <div><p className="text-[10px] text-gray-400">Destination</p><p className="text-gray-700">{D.destination}</p></div>
-          <div><p className="text-[10px] text-gray-400">POD ETA</p><p className="text-gray-700">{D.podEta}</p></div>
-          <div><p className="text-[10px] text-gray-400">Warehouse ETA</p><p className="font-semibold text-primary-600">{D.whEta}</p></div>
-        </div>
-      </div>
 
-      {/* ─── Stats ─── */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
-        <div className="bg-white border border-gray-200 rounded-xl p-4">
-          <p className="text-[10px] text-gray-400 uppercase">Cargo Value</p>
-          <p className="text-2xl font-bold text-gray-900 mt-1">$31,720</p>
-          <p className="text-xs text-gray-400 mt-1">Declared &middot; USD</p>
-        </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-4">
-          <p className="text-[10px] text-gray-400 uppercase">Import Duty</p>
-          <p className="text-2xl font-bold text-gray-900 mt-1">$8,991</p>
-          <p className="text-xs text-gray-400 mt-1">Incl. Section 301</p>
-        </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-4">
-          <p className="text-[10px] text-gray-400 uppercase">Weight / Volume</p>
-          <p className="text-2xl font-bold text-gray-900 mt-1">{D.totalWeight}</p>
-          <p className="text-xs text-gray-400 mt-1">40HC &middot; {D.volume}</p>
-        </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-4">
-          <p className="text-[10px] text-gray-400 uppercase">Progress</p>
-          <p className="text-2xl font-bold text-primary-600 mt-1">{D.progress}%</p>
-          <div className="h-1.5 bg-gray-100 rounded-full mt-2"><div className="h-full bg-green-500 rounded-full" style={{width:`${D.progress}%`}} /></div>
-          <p className="text-[10px] text-gray-400 mt-2">Drayage in Progress &middot; ETA {D.whEta} Seabrook</p>
+        {/* Right: Stats - 1 col */}
+        <div className="space-y-3">
+          <div className="bg-white border border-gray-200 rounded-xl p-4">
+            <p className="text-[10px] text-gray-400 uppercase">Cargo Value</p>
+            <p className="text-xl font-bold text-gray-900 mt-0.5">$31,720</p>
+            <p className="text-[10px] text-gray-400">Declared USD</p>
+          </div>
+          <div className="bg-white border border-gray-200 rounded-xl p-4">
+            <p className="text-[10px] text-gray-400 uppercase">Import Duty</p>
+            <p className="text-xl font-bold text-gray-900 mt-0.5">$8,991</p>
+            <p className="text-[10px] text-gray-400">Incl. Section 301</p>
+          </div>
+          <div className="bg-white border border-gray-200 rounded-xl p-4">
+            <p className="text-[10px] text-gray-400 uppercase">Weight / Volume</p>
+            <p className="text-xl font-bold text-gray-900 mt-0.5">{D.totalWeight}</p>
+            <p className="text-[10px] text-gray-400">40HC &middot; {D.volume}</p>
+          </div>
+          <div className="bg-white border border-green-200 rounded-xl p-4">
+            <p className="text-[10px] text-gray-400 uppercase">Progress</p>
+            <p className="text-xl font-bold text-primary-600 mt-0.5">{D.progress}%</p>
+            <div className="h-1.5 bg-gray-100 rounded-full mt-1.5"><div className="h-full bg-green-500 rounded-full" style={{width:`${D.progress}%`}} /></div>
+            <p className="text-[10px] text-gray-400 mt-1.5">Drayage &middot; ETA {D.whEta} Seabrook</p>
+          </div>
         </div>
       </div>
 

@@ -40,6 +40,7 @@ function statusColor(status: string) {
   if (status === 'Received') return 'bg-green-100 text-green-700'
   if (status === 'Receiving') return 'bg-lime-100 text-lime-700'
   if (status === 'Delivered') return 'bg-emerald-100 text-emerald-700'
+  if (status === 'Returned') return 'bg-slate-100 text-slate-700'
   if (status === 'In Transit') return 'bg-blue-100 text-blue-700'
   if (status === 'Arrived') return 'bg-indigo-100 text-indigo-700'
   if (status === 'Customs Released') return 'bg-teal-100 text-teal-700'
