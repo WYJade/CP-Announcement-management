@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Search, X } from 'lucide-react'
 
 const STATUS_TABS = [
@@ -24,6 +25,7 @@ const SAMPLE_DATA = [
 ]
 
 export default function Containers() {
+  const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('on-ship')
 
   return (
@@ -66,7 +68,7 @@ export default function Containers() {
           <tbody>
             {SAMPLE_DATA.map((row, i) => (
               <tr key={i} className="border-b border-gray-100 hover:bg-gray-50">
-                <td className="py-3 px-4 text-primary-600 font-medium cursor-pointer hover:underline">{row.containerNo}</td>
+                <td className="py-3 px-4 text-primary-600 font-medium cursor-pointer hover:underline" onClick={() => navigate(`/international/containers/${row.containerNo}`)}>{row.containerNo}</td>
                 <td className="py-3 px-4 text-gray-600">{row.port}</td>
                 <td className="py-3 px-4 text-gray-600">{row.ssl}</td>
                 <td className="py-3 px-4 text-gray-600">{row.size}</td>

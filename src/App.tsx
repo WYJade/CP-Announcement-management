@@ -20,6 +20,8 @@ import CustomsEntryDetail from './components/International/CustomsEntryDetail'
 import IntlShipments from './components/International/IntlShipments'
 import IntlShipmentDetail from './components/International/IntlShipmentDetail'
 import Containers from './components/International/Containers'
+import ContainerDetail from './components/International/ContainerDetail'
+import ContainerDetail from './components/International/ContainerDetail'
 import DrayageLoads from './components/International/DrayageLoads'
 import DrayageLoadDetail from './components/International/DrayageLoadDetail'
 import IntlTracking from './components/International/IntlTracking'
@@ -72,6 +74,8 @@ function App() {
         <Route path="international/shipments" element={<IntlShipments />} />
         <Route path="international/shipments/:id" element={<IntlShipmentDetail />} />
         <Route path="international/containers" element={<Containers />} />
+        <Route path="international/containers/:id" element={<ContainerDetail />} />
+        <Route path="international/containers/:id" element={<ContainerDetail />} />
         <Route path="international/drayage" element={<DrayageLoads />} />
         <Route path="international/drayage/:id" element={<DrayageLoadDetail />} />
         <Route path="international/tracking" element={<IntlTracking />} />
