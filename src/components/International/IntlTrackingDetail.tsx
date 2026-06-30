@@ -76,39 +76,57 @@ export default function IntlTrackingDetail() {
             <div className="bg-white border border-gray-200 rounded-xl p-4"><p className="text-[9px] text-gray-400 uppercase">Cargo Value</p><p className="text-lg font-bold text-gray-900">$31,720</p><p className="text-[9px] text-gray-400">Declared USD</p></div>
             <div className="bg-white border border-gray-200 rounded-xl p-4"><p className="text-[9px] text-gray-400 uppercase">Import Duty</p><p className="text-lg font-bold text-gray-900">$8,991</p><p className="text-[9px] text-gray-400">Incl. Section 301</p></div>
             <div className="bg-white border border-gray-200 rounded-xl p-4"><p className="text-[9px] text-gray-400 uppercase">Weight / Volume</p><p className="text-lg font-bold text-gray-900">{D.totalWeight}</p><p className="text-[9px] text-gray-400">40HC &middot; {D.volume}</p></div>
-            <div className="bg-white border border-green-200 rounded-xl p-4"><p className="text-[9px] text-gray-400 uppercase">Progress</p><p className="text-lg font-bold text-primary-600">{D.progress}%</p><div className="h-1.5 bg-gray-100 rounded-full mt-1"><div className="h-full bg-green-500 rounded-full" style={{width:`${D.progress}%`}} /></div><p className="text-[9px] text-gray-400 mt-1">Drayage &middot; ETA {D.whEta} Seabrook</p></div>
           </div>
 
-          {/* Right: Business Milestone Timeline */}
-          <div className="flex-1 bg-white border border-gray-200 rounded-xl p-6">
-            <h3 className="text-sm font-bold text-gray-900 mb-5">Business Milestone Timeline</h3>
-            {[
-              { stage: 'Supplier Dispatch', id: '', status: 'done', date: 'Apr 15, 2026', location: 'Hai Phong, Vietnam', desc: 'Supplier dispatch completed. Cargo loaded and ready for shipment.', sub: 'WIN WIN CORP' },
-              { stage: 'International Transportation', id: 'SSGNS2607829', status: 'done', date: 'Apr 22, 2026', location: 'Haiphong, VN', desc: 'Container loaded and vessel departed.', sub: 'WAN HAI A10 / E013 \u00b7 Haiphong, VN \u2192 Savannah, US \u00b7 POD ETA: Jun 13' },
-              { stage: 'Customs Clearance', id: '82G-0101679-0', status: 'done', date: 'Jun 10, 2026', location: 'Savannah, GA', desc: 'Customs entry released. All documents cleared.', sub: 'Broker: JFS' },
-              { stage: 'Drayage', id: 'UNIS_SAV_M012771', status: 'active', date: 'Jun 19, 2026 (ETA)', location: 'Garden City Terminal \u2192 UNIS Seabrook', desc: 'Container scheduled for pickup and delivery to warehouse.', sub: '' },
-              { stage: 'Warehouse Receiving', id: 'RN-38199', status: 'pending', date: 'TBD (~Jun 21)', location: 'UNIS Seabrook', desc: 'Awaiting container arrival for unloading and receiving.', sub: 'Expected: 782 EA' },
-            ].map((step, i, arr) => (
-              <div key={i} className="flex">
-                <div className="flex flex-col items-center mr-4">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${stageBg(step.status)}`}>{stageIcon(step.status)}</div>
-                  {i < arr.length - 1 && <div className={`w-0.5 flex-1 ${step.status === 'done' ? 'bg-green-300' : 'bg-gray-200'}`} />}
-                </div>
-                <div className="flex-1 pb-6">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-semibold text-gray-900">{step.stage}</span>
-                    {step.id && <span className="text-[11px] font-mono text-primary-600 bg-primary-50 px-1.5 py-0.5 rounded">{step.id}</span>}
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${step.status === 'done' ? 'bg-green-100 text-green-700' : step.status === 'active' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500'}`}>{step.status === 'done' ? 'Completed' : step.status === 'active' ? 'In Progress' : 'Pending'}</span>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">{step.desc}</p>
-                  {step.sub && <p className="text-[11px] text-gray-400 mt-0.5">{step.sub}</p>}
-                </div>
-                <div className="shrink-0 text-right pl-4 pt-0.5">
-                  <p className="text-xs text-gray-500">{step.date}</p>
-                  {step.location && <p className="text-[10px] text-gray-400 mt-0.5">{step.location}</p>}
-                </div>
+          {/* Right: Progress bar + Business Milestone Timeline */}
+          <div className="flex-1">
+            {/* Progress bar at top */}
+            <div className="bg-white border border-green-200 rounded-xl p-4 mb-4">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-xs font-semibold text-gray-700">Overall Progress</p>
+                <p className="text-sm font-bold text-primary-600">{D.progress}%</p>
               </div>
-            ))}
+              <div className="h-2 bg-gray-100 rounded-full"><div className="h-full bg-green-500 rounded-full" style={{width:`${D.progress}%`}} /></div>
+              <p className="text-[10px] text-gray-400 mt-1.5">Drayage &middot; ETA {D.whEta} Seabrook</p>
+            </div>
+
+            {/* Timeline with sub-statuses mapped to phases */}
+            <div className="bg-white border border-gray-200 rounded-xl p-6">
+              <h3 className="text-sm font-bold text-gray-900 mb-5">Business Milestone Timeline</h3>
+              {[
+                { stage: 'Supplier Dispatch', id: '', status: 'done', date: 'Apr 15, 2026', location: 'Hai Phong, Vietnam', desc: 'Supplier dispatch completed. Cargo loaded and ready for shipment.', sub: 'WIN WIN CORP', phaseColor: 'border-l-gray-400', statuses: ['Booked'] },
+                { stage: 'International Transportation', id: 'SSGNS2607829', status: 'done', date: 'Apr 22, 2026', location: 'Haiphong, VN', desc: 'Container loaded and vessel departed.', sub: 'WAN HAI A10 / E013 \u00b7 Haiphong, VN \u2192 Savannah, US \u00b7 POD ETA: Jun 13', phaseColor: 'border-l-blue-400', statuses: ['Booked', 'In Transit', 'Arrived'] },
+                { stage: 'Customs Clearance', id: '82G-0101679-0', status: 'done', date: 'Jun 10, 2026', location: 'Savannah, GA', desc: 'Customs entry released. All documents cleared.', sub: 'Broker: JFS', phaseColor: 'border-l-teal-400', statuses: ['Customs Released'] },
+                { stage: 'Drayage', id: 'UNIS_SAV_M012771', status: 'active', date: 'Jun 19, 2026 (ETA)', location: 'Garden City Terminal \u2192 UNIS Seabrook', desc: 'Container scheduled for pickup and delivery to warehouse.', sub: '', phaseColor: 'border-l-violet-400', statuses: ['Available', 'Dispatched', 'OFD', 'Delivered', 'Returned'] },
+                { stage: 'Warehouse Receiving', id: 'RN-38199', status: 'pending', date: 'TBD (~Jun 21)', location: 'UNIS Seabrook', desc: 'Awaiting container arrival for unloading and receiving.', sub: 'Expected: 782 EA', phaseColor: 'border-l-green-400', statuses: ['Receiving', 'Received'] },
+              ].map((step, i, arr) => (
+                <div key={i} className="flex">
+                  <div className="flex flex-col items-center mr-4">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${stageBg(step.status)}`}>{stageIcon(step.status)}</div>
+                    {i < arr.length - 1 && <div className={`w-0.5 flex-1 ${step.status === 'done' ? 'bg-green-300' : 'bg-gray-200'}`} />}
+                  </div>
+                  <div className={`flex-1 pb-6 border-l-2 ${step.phaseColor} pl-3`}>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-sm font-semibold text-gray-900">{step.stage}</span>
+                      {step.id && <span className="text-[11px] font-mono text-primary-600 bg-primary-50 px-1.5 py-0.5 rounded">{step.id}</span>}
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${step.status === 'done' ? 'bg-green-100 text-green-700' : step.status === 'active' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500'}`}>{step.status === 'done' ? 'Completed' : step.status === 'active' ? 'In Progress' : 'Pending'}</span>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">{step.desc}</p>
+                    {step.sub && <p className="text-[11px] text-gray-400 mt-0.5">{step.sub}</p>}
+                    {/* Sub-statuses belonging to this phase */}
+                    <div className="flex flex-wrap gap-1 mt-1.5">
+                      {step.statuses.map(s => (
+                        <span key={s} className="text-[9px] px-1.5 py-0.5 rounded bg-gray-100 text-gray-500 border border-gray-200">{s}</span>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="shrink-0 text-right pl-3 pt-0.5">
+                    <p className="text-xs text-gray-500">{step.date}</p>
+                    {step.location && <p className="text-[10px] text-gray-400 mt-0.5">{step.location}</p>}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       )}
