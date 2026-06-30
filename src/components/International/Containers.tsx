@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Search, X } from 'lucide-react'
+import { Search, X, Settings } from 'lucide-react'
 
 const STATUS_TABS = [
   { key: 'on-ship', label: 'On Ship', count: 3 },
@@ -33,25 +33,33 @@ export default function Containers() {
       <h1 className="text-2xl font-bold text-gray-900 mb-1">Containers</h1>
       <p className="text-sm text-gray-500 mb-5">View drayage containers synced from the Item Drayage System.</p>
 
-      {/* Status tabs */}
-      <div className="flex gap-2 mb-5">
+      {/* Status tabs - text style like screenshot */}
+      <div className="flex gap-4 mb-5 border-b border-gray-200">
         {STATUS_TABS.map(tab => (
           <button key={tab.key} onClick={() => setActiveTab(tab.key)}
-            className={`px-3 py-1.5 text-sm font-medium rounded-lg border transition-all ${
-              activeTab === tab.key ? 'border-primary-300 bg-primary-50 text-primary-700' : 'border-gray-200 text-gray-500 hover:bg-gray-50'
+            className={`pb-2 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === tab.key ? 'border-primary-600 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700'
             }`}>
-            {tab.label} {tab.count}
+            {tab.label}
           </button>
         ))}
       </div>
 
-      {/* Search */}
-      <div className="bg-white border border-gray-200 rounded-xl p-4 mb-5">
-        <div className="flex gap-3 items-center">
-          <label className="text-xs font-medium text-gray-500">Key</label>
-          <input type="text" placeholder="Container No, Customer, Vessel..." className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm" />
-          <button className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"><X size={12} /> Clear</button>
-          <button className="flex items-center gap-1 px-4 py-1.5 text-sm text-white bg-primary-600 rounded-lg hover:bg-primary-700"><Search size={12} /> Search</button>
+      {/* Search + Port filter + Columns */}
+      <div className="flex items-center gap-3 mb-5">
+        <div className="relative">
+          <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          <input type="text" placeholder="Search by Container No" className="pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg w-56" />
+        </div>
+        <select className="border border-gray-300 rounded-lg px-3 py-2 text-sm">
+          <option>Port</option>
+          <option>PCT</option>
+          <option>LBCT</option>
+        </select>
+        <div className="ml-auto">
+          <button className="flex items-center gap-1.5 px-3 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50">
+            <Settings size={13} /> Columns
+          </button>
         </div>
       </div>
 
