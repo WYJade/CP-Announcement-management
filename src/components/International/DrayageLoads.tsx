@@ -27,8 +27,9 @@ function CustomerFilter() {
 
   return (
     <div className="relative">
-      <button onClick={() => setOpen(!open)} className="border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 min-w-[140px] text-left flex items-center gap-1">
-        Customer {selected.length > 0 && <span className="bg-primary-100 text-primary-700 text-[10px] font-bold px-1.5 rounded-full">{selected.length}</span>}
+      <button onClick={() => setOpen(!open)} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 text-left flex items-center justify-between">
+        <span className="truncate">{selected.length > 0 ? `${selected.length} selected` : 'Customer'}</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9" /></svg>
       </button>
       {open && (
         <div className="absolute top-full left-0 mt-1 w-72 bg-white border border-gray-200 rounded-xl shadow-xl z-20 overflow-hidden">
