@@ -6,15 +6,16 @@ import AnnouncementBanner from '../common/AnnouncementBanner'
 
 function Layout() {
   const location = useLocation()
+  const isAgentsPage = location.pathname === '/agents'
 
   return (
     <div className="min-h-screen bg-gray-50">
       <IconSidebar />
-      <NavSidebar />
+      {!isAgentsPage && <NavSidebar />}
       <Header />
-      <main className="ml-72 mt-14 p-4 overflow-auto">
-        <AnnouncementBanner />
-        <div className="mt-3">
+      <main className={`${isAgentsPage ? 'ml-16' : 'ml-72'} mt-14 p-4 overflow-auto`}>
+        {!isAgentsPage && <AnnouncementBanner />}
+        <div className={isAgentsPage ? '' : 'mt-3'}>
           <Outlet />
         </div>
       </main>

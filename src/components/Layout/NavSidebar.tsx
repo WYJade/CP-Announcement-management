@@ -146,6 +146,7 @@ const menuItems: MenuItem[] = [
       { id: 'containers', label: 'Containers', path: '/international/containers' },
       { id: 'drayage-loads', label: 'Drayage Loads', path: '/international/drayage' },
       { id: 'intl-tracking', label: 'End-to-End Tracking', path: '/international/tracking' },
+      { id: 'intl-tracking2', label: 'End to End Tracking', path: '/international/tracking2' },
     ],
   },
   {

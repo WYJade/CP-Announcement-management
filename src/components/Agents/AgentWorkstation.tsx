@@ -136,8 +136,8 @@ export default function AgentWorkstation() {
 
   return (
     <div className="flex h-[calc(100vh-3.5rem)] -m-4 bg-gray-50">
-      {/* Left sidebar - Navigation */}
-      <div className="w-44 bg-white border-r border-gray-200 flex flex-col shrink-0">
+      {/* Left sidebar - AI Native Navigation */}
+      <div className="w-48 bg-white border-r border-gray-200 flex flex-col shrink-0 overflow-y-auto">
         <div className="p-3 border-b border-gray-100">
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 bg-primary-600 rounded-lg flex items-center justify-center">
@@ -161,8 +161,24 @@ export default function AgentWorkstation() {
             </button>
           ))}
         </nav>
-        <div className="mt-auto p-3 border-t border-gray-100">
-          <p className="text-[10px] text-gray-400">Settings</p>
+
+        {/* Settings */}
+        <div className="px-2 py-2 border-t border-gray-100 mt-2">
+          <p className="text-[10px] font-semibold text-gray-400 uppercase px-2 pt-1 pb-1">Settings</p>
+          <button className="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-xs font-medium text-gray-600 hover:bg-gray-50">
+            <Settings size={14} />
+            Preferences
+          </button>
+        </div>
+
+        {/* Recents */}
+        <div className="px-2 py-2 border-t border-gray-100">
+          <p className="text-[10px] font-semibold text-primary-600 uppercase px-2 pt-1 pb-1">Recents</p>
+          <div className="space-y-0.5">
+            {['23 单批量重承诺方案', 'SKU-005 库存查询', 'VIP Gold 取消例外解释', '海风家居 7d SLA 趋势', 'Approval Gateway 流程', 'EDI 850 解析问题', '库存预警处理', '渠道库存同步异常'].map((item, i) => (
+              <button key={i} className="w-full text-left px-2.5 py-1.5 rounded-lg text-[11px] text-gray-600 hover:bg-gray-50 truncate">{item}</button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -238,7 +254,7 @@ export default function AgentWorkstation() {
 
       {/* Main content - Agent Workstation */}
       <div className="flex-1 overflow-y-auto p-6">
-        <div className="max-w-4xl">
+        <div>
           <div className="flex items-center gap-3 mb-6">
             <Zap size={20} className="text-primary-600" />
             <div>

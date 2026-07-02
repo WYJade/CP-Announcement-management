@@ -101,6 +101,24 @@ export function BannerProvider({ children }: { children: ReactNode }) {
     (page?: string): BannerConfig[] => {
       const now = new Date()
 
+      // Pages that should NOT show any banners
+      const excludedPages = [
+        '/orders/wholesale',
+        '/orders/retail',
+        '/inbound/inquiry',
+        '/inventory/activity',
+        '/outbound/inquiry',
+        '/supply-chain/shipments',
+        '/supply-chain/tracking',
+        '/finance/invoices',
+        '/dashboard/kpi',
+      ]
+
+      // If current page is excluded, show no banners
+      if (page && excludedPages.some(ep => page.startsWith(ep))) {
+        return []
+      }
+
       const filtered = banners
         .filter((banner) => {
           // Skip dismissed (unless persistent/acknowledge type)

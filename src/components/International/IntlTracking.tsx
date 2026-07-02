@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { Search, Filter, AlertTriangle } from 'lucide-react'
 
 // ─── Types & Data ────────────────────────────────────────────────────────────
@@ -55,7 +55,7 @@ function statusColor(status: string) {
 // Each status belongs to exactly ONE phase. Phase tabs filter by phase.
 // Status pills filter by individual status. Both are always consistent.
 
-const UNIFIED_STATUSES = ['Booked', 'In Transit', 'Arrived', 'Customs Released', 'Available', 'Dispatched', 'OFD', 'Delivered', 'Receiving', 'Received', 'Exception'] as const
+const UNIFIED_STATUSES = ['Booked', 'In Transit', 'Arrived', 'Customs Released', 'Available', 'Dispatched', 'OFD', 'Delivered', 'Receiving', 'Received'] as const
 
 // Which phase does each status belong to?
 const STATUS_TO_PHASE: Record<string, string> = {
@@ -79,7 +79,7 @@ const PHASE_STATUSES: Record<string, string[]> = {
   customs: ['Customs Released'],
   drayage: ['Available', 'Dispatched', 'OFD', 'Delivered'],
   warehouse: ['Receiving', 'Received'],
-  exception: ['Exception'],
+  exception: ['Exception'], // Exception only shown when Exceptions tab is active
 }
 
 const PHASE_TABS = [
@@ -88,17 +88,19 @@ const PHASE_TABS = [
   { key: 'customs', label: 'Customs Clearance' },
   { key: 'drayage', label: 'Drayage' },
   { key: 'warehouse', label: 'Warehouse Receipt' },
-  { key: 'exception', label: 'Exceptions' },
 ]
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export default function IntlTracking() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const basePath = location.pathname.includes('/tracking2') ? '/international/tracking2' : '/international/tracking'
   const [search, setSearch] = useState('')
   const [phaseTab, setPhaseTab] = useState('all')
   const [statusFilter, setStatusFilter] = useState('All')
   const [viewMode, setViewMode] = useState<'table' | 'card'>('table')
+  const [showAdvanced, setShowAdvanced] = useState(false)
 
   // Get statuses for current phase
   const availableStatuses = PHASE_STATUSES[phaseTab] || PHASE_STATUSES.all
@@ -141,46 +143,57 @@ export default function IntlTracking() {
       <h1 className="text-2xl font-bold text-gray-900 mb-1">End-to-End Tracking</h1>
       <p className="text-sm text-gray-500 mb-5">International logistics full-chain visibility: Supplier &rarr; Ocean &rarr; Customs &rarr; Drayage &rarr; Warehouse</p>
 
-      {/* Phase tabs with counts */}
-      <div className="flex gap-1 mb-3 border-b border-gray-200">
+      {/* Phase tabs with counts - with background styling */}
+      <div className="bg-gray-50 border border-gray-200 rounded-xl p-1.5 mb-4 flex gap-1">
         {PHASE_TABS.map(tab => {
           const count = tab.key === 'all' ? TRACKING_DATA.length : TRACKING_DATA.filter(t => (PHASE_STATUSES[tab.key] || []).includes(t.status)).length
+          const tabColors: Record<string, string> = {
+            all: phaseTab === 'all' ? 'bg-white shadow-sm border border-gray-200 text-gray-900' : 'text-gray-500 hover:text-gray-700 hover:bg-white/60',
+            ocean: phaseTab === 'ocean' ? 'bg-blue-50 shadow-sm border border-blue-200 text-blue-700' : 'text-gray-500 hover:text-blue-600 hover:bg-blue-50/50',
+            customs: phaseTab === 'customs' ? 'bg-teal-50 shadow-sm border border-teal-200 text-teal-700' : 'text-gray-500 hover:text-teal-600 hover:bg-teal-50/50',
+            drayage: phaseTab === 'drayage' ? 'bg-violet-50 shadow-sm border border-violet-200 text-violet-700' : 'text-gray-500 hover:text-violet-600 hover:bg-violet-50/50',
+            warehouse: phaseTab === 'warehouse' ? 'bg-green-50 shadow-sm border border-green-200 text-green-700' : 'text-gray-500 hover:text-green-600 hover:bg-green-50/50',
+          }
           return (
             <button key={tab.key} onClick={() => handlePhaseChange(tab.key)}
-              className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
-                phaseTab === tab.key ? 'border-primary-600 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}>
+              className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${tabColors[tab.key] || ''}`}>
               {tab.label}
-              {tab.key === 'exception' && count > 0
-                ? <span className="ml-1.5 bg-red-500 text-white text-[9px] font-bold px-1.5 rounded-full">{count}</span>
-                : tab.key !== 'exception' && <span className="ml-1 text-[10px] opacity-60">{count}</span>
-              }
+              <span className="ml-1.5 text-[10px] font-bold opacity-70">{count}</span>
             </button>
           )
         })}
       </div>
 
-      {/* Status pills — unified with phase, always consistent */}
-      <div className="flex gap-1 mb-4 flex-wrap items-center">
-        <span className="text-[10px] text-gray-400 mr-1 uppercase font-semibold">Status:</span>
+      {/* Status pills — color-coded by phase */}
+      <div className="flex gap-1.5 mb-4 flex-wrap items-center">
+        <span className="text-[10px] text-gray-400 mr-1 uppercase font-semibold tracking-wider">Status:</span>
         <button onClick={() => handleStatusClick('All')}
-          className={`px-2.5 py-1 text-xs font-medium rounded-full border transition-colors ${statusFilter === 'All' ? 'bg-primary-50 border-primary-300 text-primary-700' : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50'}`}>
-          All <span className="text-[10px] opacity-60">{phaseTab === 'all' ? TRACKING_DATA.length : TRACKING_DATA.filter(t => availableStatuses.includes(t.status)).length}</span>
+          className={`px-3 py-1.5 text-xs font-semibold rounded-lg border transition-all ${statusFilter === 'All' ? 'bg-gray-900 border-gray-900 text-white shadow-sm' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300'}`}>
+          All <span className="text-[10px] opacity-70">{phaseTab === 'all' ? TRACKING_DATA.length : TRACKING_DATA.filter(t => availableStatuses.includes(t.status)).length}</span>
         </button>
         {availableStatuses.map(s => {
           const count = TRACKING_DATA.filter(t => t.status === s).length
+          const phase = STATUS_TO_PHASE[s]
+          const pillColors: Record<string, { active: string; inactive: string; dot: string }> = {
+            ocean: { active: 'bg-blue-600 border-blue-600 text-white', inactive: 'bg-white border-blue-200 text-blue-700 hover:bg-blue-50', dot: 'bg-blue-500' },
+            customs: { active: 'bg-teal-600 border-teal-600 text-white', inactive: 'bg-white border-teal-200 text-teal-700 hover:bg-teal-50', dot: 'bg-teal-500' },
+            drayage: { active: 'bg-violet-600 border-violet-600 text-white', inactive: 'bg-white border-violet-200 text-violet-700 hover:bg-violet-50', dot: 'bg-violet-500' },
+            warehouse: { active: 'bg-green-600 border-green-600 text-white', inactive: 'bg-white border-green-200 text-green-700 hover:bg-green-50', dot: 'bg-green-500' },
+          }
+          const colors = pillColors[phase] || pillColors.ocean
           return (
             <button key={s} onClick={() => handleStatusClick(s)}
-              className={`px-2.5 py-1 text-xs font-medium rounded-full border transition-colors ${
-                statusFilter === s ? 'bg-primary-50 border-primary-300 text-primary-700' : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50'
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border transition-all shadow-sm ${
+                statusFilter === s ? colors.active : colors.inactive
               }`}>
-              {s} <span className="text-[10px] opacity-60">{count}</span>
+              <span className={`w-1.5 h-1.5 rounded-full ${statusFilter === s ? 'bg-white/80' : colors.dot}`} />
+              {s} <span className="text-[10px] opacity-70">{count}</span>
             </button>
           )
         })}
       </div>
 
-      {/* Search + Filters */}
+      {/* Search + Advanced Filter */}
       <div className="flex items-center gap-3 mb-4">
         <div className="relative flex-1">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -189,21 +202,46 @@ export default function IntlTracking() {
             className="w-full pl-9 pr-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500" />
         </div>
         <select className="border border-gray-300 rounded-lg px-3 py-2.5 text-sm"><option>Status</option></select>
-        <input type="text" placeholder="Date Range" className="border border-gray-300 rounded-lg px-3 py-2.5 text-sm w-32" />
-        <select className="border border-gray-300 rounded-lg px-3 py-2.5 text-sm"><option>Origin</option></select>
-        <select className="border border-gray-300 rounded-lg px-3 py-2.5 text-sm"><option>Destination</option></select>
-        <select className="border border-gray-300 rounded-lg px-3 py-2.5 text-sm"><option>Customer</option></select>
-        <label className="flex items-center gap-1.5 text-xs text-gray-600 whitespace-nowrap">
-          <input type="checkbox" className="rounded text-red-500" /> Exception Only
-        </label>
+        <button
+          onClick={() => setShowAdvanced(!showAdvanced)}
+          className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border rounded-lg transition-colors ${showAdvanced ? 'bg-primary-50 border-primary-300 text-primary-700' : 'border-gray-300 text-gray-600 hover:bg-gray-50'}`}
+        >
+          <Filter size={14} />
+          Advanced Filter
+          {showAdvanced && <span className="text-[10px] ml-0.5">▲</span>}
+          {!showAdvanced && <span className="text-[10px] ml-0.5">▼</span>}
+        </button>
       </div>
 
-      {/* View toggle */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex gap-1">
-          <button onClick={() => setViewMode('table')} className={`px-3 py-1.5 text-xs font-medium rounded-md border ${viewMode === 'table' ? 'bg-primary-50 border-primary-200 text-primary-700' : 'border-gray-200 text-gray-500'}`}>Table View</button>
-          <button onClick={() => setViewMode('card')} className={`px-3 py-1.5 text-xs font-medium rounded-md border ${viewMode === 'card' ? 'bg-primary-50 border-primary-200 text-primary-700' : 'border-gray-200 text-gray-500'}`}>Card View</button>
+      {/* Advanced Filter Panel (collapsible) */}
+      {showAdvanced && (
+        <div className="mb-4 p-4 bg-gray-50 border border-gray-200 rounded-xl">
+          <div className="grid grid-cols-5 gap-3">
+            <div>
+              <label className="text-[10px] text-gray-500 uppercase font-semibold mb-1 block">Date Range</label>
+              <input type="text" placeholder="Start - End" className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
+            </div>
+            <div>
+              <label className="text-[10px] text-gray-500 uppercase font-semibold mb-1 block">Origin</label>
+              <select className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"><option value="">All Origins</option><option>Shanghai, CN</option><option>Ningbo, CN</option><option>Haiphong, VN</option><option>Shenzhen, CN</option><option>Qingdao, CN</option><option>Ho Chi Minh, VN</option></select>
+            </div>
+            <div>
+              <label className="text-[10px] text-gray-500 uppercase font-semibold mb-1 block">Destination</label>
+              <select className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"><option value="">All Destinations</option><option>Savannah, US</option><option>Los Angeles, US</option><option>Long Beach, US</option><option>New York, US</option></select>
+            </div>
+            <div>
+              <label className="text-[10px] text-gray-500 uppercase font-semibold mb-1 block">Customer</label>
+              <select className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"><option value="">All Customers</option><option>ADOORN LLC</option><option>THE ONLY BEAN LLC</option><option>ORGAIN LLC</option><option>VITA COCO</option><option>PLEASS GLOBAL</option></select>
+            </div>
+            <div className="flex items-end">
+              <button className="w-full px-4 py-2 text-sm font-medium bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">Apply</button>
+            </div>
+          </div>
         </div>
+      )}
+
+      {/* Shipment count */}
+      <div className="flex items-center justify-end mb-4">
         <span className="text-xs text-gray-400">{filtered.length} shipments</span>
       </div>
 
@@ -222,7 +260,7 @@ export default function IntlTracking() {
               {filtered.map(row => (
                 <tr key={row.id} className={`border-b border-gray-100 hover:bg-gray-50 ${row.hasException ? 'bg-red-50/50' : ''}`}>
                   <td className="py-3 px-3">
-                    <p className="text-xs font-medium text-primary-600 cursor-pointer hover:underline" onClick={() => navigate(`/international/tracking/${row.id}`)}>{row.shipmentNo}</p>
+                    <p className="text-xs font-medium text-primary-600 cursor-pointer hover:underline" onClick={() => navigate(`${basePath}/${row.id}`)}>{row.shipmentNo}</p>
                     <p className="text-[10px] text-gray-400">{row.hbl}</p>
                   </td>
                   <td className="py-3 px-3">
@@ -239,7 +277,7 @@ export default function IntlTracking() {
                   <td className="py-3 px-3 text-xs text-gray-500">{row.receivedTime}</td>
                   <td className="py-3 px-3 text-xs text-gray-400">{row.lastUpdated}</td>
                   <td className="py-3 px-3">
-                    <button onClick={() => navigate(`/international/tracking/${row.id}`)} className="text-xs text-primary-600 hover:underline">Detail</button>
+                    <button onClick={() => navigate(`${basePath}/${row.id}`)} className="text-xs text-primary-600 hover:underline">Detail</button>
                   </td>
                 </tr>
               ))}

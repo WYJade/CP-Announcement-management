@@ -5,13 +5,16 @@ import {
   MessageSquare,
 } from 'lucide-react'
 import { useI18n } from '../../context/I18nContext'
+import { useLocation } from 'react-router-dom'
 import LanguageSwitcher from './LanguageSwitcher'
 
 function Header() {
   const { t } = useI18n()
+  const location = useLocation()
+  const isAgentsPage = location.pathname === '/agents'
 
   return (
-    <header className="h-14 bg-white border-b border-gray-200 fixed top-0 left-72 right-0 z-30 flex items-center px-4">
+    <header className={`h-14 bg-white border-b border-gray-200 fixed top-0 ${isAgentsPage ? 'left-16' : 'left-72'} right-0 z-30 flex items-center px-4`}>
       {/* Left section */}
       <div className="flex items-center gap-3">
         <Home size={16} className="text-gray-500" />

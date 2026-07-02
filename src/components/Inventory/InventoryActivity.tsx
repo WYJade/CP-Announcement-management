@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { Search, Filter, Download } from 'lucide-react'
+import { Search, Filter, Download, ChevronRight } from 'lucide-react'
 
 // ─── Sample inventory data ───────────────────────────────────────────────────
 
