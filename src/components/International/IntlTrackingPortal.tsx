@@ -63,7 +63,8 @@ export default function IntlTrackingPortal() {
       setHasSearched(true)
       return
     }
-    setResults(ALL_RESULTS.slice(0, 3))
+    // No match found — show empty results
+    setResults([])
     setHasSearched(true)
   }
 
@@ -150,6 +151,7 @@ export default function IntlTrackingPortal() {
                   { ref: '039GX40070', type: 'MBL', note: 'May return multiple shipments' },
                   { ref: 'WHSU8555505', type: 'Container No.', note: 'May return multiple shipments' },
                   { ref: 'UNIS_SAV_M012771', type: 'Load#', note: 'Direct to detail (single result)' },
+                  { ref: 'UNKNOWN123456', type: 'Container No.', note: 'No results found (example)' },
                 ].map((item, i) => (
                   <button key={i} onClick={() => { setQuery(item.ref); setShowSuggestions(false); }} className="w-full text-left px-4 py-2.5 hover:bg-gray-50 flex items-center justify-between transition-colors border-b border-gray-50 last:border-0">
                     <div className="flex items-center gap-2">
@@ -239,14 +241,16 @@ export default function IntlTrackingPortal() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 mb-4">
-            <Sparkles size={14} className="text-primary-500" />
-            <p className="text-sm text-gray-600">Found <span className="font-bold text-gray-900">{results.length}</span> shipments for "<span className="font-medium text-primary-600">{query}</span>"</p>
-            <span className="text-[10px] bg-amber-50 text-amber-600 border border-amber-200 px-2 py-0.5 rounded-full font-medium ml-1">Select one to view details</span>
-          </div>
+          {results.length > 0 ? (
+            <>
+              <div className="flex items-center gap-2 mb-4">
+                <Sparkles size={14} className="text-primary-500" />
+                <p className="text-sm text-gray-600">Found <span className="font-bold text-gray-900">{results.length}</span> shipments for "<span className="font-medium text-primary-600">{query}</span>"</p>
+                <span className="text-[10px] bg-amber-50 text-amber-600 border border-amber-200 px-2 py-0.5 rounded-full font-medium ml-1">Select one to view details</span>
+              </div>
 
-          <div className="space-y-3">
-            {results.map(result => (
+              <div className="space-y-3">
+                {results.map(result => (
               <div key={result.id} className="bg-white border border-gray-200 rounded-xl p-5 hover:shadow-md hover:border-primary-200 transition-all cursor-pointer group" onClick={() => navigate(`/international/tracking2/${result.id}`)}>
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
@@ -272,7 +276,32 @@ export default function IntlTrackingPortal() {
                 </div>
               </div>
             ))}
-          </div>
+              </div>
+            </>
+          ) : (
+            /* No results found - friendly empty state */
+            <div className="text-center py-16">
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Search size={24} className="text-gray-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">No Shipments Found</h3>
+              <p className="text-sm text-gray-500 max-w-md mx-auto mb-6">
+                We couldn't find any shipments matching "<span className="font-medium text-gray-700">{query}</span>". Please check the reference number and try again.
+              </p>
+              <div className="bg-gray-50 border border-gray-200 rounded-xl p-5 max-w-lg mx-auto text-left">
+                <p className="text-xs font-semibold text-gray-700 mb-3">Suggestions:</p>
+                <ul className="text-xs text-gray-500 space-y-2">
+                  <li className="flex items-start gap-2"><span className="text-gray-300 mt-0.5">•</span>Double-check the reference number for typos</li>
+                  <li className="flex items-start gap-2"><span className="text-gray-300 mt-0.5">•</span>Try searching with a different identifier (Shipment No., HBL, Container No., or Load#)</li>
+                  <li className="flex items-start gap-2"><span className="text-gray-300 mt-0.5">•</span>The shipment may not yet be registered in the system</li>
+                  <li className="flex items-start gap-2"><span className="text-gray-300 mt-0.5">•</span>Contact your account manager if you believe this is an error</li>
+                </ul>
+              </div>
+              <button onClick={() => { setHasSearched(false); setQuery('') }} className="mt-6 px-5 py-2 text-sm font-medium text-primary-600 border border-primary-200 rounded-lg hover:bg-primary-50 transition-colors">
+                Back to Search
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>
