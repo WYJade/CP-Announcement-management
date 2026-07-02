@@ -95,7 +95,7 @@ const PHASE_TABS = [
 export default function IntlTracking() {
   const navigate = useNavigate()
   const location = useLocation()
-  const basePath = location.pathname.includes('/tracking2') ? '/international/tracking2' : '/international/tracking'
+  const basePath = location.pathname.includes('/tracking2') ? '/international/tracking2' : location.pathname.includes('/backup') ? '/backup/tracking' : '/international/tracking'
   const [search, setSearch] = useState('')
   const [phaseTab, setPhaseTab] = useState('all')
   const [statusFilter, setStatusFilter] = useState('All')

@@ -79,6 +79,10 @@ function App() {
         <Route path="international/drayage/:id" element={<DrayageLoadDetail />} />
         <Route path="international/tracking" element={<IntlTracking />} />
         <Route path="international/tracking/:id" element={<IntlTrackingDetail />} />
+
+        {/* Backup — End-to-End Tracking (moved from International) */}
+        <Route path="backup/tracking" element={<IntlTracking />} />
+        <Route path="backup/tracking/:id" element={<IntlTrackingDetail />} />
         <Route path="international/tracking2" element={<IntlTrackingPortal />} />
         <Route path="international/tracking2/:id" element={<IntlTrackingDetail />} />
 

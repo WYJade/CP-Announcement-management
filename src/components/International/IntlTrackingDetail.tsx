@@ -112,7 +112,7 @@ export default function IntlTrackingDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
   const location = useLocation()
-  const basePath = location.pathname.includes('/tracking2') ? '/international/tracking2' : '/international/tracking'
+  const basePath = location.pathname.includes('/tracking2') ? '/international/tracking2' : location.pathname.includes('/backup') ? '/backup/tracking' : '/international/tracking'
   const [activeTab, setActiveTab] = useState(MAIN_TABS[0])
   const [detailTab, setDetailTab] = useState(TABS[0])
   const [viewDoc, setViewDoc] = useState<string | null>(null)

@@ -20,6 +20,7 @@ import {
   ChevronRight,
   Users2,
   Navigation,
+  Archive,
 } from 'lucide-react'
 import { useCollaboration } from '../../context/CollaborationContext'
 
@@ -145,7 +146,6 @@ const menuItems: MenuItem[] = [
       { id: 'intl-shipments', label: 'Shipments', path: '/international/shipments' },
       { id: 'containers', label: 'Containers', path: '/international/containers' },
       { id: 'drayage-loads', label: 'Drayage Loads', path: '/international/drayage' },
-      { id: 'intl-tracking', label: 'End-to-End Tracking', path: '/international/tracking' },
       { id: 'intl-tracking2', label: 'End to End Tracking', path: '/international/tracking2' },
     ],
   },
@@ -179,6 +179,15 @@ const menuItems: MenuItem[] = [
     label: 'User Profile',
     icon: <UserCircle size={16} />,
     expandable: false,
+  },
+  {
+    id: 'backup',
+    label: 'Backup',
+    icon: <Archive size={16} />,
+    expandable: true,
+    children: [
+      { id: 'backup-tracking', label: 'End-to-End Tracking', path: '/backup/tracking' },
+    ],
   },
 ]
 
