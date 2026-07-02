@@ -1,6 +1,61 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Search, X, Settings } from 'lucide-react'
+
+// ─── Customer Data ───────────────────────────────────────────────────────────
+const CUSTOMERS = [
+  { name: 'JULY& CO PTY LTD', code: 'JULCOP0001' },
+  { name: 'ORGAIN LLC', code: 'ORGLLC0001' },
+  { name: 'VITA COCO', code: 'VITCOC0001' },
+  { name: 'THE ONLY BEAN LLC', code: 'TONBEA0001' },
+  { name: 'PLEASS GLOBAL LIMITED', code: 'PLEGLO0001' },
+  { name: 'ADOORN LLC', code: 'ADOLLC0001' },
+]
+
+function CustomerFilter() {
+  const [open, setOpen] = useState(false)
+  const [query, setQuery] = useState('')
+  const [selected, setSelected] = useState<string[]>([])
+  const ref = useRef<HTMLDivElement>(null)
+
+  const filtered = CUSTOMERS.filter(c =>
+    c.name.toLowerCase().includes(query.toLowerCase()) || c.code.toLowerCase().includes(query.toLowerCase())
+  )
+
+  const toggle = (code: string) => {
+    setSelected(prev => prev.includes(code) ? prev.filter(s => s !== code) : [...prev, code])
+  }
+
+  return (
+    <div className="relative" ref={ref}>
+      <button onClick={() => setOpen(!open)} className="border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 min-w-[140px] text-left flex items-center gap-1">
+        Customer {selected.length > 0 && <span className="bg-primary-100 text-primary-700 text-[10px] font-bold px-1.5 rounded-full">{selected.length}</span>}
+      </button>
+      {open && (
+        <div className="absolute top-full left-0 mt-1 w-72 bg-white border border-gray-200 rounded-xl shadow-xl z-20 overflow-hidden">
+          <div className="p-2 border-b border-gray-100">
+            <input type="text" value={query} onChange={e => setQuery(e.target.value)} placeholder="Search customer..." className="w-full px-2.5 py-1.5 text-xs border border-gray-200 rounded-lg" autoFocus />
+          </div>
+          <div className="max-h-48 overflow-y-auto">
+            {filtered.map(c => (
+              <label key={c.code} className="flex items-center gap-2 px-3 py-2 hover:bg-gray-50 cursor-pointer text-xs">
+                <input type="checkbox" checked={selected.includes(c.code)} onChange={() => toggle(c.code)} className="rounded text-primary-600" />
+                <span className="text-gray-800">{c.name}</span>
+                <span className="text-gray-400">-</span>
+                <span className="text-gray-500 font-mono text-[10px]">{c.code}</span>
+              </label>
+            ))}
+            {filtered.length === 0 && <p className="px-3 py-3 text-xs text-gray-400 text-center">No customers found</p>}
+          </div>
+          <div className="p-2 border-t border-gray-100 flex justify-between">
+            <button onClick={() => setSelected([])} className="text-[10px] text-gray-400 hover:text-gray-600">Clear all</button>
+            <button onClick={() => setOpen(false)} className="text-[10px] text-primary-600 font-medium hover:text-primary-700">Done</button>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
 
 const STATUS_TABS = [
   { key: 'on-ship', label: 'On Ship', count: 3 },
@@ -45,7 +100,7 @@ export default function Containers() {
         ))}
       </div>
 
-      {/* Search + Port filter + Columns */}
+      {/* Search + Port filter + Customer filter + Columns */}
       <div className="flex items-center gap-3 mb-5">
         <div className="relative">
           <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -56,6 +111,7 @@ export default function Containers() {
           <option>PCT</option>
           <option>LBCT</option>
         </select>
+        <CustomerFilter />
         <div className="ml-auto">
           <button className="flex items-center gap-1.5 px-3 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50">
             <Settings size={13} /> Columns
