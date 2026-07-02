@@ -162,15 +162,6 @@ export default function AgentWorkstation() {
           ))}
         </nav>
 
-        {/* Settings */}
-        <div className="px-2 py-2 border-t border-gray-100 mt-2">
-          <p className="text-[10px] font-semibold text-gray-400 uppercase px-2 pt-1 pb-1">Settings</p>
-          <button className="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-xs font-medium text-gray-600 hover:bg-gray-50">
-            <Settings size={14} />
-            Preferences
-          </button>
-        </div>
-
         {/* Recents */}
         <div className="px-2 py-2 border-t border-gray-100">
           <p className="text-[10px] font-semibold text-primary-600 uppercase px-2 pt-1 pb-1">Recents</p>
