@@ -3,10 +3,10 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { ArrowLeft, ArrowRight, CheckCircle2, Circle, Truck, Eye, Clock, MapPin, GripVertical } from 'lucide-react'
 
 const D = {
-  customer: 'ADOORN LLC', shipmentNo: 'SSHAS2608137', hbl: 'SSGNS2607829', mbl: '039GX40070',
+  customer: 'ADOORN LLC', carrier: 'WAN HAI LINES', shipmentNo: 'SSHAS2608137', hbl: 'SSGNS2607829', mbl: '039GX40070',
   container: 'WHSU8555505', status: 'Drayage in Progress', milestone: 'Port to Warehouse Delivery Scheduled',
   origin: 'Haiphong, VN', destination: 'UNIS Seabrook Warehouse, Deer Park, NY',
-  carrier: 'WAN HAI LINES', vessel: 'WAN HAI A10 / E013', podEta: 'Jun 13, 2026 14:00', whEta: 'Jun 19, 2026 09:00', lastUpdated: 'Jun 15, 2026 08:30',
+  vessel: 'WAN HAI A10 / E013', podEta: 'Jun 13, 2026 14:00', whEta: 'Jun 19, 2026 09:00', lastUpdated: 'Jun 15, 2026 08:30',
   progress: 62, totalContainers: 1, totalSkus: 10, totalWeight: '10,542 KG', volume: '68 M\u00b3',
   containers: [{ containerNo: 'WHSU8555505', size: '40HC', seal: 'WHLW847513', loadNo: 'UNIS_SAV_M012771', drayageStatus: 'Scheduled', pickupTerminal: 'Garden City Terminal', destWarehouse: 'UNIS Seabrook', lfd: 'Jun 11, 2026', deliveryEta: 'Jun 19, 2026', deliveredTime: '-' }],
   items: [
@@ -105,8 +105,8 @@ const TIMELINE_PHASES: PhaseNode[] = [
   },
 ]
 
-const TABS = ['Containers & Drayage', 'Items SKUs', 'Customs', 'Documents']
-const MAIN_TABS = ['Overview', 'Detail']
+const TABS = ['Containers & Drayage', 'Items SKUs', 'Customs Clearance', 'Drayage Load', 'Documents']
+const MAIN_TABS = ['Overview', 'Containers & Drayage', 'Items SKUs', 'Customs Clearance', 'Drayage Load', 'Documents']
 
 export default function IntlTrackingDetail() {
   const { id } = useParams()
@@ -114,7 +114,6 @@ export default function IntlTrackingDetail() {
   const location = useLocation()
   const basePath = location.pathname.includes('/tracking2') ? '/international/tracking2' : location.pathname.includes('/backup') ? '/backup/tracking' : '/international/tracking'
   const [activeTab, setActiveTab] = useState(MAIN_TABS[0])
-  const [detailTab, setDetailTab] = useState(TABS[0])
   const [viewDoc, setViewDoc] = useState<string | null>(null)
   const [mapFullscreen, setMapFullscreen] = useState(false)
 
@@ -179,6 +178,8 @@ export default function IntlTrackingDetail() {
               </div>
 
               <div className="border-t border-gray-200 pt-3 space-y-3 text-xs">
+                <div><p className="text-[9px] text-gray-400 uppercase">Customer</p><p className="font-semibold text-gray-900">{D.customer}</p></div>
+                <div><p className="text-[9px] text-gray-400 uppercase">Carrier</p><p className="font-semibold text-gray-900">{D.carrier}</p></div>
                 <div><p className="text-[9px] text-gray-400 uppercase">Shipment No.</p><p className="font-semibold text-gray-900">{D.shipmentNo}</p></div>
                 <div><p className="text-[9px] text-gray-400 uppercase">HBL</p><p className="font-semibold text-gray-900">{D.hbl}</p></div>
                 <div><p className="text-[9px] text-gray-400 uppercase">MBL</p><p className="font-semibold text-gray-900">{D.mbl}</p></div>
@@ -342,39 +343,56 @@ export default function IntlTrackingDetail() {
         </div>
       )}
 
-      {/* ═══ Tab: Detail (with sub-tabs) ═══ */}
-      {activeTab === 'Detail' && (
-        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-          <div className="flex border-b border-gray-200">
-            {TABS.map(tab => (
-              <button key={tab} onClick={() => setDetailTab(tab)} className={`px-5 py-3 text-sm font-medium border-b-2 transition-colors ${detailTab === tab ? 'border-primary-600 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>{tab}</button>
-            ))}
+      {/* ═══ Content Tabs (directly after Overview) ═══ */}
+      {activeTab === 'Containers & Drayage' && (
+        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden p-5">
+          <table className="w-full text-xs">
+            <thead><tr className="bg-gray-50 border-b">{['Container No.', 'Size', 'Seal', 'Drayage Load No.', 'Status', 'Pickup Terminal', 'Dest. Warehouse', 'LFD', 'Delivery ETA', 'Delivered'].map(h => (<th key={h} className="text-left py-2.5 px-3 font-semibold text-gray-500">{h}</th>))}</tr></thead>
+            <tbody>{D.containers.map((c, i) => (<tr key={i} className="border-b border-gray-100"><td className="py-2.5 px-3 font-mono">{c.containerNo}</td><td className="py-2.5 px-3">{c.size}</td><td className="py-2.5 px-3">{c.seal}</td><td className="py-2.5 px-3 text-primary-600 font-medium cursor-pointer hover:underline" onClick={() => navigate(`/international/drayage/${c.loadNo}`)}>{c.loadNo}</td><td className="py-2.5 px-3">{c.drayageStatus}</td><td className="py-2.5 px-3">{c.pickupTerminal}</td><td className="py-2.5 px-3">{c.destWarehouse}</td><td className="py-2.5 px-3">{c.lfd}</td><td className="py-2.5 px-3">{c.deliveryEta}</td><td className="py-2.5 px-3">{c.deliveredTime}</td></tr>))}</tbody>
+          </table>
+        </div>
+      )}
+      {activeTab === 'Items SKUs' && (
+        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden p-5">
+          <table className="w-full text-xs">
+            <thead><tr className="bg-gray-50 border-b">{['SKU', 'Product Name', 'Variant', 'Expected', 'Received', 'Diff', 'Damaged', 'Unit', 'Status'].map(h => (<th key={h} className="text-left py-2.5 px-3 font-semibold text-gray-500">{h}</th>))}</tr></thead>
+            <tbody>{D.items.map((item, i) => (<tr key={i} className="border-b border-gray-100"><td className="py-2.5 px-3 font-mono text-primary-600">{item.sku}</td><td className="py-2.5 px-3">{item.name}</td><td className="py-2.5 px-3">{item.variant}</td><td className="py-2.5 px-3 font-medium">{item.expected}</td><td className="py-2.5 px-3 text-green-600 font-medium">{item.received}</td><td className="py-2.5 px-3 text-orange-600">{item.diff}</td><td className="py-2.5 px-3 text-red-600">{item.damaged}</td><td className="py-2.5 px-3">{item.unit}</td><td className="py-2.5 px-3"><span className="text-green-600 font-medium">{item.status}</span></td></tr>))}</tbody>
+          </table>
+        </div>
+      )}
+      {activeTab === 'Customs Clearance' && (
+        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden p-5">
+          <div className="grid grid-cols-3 gap-4 text-sm">
+            {[['Customs Status', 'Released'], ['Entry No.', '82G-0101679-0'], ['Port of Entry', 'Savannah, GA'], ['Customs Broker', 'JFS (Jones Fulfillment Services)'], ['Hold Reason', 'None'], ['Duty Amount', '$8,991.00'], ['HTS Code', '8518.40.20']].map(([l, v]) => (<div key={l}><p className="text-[10px] text-gray-400 uppercase">{l}</p><p className="font-medium text-gray-900">{v}</p></div>))}
           </div>
-          <div className="p-5">
-            {detailTab === 'Containers & Drayage' && (
-              <table className="w-full text-xs">
-                <thead><tr className="bg-gray-50 border-b">{['Container No.', 'Size', 'Seal', 'Drayage Load No.', 'Status', 'Pickup Terminal', 'Dest. Warehouse', 'LFD', 'Delivery ETA', 'Delivered'].map(h => (<th key={h} className="text-left py-2.5 px-3 font-semibold text-gray-500">{h}</th>))}</tr></thead>
-                <tbody>{D.containers.map((c, i) => (<tr key={i} className="border-b border-gray-100"><td className="py-2.5 px-3 font-mono">{c.containerNo}</td><td className="py-2.5 px-3">{c.size}</td><td className="py-2.5 px-3">{c.seal}</td><td className="py-2.5 px-3 text-primary-600 font-medium cursor-pointer hover:underline" onClick={() => navigate(`/international/drayage/${c.loadNo}`)}>{c.loadNo}</td><td className="py-2.5 px-3">{c.drayageStatus}</td><td className="py-2.5 px-3">{c.pickupTerminal}</td><td className="py-2.5 px-3">{c.destWarehouse}</td><td className="py-2.5 px-3">{c.lfd}</td><td className="py-2.5 px-3">{c.deliveryEta}</td><td className="py-2.5 px-3">{c.deliveredTime}</td></tr>))}</tbody>
-              </table>
-            )}
-            {detailTab === 'Items SKUs' && (
-              <table className="w-full text-xs">
-                <thead><tr className="bg-gray-50 border-b">{['SKU', 'Product Name', 'Variant', 'Expected', 'Received', 'Diff', 'Damaged', 'Unit', 'Status'].map(h => (<th key={h} className="text-left py-2.5 px-3 font-semibold text-gray-500">{h}</th>))}</tr></thead>
-                <tbody>{D.items.map((item, i) => (<tr key={i} className="border-b border-gray-100"><td className="py-2.5 px-3 font-mono text-primary-600">{item.sku}</td><td className="py-2.5 px-3">{item.name}</td><td className="py-2.5 px-3">{item.variant}</td><td className="py-2.5 px-3 font-medium">{item.expected}</td><td className="py-2.5 px-3 text-green-600 font-medium">{item.received}</td><td className="py-2.5 px-3 text-orange-600">{item.diff}</td><td className="py-2.5 px-3 text-red-600">{item.damaged}</td><td className="py-2.5 px-3">{item.unit}</td><td className="py-2.5 px-3"><span className="text-green-600 font-medium">{item.status}</span></td></tr>))}</tbody>
-              </table>
-            )}
-            {detailTab === 'Customs' && (
-              <div className="grid grid-cols-3 gap-4 text-sm">
-                {[['Customs Status', 'Released'], ['Entry No.', '82G-0101679-0'], ['Port of Entry', 'Savannah, GA'], ['Release Date', 'Jun 10, 2026 16:45'], ['Customs Broker', 'JFS'], ['Hold Reason', 'None']].map(([l, v]) => (<div key={l}><p className="text-[10px] text-gray-400">{l}</p><p className="font-medium text-gray-900">{v}</p></div>))}
-              </div>
-            )}
-            {detailTab === 'Documents' && (
-              <table className="w-full text-xs">
-                <thead><tr className="bg-gray-50 border-b">{['Document Type', 'Reference No.', 'File Name', 'Updated'].map(h => (<th key={h} className="text-left py-2.5 px-3 font-semibold text-gray-500">{h}</th>))}</tr></thead>
-                <tbody>{D.documents.filter(doc => doc.type !== 'MBL').map((doc, i) => (<tr key={i} className="border-b border-gray-100 hover:bg-gray-50"><td className="py-2.5 px-3 font-medium">{doc.type}</td><td className="py-2.5 px-3">{doc.docNo}</td><td className="py-2.5 px-3">{doc.fileName ? <a href="#" onClick={e => { e.preventDefault() }} download={doc.fileName} className="text-primary-600 hover:underline font-medium">{doc.fileName}</a> : <span className="text-gray-400">-</span>}</td><td className="py-2.5 px-3">{doc.time}</td></tr>))}</tbody>
-              </table>
-            )}
-          </div>
+        </div>
+      )}
+      {activeTab === 'Drayage Load' && (
+        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden p-5">
+          <table className="w-full text-xs">
+            <thead><tr className="bg-gray-50 border-b">{['Load #', 'Container', 'Status', 'Pick Up Terminal', 'Delivery Warehouse', 'Driver', 'Pickup Date', 'Delivery ETA', 'Delivered Date'].map(h => (<th key={h} className="text-left py-2.5 px-3 font-semibold text-gray-500">{h}</th>))}</tr></thead>
+            <tbody>
+              <tr className="border-b border-gray-100">
+                <td className="py-2.5 px-3 text-primary-600 font-medium cursor-pointer hover:underline" onClick={() => navigate('/international/drayage/UNIS_SAV_M012771')}>UNIS_SAV_M012771</td>
+                <td className="py-2.5 px-3 font-mono">WHSU8555505</td>
+                <td className="py-2.5 px-3"><span className="text-[10px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-medium">Dispatched</span></td>
+                <td className="py-2.5 px-3">Garden City Terminal</td>
+                <td className="py-2.5 px-3">UNIS Seabrook</td>
+                <td className="py-2.5 px-3">Mike Johnson</td>
+                <td className="py-2.5 px-3">Jun 15, 2026</td>
+                <td className="py-2.5 px-3">Jun 19, 2026</td>
+                <td className="py-2.5 px-3 text-gray-400">-</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      )}
+      {activeTab === 'Documents' && (
+        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden p-5">
+          <table className="w-full text-xs">
+            <thead><tr className="bg-gray-50 border-b">{['Document Type', 'Reference No.', 'File Name', 'Updated'].map(h => (<th key={h} className="text-left py-2.5 px-3 font-semibold text-gray-500">{h}</th>))}</tr></thead>
+            <tbody>{D.documents.filter(doc => doc.type !== 'MBL').map((doc, i) => (<tr key={i} className="border-b border-gray-100 hover:bg-gray-50"><td className="py-2.5 px-3 font-medium">{doc.type}</td><td className="py-2.5 px-3">{doc.docNo}</td><td className="py-2.5 px-3">{doc.fileName ? <a href="#" onClick={e => { e.preventDefault() }} download={doc.fileName} className="text-primary-600 hover:underline font-medium">{doc.fileName}</a> : <span className="text-gray-400">-</span>}</td><td className="py-2.5 px-3">{doc.time}</td></tr>))}</tbody>
+          </table>
         </div>
       )}
 

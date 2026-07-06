@@ -36,9 +36,9 @@ function IconSidebar() {
         <div className="relative">
           <IconButton
             icon={<Users2 size={18} />}
-            label="Collab"
+            label="Support"
             isActive={isCollabActive}
-            onClick={() => navigate('/collaboration')}
+            onClick={() => navigate('/support')}
           />
           {collabUnread > 0 && (
             <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[9px] font-bold rounded-full w-3.5 h-3.5 flex items-center justify-center leading-none pointer-events-none">

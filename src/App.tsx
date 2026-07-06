@@ -11,6 +11,7 @@ import InventoryActivity from './components/Inventory/InventoryActivity'
 import WholesaleOrders from './components/Orders/WholesaleOrders'
 import RetailOrders from './components/Orders/RetailOrders'
 import OutboundInquiry from './components/Orders/OutboundInquiry'
+import FreightQuote from './components/Outbound/FreightQuote'
 import InboundInquiry from './components/Orders/InboundInquiry'
 import ReceiptDetail from './components/Inbound/ReceiptDetail'
 import Shipments from './components/Shipping/Shipments'
@@ -26,6 +27,7 @@ import DrayageLoadDetail from './components/International/DrayageLoadDetail'
 import IntlTracking from './components/International/IntlTracking'
 import IntlTrackingDetail from './components/International/IntlTrackingDetail'
 import IntlTrackingPortal from './components/International/IntlTrackingPortal'
+import ShipmentTracking from './components/International/ShipmentTracking'
 import AgentWorkstation from './components/Agents/AgentWorkstation'
 import UserProfile from './components/UserProfile/UserProfile'
 
@@ -56,6 +58,7 @@ function App() {
 
         {/* Outbound */}
         <Route path="outbound/inquiry" element={<OutboundInquiry />} />
+        <Route path="outbound/freight-quote" element={<FreightQuote />} />
 
         {/* Inbound */}
         <Route path="inbound/inquiry" element={<InboundInquiry />} />
@@ -85,6 +88,9 @@ function App() {
         <Route path="backup/tracking/:id" element={<IntlTrackingDetail />} />
         <Route path="international/tracking2" element={<IntlTrackingPortal />} />
         <Route path="international/tracking2/:id" element={<IntlTrackingDetail />} />
+
+        {/* International (new) - Shipment Tracking */}
+        <Route path="international-new/tracking" element={<ShipmentTracking />} />
 
         {/* Agents / AI Native */}
         <Route path="agents" element={<AgentWorkstation />} />

@@ -1,745 +1,613 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
-  ChevronRight, ChevronLeft, Paperclip, Sparkles,
-  Zap, Package, Truck, Camera, ClipboardList,
-  RotateCcw, CheckCircle2, Info,
-  ShoppingCart, AlertCircle, X, ArrowLeft,
+  ArrowLeft, Sparkles, AlertCircle, Loader2,
+  Paperclip, Info, Zap, Package, Truck, DollarSign,
+  MessageSquare, Clock, HelpCircle, BoxSelect,
 } from 'lucide-react'
-import { SERVICE_CATALOG, type ServiceDefinition } from '../../data/serviceCatalog'
-import { useCollaboration } from '../../context/CollaborationContext'
-import type { WorkItemPriority, ServiceId } from '../../types/workItem'
 
-// ─── Request topic categories ────────────────────────────────────────────────
+// ─── Types ───────────────────────────────────────────────────────────────────
+
+type Priority = 'Low' | 'Medium' | 'High' | 'Urgent'
 
 interface TopicOption {
   id: string
-  label: string
-  description: string
   icon: React.ReactNode
-  relatedServices?: ServiceId[]
+  label: string
+  desc: string
+  color: string
 }
 
-const REQUEST_TOPICS: TopicOption[] = [
-  {
-    id: 'expedite',
-    label: '加急处理',
-    description: '订单紧急需要优先出库处理',
-    icon: <Zap size={20} className="text-red-500" />,
-    relatedServices: ['expedite-processing', 'priority-handling', 'upgrade-shipping'],
-  },
-  {
-    id: 'inventory-issue',
-    label: '库存问题',
-    description: '库存差异、货损、丢货追踪、临时盘点等',
-    icon: <Package size={20} className="text-orange-500" />,
-    relatedServices: ['photo-request', 'sku-inspection', 'inventory-audit-service'],
-  },
-  {
-    id: 'shipping-issue',
-    label: '运输问题',
-    description: '配送延误、地址错误、改派需求',
-    icon: <Truck size={20} className="text-blue-500" />,
-    relatedServices: ['redirect-shipment', 'hold-shipment', 'upgrade-shipping'],
-  },
-  {
-    id: 'vas-request',
-    label: '增值服务',
-    description: '组套、贴标、拍照、包装、礼品贺卡等',
-    icon: <Camera size={20} className="text-violet-500" />,
-    relatedServices: ['kitting', 'bundling', 'repackaging', 'relabeling', 'gift-message', 'photo-request'],
-  },
-  {
-    id: 'inbound-issue',
-    label: '入库相关',
-    description: '收货差异、到货预约、入库异常',
-    icon: <ClipboardList size={20} className="text-green-500" />,
-    relatedServices: ['photo-request', 'sku-inspection'],
-  },
-  {
-    id: 'return-disposal',
-    label: '退货与处置',
-    description: '退货处理、货物销毁、翻修再售',
-    icon: <RotateCcw size={20} className="text-amber-600" />,
-    relatedServices: ['disposition-service', 'rework-service'],
-  },
-  {
-    id: 'billing',
-    label: '发票/对账',
-    description: '账单查询、发票申请、费用对账、付款问题',
-    icon: <ClipboardList size={20} className="text-emerald-500" />,
-    relatedServices: [],
-  },
-  {
-    id: 'other',
-    label: '其他问题',
-    description: '上述分类未覆盖的其他业务问题',
-    icon: <Info size={20} className="text-gray-500" />,
-    relatedServices: [],
-  },
+interface AIAnalysis {
+  subject: string
+  priority: Priority
+  relatedType: string
+  relatedId: string
+  issueCategory: string
+  issueSummary: string
+  detectedRecords: string[]
+  missingInfo: string[]
+  suggestedRouting: string
+  recommendedAction: string
+}
+
+// ─── Topic options (Step 1) ──────────────────────────────────────────────────
+const TOPICS: TopicOption[] = [
+  { id: 'urgent', icon: <Zap size={18} />, label: 'Urgent Processing', desc: 'Critical issues requiring immediate attention', color: 'text-red-500' },
+  { id: 'inventory', icon: <Package size={18} />, label: 'Inventory Issues', desc: 'Stock discrepancy, shortage, damage', color: 'text-blue-500' },
+  { id: 'shipping', icon: <Truck size={18} />, label: 'Shipping & Transport', desc: 'Delivery issues, routing, tracking', color: 'text-green-500' },
+  { id: 'vas', icon: <Sparkles size={18} />, label: 'Value-Added Services', desc: 'Labeling, kitting, packaging, returns', color: 'text-purple-500' },
+  { id: 'inbound', icon: <BoxSelect size={18} />, label: 'Inbound Related', desc: 'Receiving, appointments, putaway', color: 'text-amber-500' },
+  { id: 'customs', icon: <Clock size={18} />, label: 'Customs & Compliance', desc: 'Declarations, holds, documentation', color: 'text-teal-500' },
+  { id: 'billing', icon: <DollarSign size={18} />, label: 'Invoice / Billing', desc: 'Billing inquiries, disputes, payment', color: 'text-orange-500' },
+  { id: 'other', icon: <HelpCircle size={18} />, label: 'Other Issues', desc: 'General questions, misc. requests', color: 'text-gray-500' },
 ]
 
-// ─── Service Payment Panel ───────────────────────────────────────────────────
-
-function ServicePaymentPanel({
-  service,
-  onConfirm,
-  onCancel,
-}: {
-  service: ServiceDefinition
-  onConfirm: () => void
-  onCancel: () => void
-}) {
-  const [paying, setPaying] = useState(false)
-  const [paid, setPaid] = useState(false)
-
-  const bulletPoints = service.businessValue.split('\uFF1B').map((s) => s.trim()).filter(Boolean)
-
-  const handlePay = () => {
-    setPaying(true)
-    setTimeout(() => {
-      setPaying(false)
-      setPaid(true)
-      setTimeout(() => onConfirm(), 1200)
-    }, 1500)
-  }
-
-  if (paid) {
-    return (
-      <div className="border border-green-300 bg-green-50 rounded-xl p-6 text-center space-y-2">
-        <CheckCircle2 size={32} className="text-green-600 mx-auto" />
-        <p className="text-sm font-semibold text-green-800">支付成功，服务已开通</p>
-        <p className="text-xs text-green-600">正在返回...</p>
-      </div>
-    )
-  }
-
-  return (
-    <div className="border border-primary-200 bg-white rounded-xl shadow-lg overflow-hidden">
-      <div className="bg-gradient-to-r from-primary-600 to-indigo-600 px-5 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <ShoppingCart size={15} className="text-white/80" />
-          <span className="text-sm font-semibold text-white">开通服务</span>
-        </div>
-        <button onClick={onCancel} className="text-white/60 hover:text-white transition-colors">
-          <X size={15} />
-        </button>
-      </div>
-      <div className="p-5 space-y-4">
-        <div>
-          <h4 className="text-base font-bold text-gray-900">{service.nameCn}</h4>
-          <p className="text-xs text-gray-500 mt-0.5">{service.name} · {service.tagline}</p>
-        </div>
-        <p className="text-sm text-gray-600 leading-relaxed">{service.description}</p>
-        {bulletPoints.length > 0 && (
-          <div className="bg-gray-50 rounded-lg p-3 space-y-1.5">
-            <p className="text-[11px] font-medium text-gray-500 uppercase tracking-wide">服务价值</p>
-            {bulletPoints.map((point, i) => (
-              <p key={i} className="flex items-start gap-1.5 text-xs text-gray-600">
-                <CheckCircle2 size={11} className="text-green-500 mt-0.5 shrink-0" />
-                <span>{point}</span>
-              </p>
-            ))}
-          </div>
-        )}
-        <div className="border border-gray-200 rounded-lg p-4">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-gray-500">服务费用</span>
-            <span className="text-xl font-bold text-gray-900">{service.price}</span>
-          </div>
-          <div className="flex items-center justify-between text-xs text-gray-400">
-            <span>{service.priceNote}</span>
-            <span>按需计费 · 随时可取消</span>
-          </div>
-        </div>
-        <div className="border border-gray-200 rounded-lg p-3">
-          <p className="text-xs font-medium text-gray-500 mb-2">支付方式</p>
-          <div className="flex items-center gap-4">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input type="radio" name="pay-method" defaultChecked className="text-primary-600" />
-              <span className="text-sm text-gray-700">账户余额扣款</span>
-            </label>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input type="radio" name="pay-method" className="text-primary-600" />
-              <span className="text-sm text-gray-700">月结账单</span>
-            </label>
-          </div>
-        </div>
-        <label className="flex items-start gap-2 cursor-pointer">
-          <input type="checkbox" defaultChecked className="mt-0.5 rounded text-primary-600" />
-          <span className="text-xs text-gray-500 leading-relaxed">
-            我已阅读并同意<span className="text-primary-600">《增值服务协议》</span>，确认开通后服务即时生效
-          </span>
-        </label>
-        <div className="flex gap-3 pt-1">
-          <button onClick={onCancel} className="flex-1 py-2.5 text-sm font-medium text-gray-500 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-            取消
-          </button>
-          <button
-            onClick={handlePay}
-            disabled={paying}
-            className="flex-[2] py-2.5 bg-primary-600 text-white rounded-lg text-sm font-semibold hover:bg-primary-700 disabled:opacity-60 transition-colors flex items-center justify-center gap-1.5"
-          >
-            {paying ? (
-              <><span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> 处理..</>
-            ) : (
-              <>确认支付 {service.price}</>
-            )}
-          </button>
-        </div>
-      </div>
-    </div>
-  )
+// ─── Sample AI analysis ──────────────────────────────────────────────────────
+const SAMPLE_ANALYSIS: AIAnalysis = {
+  subject: 'Order ORD-5521 fulfillment failure - inventory allocation issue for SKU-A100 & SKU-B200',
+  priority: 'High',
+  relatedType: 'Sales Order',
+  relatedId: 'ORD-5521',
+  issueCategory: 'Inventory / Fulfillment',
+  issueSummary: 'The request is about an order fulfillment failure where inventory shows as available but the system cannot allocate stock for shipment. This typically indicates an inventory lock or allocation conflict.',
+  detectedRecords: ['Sales Order: ORD-5521', 'SKU: SKU-A100, SKU-B200', 'Warehouse: Valley View'],
+  missingInfo: ['Expected delivery date not provided', 'Screenshot of the error message recommended', 'Confirm if partial fulfillment is acceptable'],
+  suggestedRouting: 'Customer Service \u2192 Inventory Team \u2192 Warehouse Support',
+  recommendedAction: 'Please verify if there are any pending allocations or holds on SKU-A100 and SKU-B200 at Valley View. Check if other orders have reserved the available stock.',
 }
 
-// ─── Inline Service Card ─────────────────────────────────────────────────────
-
-function InlineServiceCard({ service, isPurchased, onPurchase }: {
-  service: ServiceDefinition; isPurchased: boolean; onPurchase: () => void
-}) {
-  const [showDetail, setShowDetail] = useState(false)
-  const [justPurchased, setJustPurchased] = useState(false)
-  const [showPayment, setShowPayment] = useState(false)
-
-  const handlePurchaseComplete = () => {
-    onPurchase()
-    setJustPurchased(true)
-    setShowPayment(false)
-    setShowDetail(false)
-  }
-
-  if (justPurchased) {
-    return (
-      <div className="border border-green-200 bg-green-50 rounded-lg p-3 flex items-center gap-3">
-        <CheckCircle2 size={16} className="text-green-600 shrink-0" />
-        <div className="flex-1">
-          <p className="text-sm font-medium text-green-800">{service.nameCn} 已开通</p>
-          <p className="text-xs text-green-600">本次请求可直接使用此服务</p>
-        </div>
-      </div>
-    )
-  }
-
-  if (isPurchased) {
-    return (
-      <div className="border border-green-100 bg-green-50/50 rounded-lg p-3 flex items-center gap-3">
-        <CheckCircle2 size={14} className="text-green-500 shrink-0" />
-        <span className="text-sm font-medium text-green-700">{service.nameCn}</span>
-        <span className="text-xs text-green-500">已开通 · 可直接使用</span>
-      </div>
-    )
-  }
-
-  if (showPayment) {
-    return (
-      <ServicePaymentPanel
-        service={service}
-        onConfirm={handlePurchaseComplete}
-        onCancel={() => setShowPayment(false)}
-      />
-    )
-  }
-
-  const bulletPoints = service.businessValue.split('\uFF1B').map((s) => s.trim()).filter(Boolean)
-
-  return (
-    <div className={`border rounded-lg transition-all ${showDetail ? 'border-primary-200 shadow-sm' : 'border-gray-200'}`}>
-      <div className="flex items-center gap-3 p-3 cursor-pointer hover:bg-gray-50 transition-colors" onClick={() => setShowDetail(!showDetail)}>
-        <AlertCircle size={14} className="text-amber-500 shrink-0" />
-        <div className="flex-1 min-w-0">
-          <span className="text-sm font-medium text-gray-800">{service.nameCn}</span>
-          <span className="text-xs text-gray-400 ml-2">· {service.tagline}</span>
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
-          <span className="text-sm font-semibold text-gray-700">{service.price}</span>
-          <span className="text-xs text-primary-600 font-medium">{showDetail ? '收起' : '了解开通'}</span>
-        </div>
-      </div>
-      {showDetail && (
-        <div className="px-3 pb-3 border-t border-gray-100 pt-3 space-y-3">
-          <p className="text-sm text-gray-600 leading-relaxed">{service.description}</p>
-          {bulletPoints.length > 0 && (
-            <ul className="space-y-1">
-              {bulletPoints.map((point, i) => (
-                <li key={i} className="flex items-start gap-1.5 text-xs text-gray-500">
-                  <CheckCircle2 size={11} className="text-primary-400 mt-0.5 shrink-0" />
-                  <span>{point}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-          <div className="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2.5">
-            <div>
-              <span className="text-base font-bold text-gray-900">{service.price}</span>
-              <span className="text-xs text-gray-400 ml-1.5">{service.priceNote}</span>
-            </div>
-            <span className="text-xs text-gray-400">按需计费 · 随时取消</span>
-          </div>
-          <button
-            onClick={(e) => { e.stopPropagation(); setShowPayment(true) }}
-            className="w-full flex items-center justify-center gap-2 py-2.5 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors"
-          >
-            <ShoppingCart size={14} />
-            开通服务，立即可用
-          </button>
-        </div>
-      )}
-    </div>
-  )
-}
-
-// ─── Collapsible Services Section ────────────────────────────────────────────
-
-function CollapsibleServicesSection({ relatedServices, purchasedServices, purchaseService, topicLabel }: {
-  relatedServices: ServiceDefinition[]
-  purchasedServices: Set<string>
-  purchaseService: (id: string) => void
-  topicLabel: string
-}) {
-  const [expanded, setExpanded] = useState(false)
-  const purchasedCount = relatedServices.filter((s) => purchasedServices.has(s.id)).length
-  const totalCount = relatedServices.length
-
-  // Show first 2 by default, rest on expand
-  const defaultVisible = relatedServices.slice(0, 2)
-  const extraServices = relatedServices.slice(2)
-  const hasMore = extraServices.length > 0
-
-  return (
-    <div className="border border-blue-100 rounded-lg overflow-hidden bg-gradient-to-b from-blue-50/80 to-blue-50/30">
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 py-2.5 bg-blue-50/60">
-        <div className="flex items-center gap-2">
-          <Sparkles size={14} className="text-indigo-500" />
-          <span className="text-xs font-medium text-gray-600">
-            增值服务推荐· 针对「{topicLabel}」智能推荐· {purchasedCount}/{totalCount} 已开通
-          </span>
-        </div>
-      </div>
-
-      {/* Always-visible first 2 services */}
-      <div className="px-4 py-3 space-y-2">
-        {defaultVisible.map((service) => (
-          <InlineServiceCard
-            key={service.id}
-            service={service}
-            isPurchased={purchasedServices.has(service.id)}
-            onPurchase={() => purchaseService(service.id)}
-          />
-        ))}
-
-        {/* Expanded extra services */}
-        {expanded && extraServices.map((service) => (
-          <InlineServiceCard
-            key={service.id}
-            service={service}
-            isPurchased={purchasedServices.has(service.id)}
-            onPurchase={() => purchaseService(service.id)}
-          />
-        ))}
-
-        {/* Expand/collapse toggle */}
-        {hasMore && (
-          <button
-            onClick={() => setExpanded(!expanded)}
-            className="w-full text-center py-1.5 text-xs text-primary-600 font-medium hover:text-primary-700 transition-colors"
-          >
-            {expanded ? '收起' : `查看更多增值服务(${extraServices.length})`}
-          </button>
-        )}
-      </div>
-    </div>
-  )
-}
-
-// ─── Main Page Component ─────────────────────────────────────────────────────
+// ─── Component ───────────────────────────────────────────────────────────────
 
 export default function SubmitRequestPage() {
   const navigate = useNavigate()
-  const { purchasedServices, purchaseService } = useCollaboration()
 
-  // Support URL params for pre-selection (e.g. ?topic=expedite&priority=Critical)
-  const searchParams = new URLSearchParams(window.location.search)
-  const presetTopic = searchParams.get('topic')
-  const presetPriority = searchParams.get('priority') as WorkItemPriority | null
+  // Step state
+  const [step, setStep] = useState(1) // 1: select topic, 2: fill details, 3: confirm
+  const [selectedTopic, setSelectedTopic] = useState<string | null>(null)
 
-  const initialTopic = presetTopic ? REQUEST_TOPICS.find((t) => t.id === presetTopic) ?? null : null
-  const [step, setStep] = useState<'topic' | 'details' | 'confirm'>(initialTopic ? 'details' : 'topic')
-  const [selectedTopic, setSelectedTopic] = useState<TopicOption | null>(initialTopic)
-  const [submitted, setSubmitted] = useState(false)
+  // Form state
+  const [email, setEmail] = useState('yujuan.wang@item.com')
+  const [description, setDescription] = useState('')
+  const [subject, setSubject] = useState('')
+  const [priority, setPriority] = useState<Priority>('Medium')
+  const [relatedType, setRelatedType] = useState('')
+  const [relatedId, setRelatedId] = useState('')
 
-  const [form, setForm] = useState({
-    subject: '',
-    description: '',
-    priority: (presetPriority || 'Medium') as WorkItemPriority,
-    relatedObjectType: '',
-    relatedObjectId: '',
-    email: '',
-    billingOption: 'none' as 'none' | 'invoice' | 'prepaid',
-  })
+  // AI state
+  const [aiRunning, setAiRunning] = useState(false)
+  const [aiResult, setAiResult] = useState<AIAnalysis | null>(null)
+  const [aiApplied, setAiApplied] = useState(false)
+  const [aiSkipped, setAiSkipped] = useState(false)
+  const [autoAnalyzeTimer, setAutoAnalyzeTimer] = useState<ReturnType<typeof setTimeout> | null>(null)
 
-  const [aiAnalysis, setAiAnalysis] = useState<string | null>(null)
-  const [aiLoading, setAiLoading] = useState(false)
+  // VAS state
+  const [showMoreServices, setShowMoreServices] = useState(false)
+  const [serviceModal, setServiceModal] = useState<string | null>(null)
+  const [serviceEnabled, setServiceEnabled] = useState(false)
+  const [paymentSuccess, setPaymentSuccess] = useState(false)
+  const [paymentStep, setPaymentStep] = useState<'info' | 'card' | 'success'>('info')
 
-  const handle = (field: keyof typeof form, value: string) =>
-    setForm((p) => ({ ...p, [field]: value }))
+  // AI Query state (right panel)
+  const [aiQuery, setAiQuery] = useState('')
+  const [aiQueryLoading, setAiQueryLoading] = useState(false)
+  const [aiQueryResult, setAiQueryResult] = useState('')
 
-  const relatedServices = selectedTopic?.relatedServices?.map((id) => SERVICE_CATALOG[id]).filter(Boolean) ?? []
-  const hasRelatedServices = relatedServices.length > 0
-  const purchasedRelated = relatedServices.filter((s) => purchasedServices.has(s.id))
-
-  const goNext = () => {
-    if (step === 'topic' && selectedTopic) setStep('details')
-    else if (step === 'details') setStep('confirm')
-  }
-  const goBack = () => {
-    if (step === 'details') setStep('topic')
-    else if (step === 'confirm') setStep('details')
-  }
-  const handleSubmit = () => { setSubmitted(true) }
-
-  const steps: ('topic' | 'details' | 'confirm')[] = ['topic', 'details', 'confirm']
-  const stepLabels = { topic: '选择类型', details: '填写详情', confirm: '确认提交' }
-
-  // ── Success state ─────────────────────────────────────────────────────────
-  if (submitted) {
-    return (
-      <div className="p-6 max-w-2xl mx-auto">
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-12 text-center">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-5">
-            <CheckCircle2 size={32} className="text-green-600" />
-          </div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">请求已提交</h2>
-          <p className="text-sm text-gray-500 mb-1">您的请求已成功提交，我们将尽快处理。</p>
-          <p className="text-xs text-gray-400 mb-8">您可以在「My Requests」中跟踪处理进度。</p>
-          <button
-            onClick={() => navigate('/support/requests')}
-            className="px-6 py-2.5 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors"
-          >
-            返回我的请求
-          </button>
-        </div>
-      </div>
-    )
+  const handleAiQuery = () => {
+    if (!aiQuery.trim()) return
+    setAiQueryLoading(true)
+    setAiQueryResult('')
+    setTimeout(() => {
+      setAiQueryResult('Based on system records, Order ORD-5521 has 2 SKUs (SKU-A100: 48 units, SKU-B200: 120 units) showing available inventory at Valley View warehouse. However, SKU-A100 has 45 units reserved by Order ORD-5489 (pending shipment), leaving only 3 units actually available. This allocation conflict is preventing fulfillment. Recommended action: release hold on ORD-5489 or source from alternate warehouse.')
+      setAiQueryLoading(false)
+    }, 1500)
   }
 
-  // ── Page ──────────────────────────────────────────────────────────────────
+  // Auto-analyze when description changes (debounced)
+  const handleDescriptionChange = (value: string) => {
+    setDescription(value)
+    if (aiSkipped) return
+    if (autoAnalyzeTimer) clearTimeout(autoAnalyzeTimer)
+    // Re-analyze if description changes (always re-trigger for demo)
+    if (value.trim().length > 30) {
+      setAiApplied(false)
+      const timer = setTimeout(() => {
+        runAnalysis(value)
+      }, 1500)
+      setAutoAnalyzeTimer(timer)
+    } else {
+      // Clear AI result if description is too short
+      setAiResult(null)
+    }
+  }
+
+  const runAnalysis = (desc?: string) => {
+    setAiRunning(true)
+    setAiApplied(false)
+    const text = desc || description
+    // Generate dynamic AI result based on description content
+    setTimeout(() => {
+      const extractedId = text.match(/ORD-\d+|order\s+(\w+-\d+)/i)?.[0]?.replace(/order\s+/i, '') || 'ORD-5521'
+      const extractedSku = text.match(/SKU-\w+/gi) || ['SKU-A100', 'SKU-B200']
+      const hasWarehouse = /warehouse|valley view|seabrook/i.test(text)
+      const result: AIAnalysis = {
+        subject: `Order ${extractedId} fulfillment failure - inventory allocation issue for ${extractedSku.slice(0, 2).join(' & ')}`,
+        priority: /urgent|critical|immediately/i.test(text) ? 'Urgent' : /cannot|fail|error/i.test(text) ? 'High' : 'Medium',
+        relatedType: /order|ORD/i.test(text) ? 'Sales Order' : /shipment|ship/i.test(text) ? 'Shipment' : /invoice|bill/i.test(text) ? 'Invoice / Billing' : 'Sales Order',
+        relatedId: extractedId,
+        issueCategory: /inventory|stock|SKU/i.test(text) ? 'Inventory / Fulfillment' : /ship|deliver/i.test(text) ? 'Shipping / Delivery' : 'General',
+        issueSummary: `The request is about an order fulfillment failure where inventory shows as available but the system cannot allocate stock for shipment. This typically indicates an inventory lock or allocation conflict.`,
+        detectedRecords: [`Sales Order: ${extractedId}`, `SKU: ${extractedSku.join(', ')}`, ...(hasWarehouse ? ['Warehouse: Valley View'] : [])],
+        missingInfo: [
+          ...(!hasWarehouse ? ['Warehouse location is missing'] : []),
+          'Expected delivery date not provided',
+          'Screenshot of the error message recommended',
+          'Confirm if partial fulfillment is acceptable',
+        ].filter(Boolean),
+        suggestedRouting: 'Customer Service \u2192 Inventory Team \u2192 Warehouse Support',
+        recommendedAction: `Please verify if there are any pending allocations or holds on ${extractedSku.join(' and ')} at ${hasWarehouse ? 'Valley View' : 'the specified warehouse'}. Check if other orders have reserved the available stock.`,
+      }
+      setAiResult(result)
+      setAiRunning(false)
+    }, 1200)
+  }
+
+  const handleAnalyze = () => {
+    if (!description.trim()) return
+    setAiSkipped(false)
+    runAnalysis()
+  }
+
+  const handleSkipAI = () => {
+    setAiSkipped(true)
+    setAiResult(null)
+    setAiRunning(false)
+    if (autoAnalyzeTimer) clearTimeout(autoAnalyzeTimer)
+  }
+
+  const handleApplySuggestions = () => {
+    if (!aiResult) return
+    setSubject(aiResult.subject)
+    setPriority(aiResult.priority)
+    setRelatedType(aiResult.relatedType)
+    setRelatedId(aiResult.relatedId)
+    setAiApplied(true)
+  }
+
+  const handleNextFromStep1 = () => {
+    if (selectedTopic) setStep(2)
+  }
+
+  const topicLabel = TOPICS.find(t => t.id === selectedTopic)?.label || ''
+
   return (
     <div className="p-6 max-w-5xl mx-auto">
-      {/* Page header with breadcrumb */}
-      <div className="mb-6">
-        <button
-          onClick={() => navigate('/support/requests')}
-          className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 mb-3 transition-colors"
-        >
-          <ArrowLeft size={14} />
-          Back to My Requests
-        </button>
-        <h1 className="text-2xl font-bold text-gray-900">Submit a Request</h1>
-        <p className="text-sm text-gray-500 mt-1">Fill in the details below and we'll get back to you as soon as possible.</p>
-      </div>
+      {/* Header */}
+      <button onClick={() => navigate('/support/requests')} className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 mb-4"><ArrowLeft size={14} /> Back to My Requests</button>
 
-      {/* Progress steps */}
-      <div className="mb-8">
-        <div className="flex items-center gap-1 mb-2">
-          {steps.map((s, idx) => (
-            <div key={s} className="flex-1">
-              <div className={`h-1.5 rounded-full transition-colors ${steps.indexOf(step) >= idx ? 'bg-primary-500' : 'bg-gray-200'}`} />
-            </div>
-          ))}
-        </div>
-        <div className="flex justify-between">
-          {steps.map((s, idx) => (
-            <span key={s} className={`text-xs ${steps.indexOf(step) >= idx ? 'text-primary-600 font-medium' : 'text-gray-400'}`}>
-              {stepLabels[s]}
-            </span>
-          ))}
+      <h1 className="text-xl font-bold text-gray-900 mb-1">Submit a Request</h1>
+      <p className="text-sm text-gray-500 mb-5">Fill in the details below and we'll get back to you as soon as possible.</p>
+
+      {/* Step indicator */}
+      <div className="flex items-center mb-6">
+        <div className="flex items-center gap-2 flex-1">
+          <div className={`h-1 flex-1 rounded-full ${step >= 1 ? 'bg-primary-600' : 'bg-gray-200'}`} />
+          <div className={`h-1 flex-1 rounded-full ${step >= 2 ? 'bg-primary-600' : 'bg-gray-200'}`} />
+          <div className={`h-1 flex-1 rounded-full ${step >= 3 ? 'bg-primary-600' : 'bg-gray-200'}`} />
         </div>
       </div>
+      <div className="flex justify-between text-xs mb-8">
+        <span className={step === 1 ? 'text-primary-600 font-semibold' : 'text-gray-400'}>Select Type</span>
+        <span className={step === 2 ? 'text-primary-600 font-semibold' : 'text-gray-400'}>Fill Details</span>
+        <span className={step === 3 ? 'text-primary-600 font-semibold' : 'text-gray-400'}>Confirm & Submit</span>
+      </div>
 
-      {/* Main content card */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
-        <div className="p-6">
-
-          {/* Step 1: Topic */}
-          {step === 'topic' && (
-            <div className="space-y-4">
-              <p className="text-sm text-gray-600">请选择您遇到的问题类型，以便我们更快地为您处理：</p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {REQUEST_TOPICS.map((topic) => {
-                  const isSelected = selectedTopic?.id === topic.id
-                  return (
-                    <button
-                      key={topic.id}
-                      onClick={() => setSelectedTopic(topic)}
-                      className={`flex items-center gap-4 px-4 py-4 rounded-xl border text-left transition-all ${
-                        isSelected
-                          ? 'border-primary-400 bg-primary-50 ring-1 ring-primary-200'
-                          : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                      }`}
-                    >
-                      <div className="shrink-0">{topic.icon}</div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900">{topic.label}</p>
-                        <p className="text-xs text-gray-500 mt-0.5">{topic.description}</p>
-                      </div>
-                      {isSelected && <CheckCircle2 size={18} className="text-primary-600 shrink-0" />}
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* Step 2: Details + Inline Services */}
-          {step === 'details' && (
-            <div className="space-y-5">
-
-              {/* Collapsible VAS section at top, default collapsed */}
-              {hasRelatedServices && <CollapsibleServicesSection
-                relatedServices={relatedServices}
-                purchasedServices={purchasedServices}
-                purchaseService={purchaseService}
-                topicLabel={selectedTopic?.label ?? ''}
-              />}
-
-              {/* Form fields horizontal layout */}
-              <div className="grid grid-cols-2 gap-x-5 gap-y-4">
-                {/* Email - full width, first field */}
-                <div className="col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Your email address <span className="text-red-400">*</span>
-                  </label>
-                  <input
-                    type="email"
-                    value={form.email}
-                    onChange={(e) => handle('email', e.target.value)}
-                    placeholder="your.email@company.com"
-                    className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  />
-                  <p className="text-xs text-gray-400 mt-1">Your email is used solely to track this request and keep you updated.</p>
-                </div>
-
-                {/* Subject full width */}
-                <div className="col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Subject <span className="text-red-400">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={form.subject}
-                    onChange={(e) => handle('subject', e.target.value)}
-                    placeholder="Brief summary of your issue..."
-                    className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  />
-                </div>
-
-                {/* Priority left */}
+      {/* ═══ STEP 1: Select Topic ═══ */}
+      {step === 1 && (
+        <div>
+          <p className="text-sm text-gray-600 mb-4">Select the type of issue you're experiencing so we can route your request efficiently:</p>
+          <div className="grid grid-cols-2 gap-3 mb-6">
+            {TOPICS.map(topic => (
+              <button key={topic.id} onClick={() => setSelectedTopic(topic.id)}
+                className={`flex items-start gap-3 p-4 border rounded-xl text-left transition-all ${
+                  selectedTopic === topic.id ? 'border-primary-300 bg-primary-50 ring-1 ring-primary-200' : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                }`}>
+                <span className={topic.color}>{topic.icon}</span>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Priority</label>
-                  <div className="flex gap-1.5">
-                    {(['Low', 'Medium', 'High', 'Critical'] as WorkItemPriority[]).map((p) => {
-                      const isActive = form.priority === p
-                      const styles: Record<WorkItemPriority, string> = {
-                        Low: 'border-gray-300 text-gray-600 bg-gray-50',
-                        Medium: 'border-blue-300 text-blue-700 bg-blue-50',
-                        High: 'border-orange-300 text-orange-700 bg-orange-50',
-                        Critical: 'border-red-300 text-red-700 bg-red-50',
-                      }
-                      const labels: Record<WorkItemPriority, string> = { Low: 'Low', Medium: 'Medium', High: 'High', Critical: 'Urgent' }
-                      return (
-                        <button key={p} type="button" onClick={() => handle('priority', p)}
-                          className={`flex-1 py-2 text-xs font-medium rounded-lg border transition-all ${isActive ? styles[p] : 'border-gray-200 text-gray-400 hover:bg-gray-50'}`}
-                        >{labels[p]}</button>
-                      )
-                    })}
+                  <p className="text-sm font-semibold text-gray-900">{topic.label}</p>
+                  <p className="text-[11px] text-gray-500 mt-0.5">{topic.desc}</p>
+                </div>
+              </button>
+            ))}
+          </div>
+          <div className="flex justify-between">
+            <button onClick={() => navigate('/support/requests')} className="text-sm text-gray-500">Cancel</button>
+            <button onClick={handleNextFromStep1} disabled={!selectedTopic}
+              className={`px-5 py-2 text-sm font-medium rounded-lg ${selectedTopic ? 'bg-primary-600 text-white hover:bg-primary-700' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}>
+              Next &rarr;
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ═══ STEP 2: Fill Details (with AI) ═══ */}
+      {step === 2 && (
+        <div className="flex gap-6">
+          {/* Left: Form */}
+          <div className="flex-1 min-w-0 space-y-5">
+            {/* VAS recommendation area */}
+            <div className="bg-gradient-to-r from-violet-50 to-purple-50 border border-violet-200 rounded-xl p-4">
+              <p className="text-xs text-violet-700 font-medium flex items-center gap-1.5 mb-3">
+                <Sparkles size={13} /> VAS Recommendation for "{topicLabel}" &middot; Smart Recommend &middot; {serviceEnabled ? '3/3' : '2/3'} Enabled
+              </p>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between bg-white rounded-lg px-4 py-3 border border-green-200">
+                  <div className="flex items-center gap-2">
+                    <span className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+                    <span className="text-sm font-medium text-gray-800">Photo Request</span>
+                    <span className="text-[10px] text-green-600 bg-green-50 px-2 py-0.5 rounded-full font-medium">Enabled &middot; Ready to use</span>
                   </div>
                 </div>
-
-                {/* Related Object right (two sub-fields) */}
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Related Type</label>
-                    <select value={form.relatedObjectType} onChange={(e) => handle('relatedObjectType', e.target.value)}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white">
-                      <option value="">Select...</option>
-                      <option value="Order">Order</option>
-                      <option value="SKU">SKU</option>
-                      <option value="Shipment">Shipment</option>
-                      <option value="PO">PO</option>
-                      <option value="ASN">ASN</option>
-                    </select>
+                <div className="flex items-center justify-between bg-white rounded-lg px-4 py-3 border border-gray-200">
+                  <div className="flex items-center gap-2">
+                    {serviceEnabled ? (
+                      <span className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+                    ) : (
+                      <span className="w-5 h-5 bg-amber-400 rounded-full flex items-center justify-center text-white text-[9px] font-bold">!</span>
+                    )}
+                    <span className="text-sm font-medium text-gray-800">SKU Inspection</span>
+                    {serviceEnabled ? (
+                      <span className="text-[10px] text-green-600 bg-green-50 px-2 py-0.5 rounded-full font-medium">Enabled &middot; Ready to use</span>
+                    ) : (
+                      <span className="text-[10px] text-gray-500">Professional cargo inspection</span>
+                    )}
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Related ID</label>
-                    <input type="text" value={form.relatedObjectId} onChange={(e) => handle('relatedObjectId', e.target.value)}
-                      placeholder="e.g. ORD-5521"
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500" />
-                  </div>
-                </div>
-
-                {/* Description full width */}
-                <div className="col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Description <span className="text-red-400">*</span>
-                  </label>
-                  <textarea
-                    value={form.description}
-                    onChange={(e) => handle('description', e.target.value)}
-                    rows={3}
-                    placeholder="Provide detailed information about the issue..."
-                    className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
-                  />
-                </div>
-
-                {/* Attachments */}
-                <div className="col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Attachments</label>
-                  <div className="border-2 border-dashed border-gray-200 rounded-lg p-4 text-center hover:border-gray-300 transition-colors cursor-pointer">
-                    <Paperclip size={16} className="mx-auto text-gray-400 mb-1" />
-                    <p className="text-xs text-gray-500"><span className="text-primary-600 font-medium">Add file</span> or drop files here · PNG, JPG, PDF up to 10MB</p>
-                  </div>
-                </div>
-
-                {/* AI Analysis — full width */}
-                <div className="col-span-2 border border-indigo-100 rounded-lg bg-indigo-50/30 p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <Sparkles size={14} className="text-indigo-500" />
-                      <span className="text-sm font-medium text-gray-700">AI Smart Analysis</span>
+                  {!serviceEnabled && (
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm font-semibold text-gray-700">$45</span>
+                      <button onClick={() => setServiceModal('sku-inspection')} className="text-xs text-primary-600 font-medium hover:underline">Learn More</button>
                     </div>
-                    <button
-                      onClick={() => {
-                        setAiLoading(true)
-                        setTimeout(() => {
-                          setAiLoading(false)
-                          setAiAnalysis(
-                            form.relatedObjectId
-                              ? `Based on ${form.relatedObjectId}:\n\u2022 Current status: Normal, no anomalies in last 7 days\n\u2022 Related SKU inventory sufficient for outbound\n\u2022 Suggested priority: ${form.priority === 'Critical' ? 'Immediate action needed' : 'Standard processing'}\n\u2022 Estimated resolution: 1-2 business days`
-                              : `Based on your input:\n\u2022 Request type "${selectedTopic?.label}" typically resolves in 1-3 days\n\u2022 Tip: Adding a related order/SKU ID helps us locate issues faster\n\u2022 Current support response time: < 30 minutes`
-                          )
-                        }, 2000)
-                      }}
-                      disabled={aiLoading || !form.subject.trim()}
-                      className="text-xs font-medium text-indigo-600 hover:text-indigo-700 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors"
-                    >
-                      {aiLoading ? 'Analyzing...' : 'Run AI Analysis'}
+                  )}
+                </div>
+                {showMoreServices && (
+                  <div className="flex items-center justify-between bg-white rounded-lg px-4 py-3 border border-green-200">
+                    <div className="flex items-center gap-2">
+                      <span className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+                      <span className="text-sm font-medium text-gray-800">Inventory Audit Service</span>
+                      <span className="text-[10px] text-green-600 bg-green-50 px-2 py-0.5 rounded-full font-medium">Enabled &middot; Ready to use</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+              <button onClick={() => setShowMoreServices(!showMoreServices)} className="text-xs text-primary-600 hover:underline mt-3 block mx-auto">
+                {showMoreServices ? 'Hide' : 'View more services (1)'}
+              </button>
+            </div>
+
+            {/* Email */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Your email address <span className="text-red-500">*</span></label>
+              <input type="email" value={email} onChange={e => setEmail(e.target.value)} className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500" />
+              <p className="text-[10px] text-gray-400 mt-1">Your email is used solely to track this request and keep you updated.</p>
+            </div>
+
+            {/* Describe your issue (FIRST - before Subject) */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Describe your issue <span className="text-red-500">*</span></label>
+              <div className="relative">
+                <textarea
+                  value={description}
+                  onChange={e => handleDescriptionChange(e.target.value)}
+                  rows={5}
+                  placeholder="Tell us what happened, including order number, SKU, warehouse, expected result, or any error message."
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none"
+                />
+                {/* Sample data fill button */}
+                {!description && (
+                  <button
+                    onClick={() => {
+                      const sample = 'My order ORD-5521 has two SKUs showing normal inventory, but after placing the order it cannot be fulfilled from the warehouse. The system shows available stock but fulfillment fails. Please help me check the inventory allocation for SKU-A100 and SKU-B200 at Valley View warehouse.'
+                      setDescription(sample)
+                      setAiSkipped(false)
+                      setAiRunning(true)
+                      setAiApplied(false)
+                      setTimeout(() => { runAnalysis(sample) }, 100)
+                    }}
+                    className="absolute top-2 right-2 text-[10px] text-primary-500 hover:text-primary-700 bg-white border border-primary-200 px-2 py-1 rounded flex items-center gap-1 hover:bg-primary-50 transition-colors"
+                    title="Fill sample description for testing"
+                  >
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="18 15 12 9 6 15"/></svg>
+                    Sample
+                  </button>
+                )}
+              </div>
+              <div className="flex items-center gap-3 mt-2">
+                <button
+                  onClick={handleAnalyze}
+                  disabled={!description.trim() || aiRunning}
+                  className={`flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                    description.trim() && !aiRunning ? 'bg-primary-600 text-white hover:bg-primary-700' : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  }`}>
+                  {aiRunning ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
+                  {aiRunning ? 'Analyzing...' : 'Analyze & Autofill'}
+                </button>
+                <button onClick={handleSkipAI} className="text-xs text-gray-500 border border-gray-200 px-3 py-1.5 rounded-lg hover:bg-gray-50">Skip AI</button>
+                <span className="text-[10px] text-gray-400 ml-auto">AI will extract key information from your description</span>
+              </div>
+            </div>
+
+            {/* AI Extracted Information (appears after analysis) */}
+            {aiResult && !aiApplied && (
+              <div className="bg-violet-50 border border-violet-200 rounded-xl p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-sm font-semibold text-violet-800 flex items-center gap-1.5"><Sparkles size={14} /> AI Extracted Information</p>
+                  <span className="text-[9px] text-violet-500">Review and apply, or edit manually</span>
+                </div>
+                <div className="grid grid-cols-2 gap-3 text-xs">
+                  <div><p className="text-violet-500 text-[10px] uppercase">Subject</p><p className="text-gray-800 font-medium">{aiResult.subject}</p></div>
+                  <div><p className="text-violet-500 text-[10px] uppercase">Priority</p><p className="text-gray-800 font-medium">{aiResult.priority}</p></div>
+                  <div><p className="text-violet-500 text-[10px] uppercase">Related Type</p><p className="text-gray-800 font-medium">{aiResult.relatedType}</p></div>
+                  <div><p className="text-violet-500 text-[10px] uppercase">Related ID</p><p className="text-gray-800 font-medium">{aiResult.relatedId}</p></div>
+                </div>
+                <div className="flex items-center gap-2 mt-3 pt-3 border-t border-violet-200">
+                  <button onClick={handleApplySuggestions} className="px-3 py-1.5 text-xs font-medium bg-violet-600 text-white rounded-lg hover:bg-violet-700">Apply Suggestions</button>
+                  <button onClick={() => setAiApplied(true)} className="px-3 py-1.5 text-xs font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50">Edit Manually</button>
+                </div>
+              </div>
+            )}
+
+            {/* Subject */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Subject <span className="text-red-500">*</span></label>
+              <input type="text" value={subject} onChange={e => setSubject(e.target.value)} placeholder="Brief summary of your issue" className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary-500" />
+            </div>
+
+            {/* Priority + Related Type + Related ID */}
+            <div className="grid grid-cols-3 gap-3">
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Priority</label>
+                <div className="flex gap-1">
+                  {(['Low', 'Medium', 'High', 'Urgent'] as Priority[]).map(p => (
+                    <button key={p} onClick={() => setPriority(p)}
+                      className={`flex-1 py-2 text-xs font-medium rounded-lg border transition-colors ${
+                        priority === p ? 'bg-primary-50 border-primary-300 text-primary-700' : 'border-gray-200 text-gray-500 hover:bg-gray-50'
+                      }`}>{p}</button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Related Type</label>
+                <select value={relatedType} onChange={e => setRelatedType(e.target.value)} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                  <option value="">Select...</option>
+                  <option>Sales Order</option>
+                  <option>Inbound Receipt</option>
+                  <option>Outbound Order</option>
+                  <option>Inventory</option>
+                  <option>Shipment</option>
+                  <option>Invoice / Billing</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Related ID</label>
+                <input type="text" value={relatedId} onChange={e => setRelatedId(e.target.value)} placeholder="e.g. ORD-5521" className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
+              </div>
+            </div>
+
+            {/* Attachments */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Attachments</label>
+              <div className="border-2 border-dashed border-gray-200 rounded-lg p-5 text-center hover:border-primary-300 transition-colors cursor-pointer">
+                <Paperclip size={16} className="mx-auto text-gray-400 mb-1" />
+                <p className="text-xs text-gray-500"><span className="text-primary-600 font-medium">Add file</span> or drop files here &middot; PNG, JPG, PDF up to 10MB</p>
+              </div>
+            </div>
+
+            {/* Bottom actions */}
+            <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+              <button onClick={() => setStep(1)} className="text-sm text-gray-500 hover:text-gray-700">&larr; Back</button>
+              <div className="flex items-center gap-3">
+                <button onClick={() => navigate('/support/requests')} className="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50">Cancel</button>
+                <button onClick={() => alert('Request submitted successfully! You will receive a confirmation email.')} className="px-5 py-2 text-sm font-medium bg-primary-600 text-white rounded-lg hover:bg-primary-700">Review & Submit</button>
+              </div>
+            </div>
+          </div>
+
+          {/* Right: AI Initial Analysis Panel */}
+          {!aiSkipped && (
+          <div className="w-80 shrink-0">
+            <div className="sticky top-20">
+              <div className="bg-white border border-gray-200 rounded-xl p-4">
+                <h3 className="text-xs font-bold text-gray-900 flex items-center gap-1.5 mb-4"><Sparkles size={13} className="text-primary-600" /> AI Initial Analysis</h3>
+
+                {!aiResult && !aiRunning && (
+                  <div className="text-center py-6">
+                    <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                      <Sparkles size={16} className="text-gray-400" />
+                    </div>
+                    <p className="text-[11px] text-gray-500 leading-relaxed">Describe your issue and click "Analyze & Autofill" to get AI-powered suggestions.</p>
+                  </div>
+                )}
+
+                {aiRunning && (
+                  <div className="text-center py-6">
+                    <Loader2 size={20} className="animate-spin text-primary-500 mx-auto mb-2" />
+                    <p className="text-[11px] text-gray-500">Analyzing...</p>
+                  </div>
+                )}
+
+                {aiResult && !aiRunning && (
+                  <div className="space-y-3 text-[11px]">
+                    <div><p className="text-[9px] text-gray-400 uppercase font-semibold mb-0.5">Issue Summary</p><p className="text-gray-700 leading-relaxed">{aiResult.issueSummary}</p></div>
+                    <div><p className="text-[9px] text-gray-400 uppercase font-semibold mb-0.5">Detected Records</p>{aiResult.detectedRecords.map((r, i) => <p key={i} className="text-gray-700">{r}</p>)}</div>
+                    <div>
+                      <p className="text-[9px] text-gray-400 uppercase font-semibold mb-0.5 flex items-center gap-1"><AlertCircle size={9} className="text-amber-500" /> Missing Info</p>
+                      <ul className="space-y-0.5">{aiResult.missingInfo.map((m, i) => <li key={i} className="text-amber-700 bg-amber-50 px-2 py-0.5 rounded text-[10px]">• {m}</li>)}</ul>
+                    </div>
+                    <div><p className="text-[9px] text-gray-400 uppercase font-semibold mb-0.5">Suggested Priority</p><span className="text-[10px] font-medium bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-full">{aiResult.priority}</span></div>
+                    <div><p className="text-[9px] text-gray-400 uppercase font-semibold mb-0.5">Routing</p><p className="text-gray-700">{aiResult.suggestedRouting}</p></div>
+                    <div><p className="text-[9px] text-gray-400 uppercase font-semibold mb-0.5 flex items-center gap-1"><Info size={9} className="text-blue-500" /> Action</p><p className="text-gray-700 leading-relaxed">{aiResult.recommendedAction}</p></div>
+                    <div className="pt-2 border-t border-gray-100"><p className="text-[9px] text-gray-400 italic">AI suggestions are for reference only.</p></div>
+                  </div>
+                )}
+
+                {/* AI Query Input */}
+                <div className="mt-4 pt-4 border-t border-gray-200">
+                  <p className="text-[9px] text-gray-400 uppercase font-semibold mb-2">Ask AI</p>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={aiQuery}
+                      onChange={e => setAiQuery(e.target.value)}
+                      onKeyDown={e => { if (e.key === 'Enter' && aiQuery.trim()) handleAiQuery() }}
+                      placeholder="e.g. Check inventory lock or allocation conflict"
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-[11px] pr-8 focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
+                    />
+                    <button onClick={handleAiQuery} className="absolute right-2 top-1/2 -translate-y-1/2 text-primary-500 hover:text-primary-700">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
                     </button>
                   </div>
-                  {aiLoading && (
-                    <div className="flex items-center gap-2 text-xs text-indigo-500">
-                      <span className="w-3 h-3 border-2 border-indigo-200 border-t-indigo-500 rounded-full animate-spin" />
-                      Querying database and analyzing your request...
-                    </div>
+                  {!aiQuery && !aiQueryResult && (
+                    <button onClick={() => setAiQuery('Help me check if there is inventory lock or allocation conflict for this order')} className="text-[9px] text-primary-500 hover:text-primary-700 mt-1.5 flex items-center gap-0.5">
+                      <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="18 15 12 9 6 15"/></svg>
+                      Try sample question
+                    </button>
                   )}
-                  {aiAnalysis && !aiLoading && (
-                    <div className="bg-white rounded-md border border-indigo-100 p-3 text-xs text-gray-700 whitespace-pre-line leading-relaxed">
-                      {aiAnalysis}
-                    </div>
+                  {aiQueryLoading && (
+                    <div className="mt-2 flex items-center gap-1.5 text-[10px] text-gray-400"><Loader2 size={10} className="animate-spin" /> Querying...</div>
                   )}
-                  {!aiAnalysis && !aiLoading && (
-                    <p className="text-xs text-gray-400">AI will analyze your request details and related records to provide suggestions</p>
+                  {aiQueryResult && (
+                    <div className="mt-2 bg-blue-50 border border-blue-100 rounded-lg p-3 text-[11px] text-gray-700 leading-relaxed">
+                      <p className="font-semibold text-blue-700 text-[10px] mb-1">AI Query Result:</p>
+                      <p>{aiQueryResult}</p>
+                      <button
+                        onClick={() => setDescription(prev => prev + '\n\n[AI Suggestion] ' + aiQueryResult)}
+                        className="mt-2 text-[10px] text-primary-600 font-medium hover:text-primary-700 flex items-center gap-1 bg-white border border-primary-200 px-2 py-1 rounded hover:bg-primary-50 transition-colors"
+                      >
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        Add to Description
+                      </button>
+                    </div>
                   )}
                 </div>
               </div>
             </div>
-          )}
-
-          {/* Step 3: Confirm */}
-          {step === 'confirm' && (
-            <div className="space-y-5">
-              <div className="bg-gray-50 rounded-xl p-6 space-y-3">
-                <h4 className="text-sm font-semibold text-gray-900 mb-3">Request Summary</h4>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Type</span>
-                  <span className="text-gray-900 font-medium">{selectedTopic?.label}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Subject</span>
-                  <span className="text-gray-900 font-medium truncate ml-4 max-w-[300px]">{form.subject || '\u2014'}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Priority</span>
-                  <span className={`font-medium ${
-                    form.priority === 'Critical' ? 'text-red-600' : form.priority === 'High' ? 'text-orange-600' :
-                    form.priority === 'Medium' ? 'text-blue-600' : 'text-gray-600'
-                  }`}>{form.priority}</span>
-                </div>
-                {form.relatedObjectId && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">Related</span>
-                    <span className="text-gray-900 font-mono text-xs">{form.relatedObjectType} {form.relatedObjectId}</span>
-                  </div>
-                )}
-                {form.description && (
-                  <div className="pt-3 border-t border-gray-200">
-                    <p className="text-xs text-gray-500 mb-1">Description</p>
-                    <p className="text-sm text-gray-700 leading-relaxed">{form.description}</p>
-                  </div>
-                )}
-                {purchasedRelated.length > 0 && (
-                  <div className="pt-3 border-t border-gray-200">
-                    <p className="text-xs text-gray-500 mb-2">已开通的相关服务（我们会直接为您安排）</p>
-                    <div className="flex flex-wrap gap-1.5">
-                      {purchasedRelated.map((s) => (
-                        <span key={s.id} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
-                          <CheckCircle2 size={10} />{s.nameCn}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-              <p className="text-xs text-gray-400 text-center">
-                Submitting this request will create a ticket. Our team will review and respond within 1 business day.
-              </p>
-            </div>
+          </div>
           )}
         </div>
+      )}
 
-        {/* Footer */}
-        <div className="px-6 py-4 border-t border-gray-100">
-          {/* Services summary shown when there are purchased services on step 2 */}
-          {step === 'details' && purchasedRelated.length > 0 && (
-            <div className="flex items-center gap-2 mb-3 pb-3 border-b border-gray-100">
-              <span className="text-xs text-gray-500">已选择增值服务：</span>
-              <div className="flex flex-wrap gap-1.5">
-                {purchasedRelated.map((s) => (
-                  <span key={s.id} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-green-100 text-green-700">
-                    <CheckCircle2 size={9} />{s.nameCn}
-                  </span>
-                ))}
-              </div>
+      {/* Service Detail Modal */}
+      {serviceModal && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => { setServiceModal(null); setPaymentStep('info') }}>
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-xl" onClick={e => e.stopPropagation()}>
+            <div className="bg-primary-600 text-white px-6 py-4 rounded-t-xl flex items-center justify-between">
+              <h3 className="text-sm font-bold flex items-center gap-2"><Sparkles size={14} /> Enable Service</h3>
+              <button onClick={() => { setServiceModal(null); setPaymentStep('info') }} className="text-white/70 hover:text-white text-lg">&times;</button>
             </div>
-          )}
-          <div className="flex items-center justify-between">
-            <div>
-              {step !== 'topic' && (
-                <button onClick={goBack} className="flex items-center gap-1.5 px-4 py-2 text-sm text-gray-600 hover:text-gray-800 transition-colors">
-                  <ChevronLeft size={14} /> Back
-                </button>
+            <div className="p-6">
+              {paymentStep === 'info' && (
+                <>
+                  <h4 className="text-lg font-bold text-gray-900 mb-1">SKU Inspection</h4>
+                  <p className="text-xs text-gray-500 mb-4">Professional cargo inspection, quality assurance guaranteed</p>
+                  <p className="text-sm text-gray-700 mb-4">Professional inspectors will conduct systematic inspections on designated SKUs, providing detailed reports including quantity verification, packaging status, and visual inspection.</p>
+
+                  <div className="mb-4">
+                    <p className="text-xs font-semibold text-gray-700 mb-2">Service Benefits:</p>
+                    <ul className="text-xs text-gray-600 space-y-1.5">
+                      <li className="flex items-center gap-2"><span className="w-4 h-4 bg-green-100 rounded-full flex items-center justify-center"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg></span>Reduce cargo loss rate</li>
+                      <li className="flex items-center gap-2"><span className="w-4 h-4 bg-green-100 rounded-full flex items-center justify-center"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg></span>Identify issues early</li>
+                      <li className="flex items-center gap-2"><span className="w-4 h-4 bg-green-100 rounded-full flex items-center justify-center"><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg></span>Provide evidence for cargo claims</li>
+                    </ul>
+                  </div>
+
+                  <div className="bg-gray-50 rounded-lg p-4 mb-4 flex items-center justify-between">
+                    <div>
+                      <p className="text-xs text-gray-500">Service Fee</p>
+                      <p className="text-[10px] text-gray-400">Per inspection, per container</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xl font-bold text-gray-900">$45</p>
+                      <p className="text-[10px] text-gray-400">Usage-based billing</p>
+                    </div>
+                  </div>
+
+                  <div className="mb-4">
+                    <p className="text-xs font-medium text-gray-700 mb-2">Payment Method</p>
+                    <div className="flex items-center gap-4">
+                      <label className="flex items-center gap-1.5 text-xs"><input type="radio" name="payment" className="text-primary-600" /> Account Balance</label>
+                      <label className="flex items-center gap-1.5 text-xs"><input type="radio" name="payment" defaultChecked className="text-primary-600" /> Monthly Invoice</label>
+                    </div>
+                  </div>
+
+                  <label className="flex items-start gap-2 text-[11px] text-gray-600 mb-5">
+                    <input type="checkbox" defaultChecked className="rounded text-primary-600 mt-0.5" />
+                    <span>I have read and agree to the <span className="text-primary-600 underline cursor-pointer">Service Agreement</span>. Service will be activated upon confirmation.</span>
+                  </label>
+
+                  <div className="flex gap-3">
+                    <button onClick={() => { setServiceModal(null); setPaymentStep('info') }} className="flex-1 py-2.5 text-sm border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50">Cancel</button>
+                    <button onClick={() => setPaymentStep('card')} className="flex-1 py-2.5 text-sm bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700">Confirm & Pay $45</button>
+                  </div>
+                </>
               )}
-            </div>
-            <div className="flex gap-3">
-              <button onClick={() => navigate('/support/requests')}
-                className="px-4 py-2 text-sm text-gray-500 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-                Cancel
-              </button>
-              {step === 'confirm' ? (
-                <button onClick={handleSubmit} disabled={!form.subject.trim() || !form.description.trim() || !form.email.trim()}
-                  className="px-6 py-2.5 text-sm bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
-                  Submit Request
-                </button>
-              ) : (
-                <button onClick={goNext} disabled={step === 'topic' ? !selectedTopic : !form.subject.trim()}
-                  className="flex items-center gap-1.5 px-6 py-2.5 text-sm bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
-                  Next <ChevronRight size={14} />
-                </button>
+
+              {paymentStep === 'card' && (
+                <>
+                  <h4 className="text-base font-bold text-gray-900 mb-1">Payment Details</h4>
+                  <p className="text-xs text-gray-500 mb-4">Complete payment to activate the service</p>
+
+                  <div className="bg-gray-50 rounded-lg p-4 mb-4 flex items-center justify-between">
+                    <span className="text-sm text-gray-700">SKU Inspection Service</span>
+                    <span className="text-lg font-bold text-gray-900">$45.00</span>
+                  </div>
+
+                  <div className="space-y-3 mb-5">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">Card Number</label>
+                      <input type="text" defaultValue="4242 4242 4242 4242" className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm" />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 mb-1">Expiry Date</label>
+                        <input type="text" defaultValue="12/28" className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm" />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 mb-1">CVV</label>
+                        <input type="text" defaultValue="***" className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">Cardholder Name</label>
+                      <input type="text" defaultValue="YUJUAN WANG" className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm" />
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3">
+                    <button onClick={() => setPaymentStep('info')} className="flex-1 py-2.5 text-sm border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50">Back</button>
+                    <button onClick={() => { setPaymentStep('success'); setTimeout(() => { setServiceEnabled(true); setPaymentStep('info'); setServiceModal(null) }, 3000) }} className="flex-1 py-2.5 text-sm bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700">Pay $45.00</button>
+                  </div>
+                </>
+              )}
+
+              {paymentStep === 'success' && (
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  </div>
+                  <h4 className="text-lg font-bold text-green-700 mb-2">Payment Successful!</h4>
+                  <p className="text-sm text-gray-600 mb-1">SKU Inspection service has been activated.</p>
+                  <p className="text-xs text-gray-400">Transaction ID: TXN-2026-0706-4521</p>
+                  <p className="text-xs text-gray-400 mt-1">Amount: $45.00 &middot; Method: Visa ****4242</p>
+                  <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-3">
+                    <p className="text-[11px] text-green-700">The service is now ready to use for this request and all future requests.</p>
+                  </div>
+                  <p className="text-[10px] text-gray-400 mt-3">Closing automatically...</p>
+                </div>
               )}
             </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }

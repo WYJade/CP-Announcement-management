@@ -15,6 +15,19 @@ body {
   box-sizing: border-box;
 }
 
+/* Remove heavy black focus outline from buttons, inputs, selects */
+*:focus {
+  outline: none;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3);
+}
+
 ::-webkit-scrollbar {
   width: 6px;
 }

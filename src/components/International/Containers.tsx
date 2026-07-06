@@ -59,21 +59,21 @@ function CustomerFilter() {
 }
 
 const STATUS_TABS = [
-  { key: 'on-ship', label: 'On Ship', count: 3 },
-  { key: 'hold', label: 'Hold', count: 2 },
+  { key: 'booked', label: 'Booked', count: 1 },
+  { key: 'in-transit', label: 'In Transit', count: 3 },
+  { key: 'arrived', label: 'Arrived', count: 2 },
   { key: 'available', label: 'Available', count: 5 },
-  { key: 'appointed', label: 'Appointed', count: 3 },
-  { key: 'out-gated', label: 'Out-Gated', count: 5 },
-  { key: 'terminated', label: 'Terminated', count: 6 },
-  { key: 'unknown', label: 'Unknown', count: 1 },
+  { key: 'in-delivery', label: 'In Delivery', count: 3 },
+  { key: 'delivered', label: 'Delivered', count: 4 },
+  { key: 'returned', label: 'Returned', count: 2 },
 ]
 
 const SAMPLE_DATA = [
-  { containerNo: 'ONEU8472065', port: 'PCT', ssl: 'COSCO', size: "40'", type: 'Standard', customer: 'ORGAIN LLC', vessel: 'COSCO FAITH', lfd: 'Jun 25, 2026', status: 'On Ship' },
-  { containerNo: 'TCKU3456789', port: 'LBCT', ssl: 'MAERSK', size: "20'", type: 'Standard', customer: 'VITA COCO', vessel: 'MSC BEATRICE', lfd: 'Jun 22, 2026', status: 'On Ship' },
-  { containerNo: 'MSDU5678901', port: 'LBCT', ssl: 'MSCU', size: "40'", type: 'High Cube', customer: 'THE ONLY BEAN LLC', vessel: 'SEASPAN HAMBURG', lfd: 'Jun 28, 2026', status: 'On Ship' },
-  { containerNo: 'KKFU9159476', port: 'LBCT', ssl: 'MSCU', size: "20'", type: 'Standard', customer: 'ORGAIN LLC', vessel: 'CSCL SOUTH CHINA SEA', lfd: 'Jun 18, 2026', status: 'Hold' },
-  { containerNo: 'NYKU4064208', port: 'PCT', ssl: 'CMDU', size: "40'", type: 'Standard', customer: 'ORGAIN LLC', vessel: 'CSCL SOUTH CHINA SEA', lfd: 'Jun 20, 2026', status: 'Hold' },
+  { containerNo: 'ONEU8472065', port: 'PCT', ssl: 'COSCO', size: "40'", type: 'Standard', customer: 'ORGAIN LLC', vessel: 'COSCO FAITH', lfd: 'Jun 25, 2026', status: 'In Transit' },
+  { containerNo: 'TCKU3456789', port: 'LBCT', ssl: 'MAERSK', size: "20'", type: 'Standard', customer: 'VITA COCO', vessel: 'MSC BEATRICE', lfd: 'Jun 22, 2026', status: 'In Transit' },
+  { containerNo: 'MSDU5678901', port: 'LBCT', ssl: 'MSCU', size: "40'", type: 'High Cube', customer: 'THE ONLY BEAN LLC', vessel: 'SEASPAN HAMBURG', lfd: 'Jun 28, 2026', status: 'In Transit' },
+  { containerNo: 'KKFU9159476', port: 'LBCT', ssl: 'MSCU', size: "20'", type: 'Standard', customer: 'ORGAIN LLC', vessel: 'CSCL SOUTH CHINA SEA', lfd: 'Jun 18, 2026', status: 'Arrived' },
+  { containerNo: 'NYKU4064208', port: 'PCT', ssl: 'CMDU', size: "40'", type: 'Standard', customer: 'ORGAIN LLC', vessel: 'CSCL SOUTH CHINA SEA', lfd: 'Jun 20, 2026', status: 'Arrived' },
   { containerNo: 'MSNU1334770', port: 'LBCT', ssl: 'MSCU', size: "20'", type: 'Standard', customer: 'PLEASS GLOBAL LIMITED', vessel: 'SEASPAN HAMBURG', lfd: 'Apr 6, 2026', status: 'Available' },
   { containerNo: 'MSNU1696110', port: 'LBCT', ssl: 'MSCU', size: "20'", type: 'Standard', customer: '-', vessel: 'SEASPAN HAMBURG', lfd: 'Apr 6, 2026', status: 'Available' },
   { containerNo: 'MSBU1317970', port: 'LBCT', ssl: 'MSCU', size: "20'", type: 'Standard', customer: '-', vessel: 'SEASPAN HAMBURG', lfd: 'Apr 6, 2026', status: 'Available' },
@@ -82,7 +82,7 @@ const SAMPLE_DATA = [
 
 export default function Containers() {
   const navigate = useNavigate()
-  const [activeTab, setActiveTab] = useState('on-ship')
+  const [activeTab, setActiveTab] = useState('in-transit')
 
   return (
     <div className="p-6">
@@ -142,7 +142,7 @@ export default function Containers() {
                 <td className="py-3 px-4 text-gray-600">{row.vessel}</td>
                 <td className="py-3 px-4 text-gray-600">{row.lfd}</td>
                 <td className="py-3 px-4">
-                  <span className={`text-xs font-medium ${row.status === 'On Ship' ? 'text-green-600' : row.status === 'Hold' ? 'text-red-600' : row.status === 'Available' ? 'text-green-600' : 'text-gray-500'}`}>
+                  <span className={`text-xs font-medium ${row.status === 'In Transit' ? 'text-blue-600' : row.status === 'Arrived' ? 'text-indigo-600' : row.status === 'Available' ? 'text-green-600' : row.status === 'In Delivery' ? 'text-violet-600' : row.status === 'Delivered' ? 'text-emerald-600' : row.status === 'Returned' ? 'text-gray-600' : 'text-gray-500'}`}>
                     {row.status}
                   </span>
                 </td>

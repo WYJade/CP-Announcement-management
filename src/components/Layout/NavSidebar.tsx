@@ -106,6 +106,7 @@ const menuItems: MenuItem[] = [
     expandable: true,
     children: [
       { id: 'outbound-inquiry', label: 'Inquiry', path: '/outbound/inquiry' },
+      { id: 'freight-quote', label: 'Freight Quote', path: '/outbound/freight-quote' },
     ],
   },
   {
@@ -137,16 +138,12 @@ const menuItems: MenuItem[] = [
     ],
   },
   {
-    id: 'international',
+    id: 'international-new',
     label: 'International',
     icon: <Navigation size={16} />,
     expandable: true,
     children: [
-      { id: 'customs-entries', label: 'Customs Entries', path: '/international/customs' },
-      { id: 'intl-shipments', label: 'Shipments', path: '/international/shipments' },
-      { id: 'containers', label: 'Containers', path: '/international/containers' },
-      { id: 'drayage-loads', label: 'Drayage Loads', path: '/international/drayage' },
-      { id: 'intl-tracking2', label: 'End to End Tracking', path: '/international/tracking2' },
+      { id: 'shipment-tracking', label: 'Shipment Tracking', path: '/international-new/tracking' },
     ],
   },
   {
@@ -187,6 +184,7 @@ const menuItems: MenuItem[] = [
     expandable: true,
     children: [
       { id: 'backup-tracking', label: 'End-to-End Tracking', path: '/backup/tracking' },
+      { id: 'backup-intl-d', label: 'International-D', path: '/international/containers' },
     ],
   },
 ]

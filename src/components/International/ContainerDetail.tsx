@@ -11,10 +11,10 @@ const DEFAULT = { containerNo: '', ssl: 'MSCU', size: '40 High Cube', port: 'LBC
 export default function ContainerDetail() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const [activeTab, setActiveTab] = useState('Details')
+  const [activeTab, setActiveTab] = useState('Info')
   const d = CONTAINER_DATA[id || ''] || { ...DEFAULT, containerNo: id || '' }
 
-  const TABS = ['Details', 'Availability', 'Load']
+  const TABS = ['Info', 'Shipment', 'Load']
 
   return (
     <div className="p-6">
@@ -43,9 +43,11 @@ export default function ContainerDetail() {
         ))}
       </div>
 
-      {/* Details tab - multi-column grid layout */}
-      {activeTab === 'Details' && (
+      {/* Info tab - multi-column grid layout */}
+      {activeTab === 'Info' && (
+        <div className="space-y-4">
         <div className="bg-white border border-gray-200 rounded-xl p-5">
+          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">Basic Information</h3>
           <div className="grid grid-cols-3 gap-x-8 gap-y-4">
             <div><p className="text-[10px] text-gray-400 uppercase">Status</p><p className="text-sm font-medium text-gray-900">{d.status}</p></div>
             <div><p className="text-[10px] text-gray-400 uppercase">Location</p><p className="text-sm font-medium text-purple-600">{d.location}</p></div>
@@ -64,34 +66,73 @@ export default function ContainerDetail() {
             <div><p className="text-[10px] text-gray-400 uppercase">Pick up# / Appt#</p><p className="text-sm font-medium text-gray-900">-</p></div>
           </div>
         </div>
+
+        {/* Item SKUs */}
+        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+          <div className="px-5 py-3 border-b border-gray-100">
+            <h3 className="text-sm font-semibold text-gray-900">Item SKUs</h3>
+          </div>
+          <table className="w-full text-xs">
+            <thead><tr className="bg-gray-50 border-b border-gray-200">
+              <th className="text-left py-2.5 px-4 font-semibold text-gray-500">SKU</th>
+              <th className="text-left py-2.5 px-4 font-semibold text-gray-500">Product Name</th>
+              <th className="text-left py-2.5 px-4 font-semibold text-gray-500">Unit</th>
+              <th className="text-right py-2.5 px-4 font-semibold text-gray-500">Qty (Shipped)</th>
+              <th className="text-right py-2.5 px-4 font-semibold text-gray-500">Expected</th>
+              <th className="text-right py-2.5 px-4 font-semibold text-gray-500">Received</th>
+              <th className="text-right py-2.5 px-4 font-semibold text-gray-500">Diff</th>
+              <th className="text-right py-2.5 px-4 font-semibold text-gray-500">Damaged</th>
+              <th className="text-left py-2.5 px-4 font-semibold text-gray-500">Status</th>
+            </tr></thead>
+            <tbody>
+              {[
+                { sku: 'SKU-A100', name: 'Wireless Bluetooth Speaker', unit: 'EA', shipped: 120, expected: 120, received: 118, diff: -2, damaged: 1, status: 'Received' },
+                { sku: 'SKU-B200', name: 'USB-C Charging Cable 3-Pack', unit: 'EA', shipped: 500, expected: 500, received: 500, diff: 0, damaged: 0, status: 'Received' },
+                { sku: 'SKU-C350', name: 'Portable Power Bank 10000mAh', unit: 'EA', shipped: 200, expected: 200, received: 198, diff: -2, damaged: 2, status: 'Received' },
+                { sku: 'SKU-D410', name: 'Noise Cancelling Earbuds', unit: 'EA', shipped: 80, expected: 80, received: 80, diff: 0, damaged: 0, status: 'Received' },
+                { sku: 'SKU-E520', name: 'Smart Watch Band (Silicone)', unit: 'EA', shipped: 300, expected: 300, received: 0, diff: -300, damaged: 0, status: 'Pending' },
+              ].map((item, i) => (
+                <tr key={i} className="border-b border-gray-100 hover:bg-gray-50">
+                  <td className="py-2.5 px-4 font-mono text-primary-600 font-medium">{item.sku}</td>
+                  <td className="py-2.5 px-4 text-gray-700">{item.name}</td>
+                  <td className="py-2.5 px-4 text-gray-500">{item.unit}</td>
+                  <td className="py-2.5 px-4 text-right text-gray-700 font-medium">{item.shipped}</td>
+                  <td className="py-2.5 px-4 text-right text-gray-700">{item.expected}</td>
+                  <td className="py-2.5 px-4 text-right text-green-600 font-medium">{item.received}</td>
+                  <td className={`py-2.5 px-4 text-right font-medium ${item.diff < 0 ? 'text-orange-600' : 'text-gray-500'}`}>{item.diff}</td>
+                  <td className={`py-2.5 px-4 text-right font-medium ${item.damaged > 0 ? 'text-red-600' : 'text-gray-500'}`}>{item.damaged}</td>
+                  <td className="py-2.5 px-4"><span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${item.status === 'Received' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>{item.status}</span></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        </div>
       )}
 
-      {/* Availability tab - compact multi-column */}
-      {activeTab === 'Availability' && (
-        <div className="bg-white border border-gray-200 rounded-xl p-5">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-primary-600">Channel 1</span>
-              <span className="text-[10px] text-gray-400">Last synced: {d.syncedAt}</span>
-            </div>
-            <button className="px-3 py-1.5 text-xs bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700">Refresh</button>
-          </div>
-          <div className="grid grid-cols-3 gap-x-8 gap-y-4">
-            <div><p className="text-[10px] text-gray-400 uppercase">Terminal</p><p className="text-sm font-medium text-gray-900">-</p></div>
-            <div><p className="text-[10px] text-gray-400 uppercase">Source</p><p className="text-sm font-medium text-gray-900">-</p></div>
-            <div><p className="text-[10px] text-gray-400 uppercase">Location</p><p className="text-sm font-medium text-gray-900">-</p></div>
-            <div><p className="text-[10px] text-gray-400 uppercase">Parsed Location</p><p className="text-sm font-medium text-gray-900">-</p></div>
-            <div><p className="text-[10px] text-gray-400 uppercase">Holds</p><p className="text-sm font-medium text-gray-900">-</p></div>
-            <div><p className="text-[10px] text-gray-400 uppercase">Demurrage Fees</p><p className="text-sm font-medium text-gray-900">-</p></div>
-            <div><p className="text-[10px] text-gray-400 uppercase">Ready For Appointment</p><p className="text-sm font-medium text-gray-900">-</p></div>
-            <div><p className="text-[10px] text-gray-400 uppercase">Available For Pickup</p><p className="text-sm font-medium text-gray-900">-</p></div>
-            <div><p className="text-[10px] text-gray-400 uppercase">Wheeled</p><p className="text-sm font-medium text-gray-900">-</p></div>
-            <div><p className="text-[10px] text-gray-400 uppercase">Last Free Date</p><p className="text-sm font-medium text-gray-900">-</p></div>
-            <div><p className="text-[10px] text-gray-400 uppercase">Discharged Time</p><p className="text-sm font-medium text-gray-900">-</p></div>
-            <div><p className="text-[10px] text-gray-400 uppercase">Observed</p><p className="text-sm font-medium text-gray-900">-</p></div>
-            <div><p className="text-[10px] text-gray-400 uppercase">Synced At</p><p className="text-sm font-medium text-gray-900">{d.syncedAt}</p></div>
-            <div><p className="text-[10px] text-gray-400 uppercase">Error</p><p className="text-sm font-medium text-gray-900">-</p></div>
-          </div>
+      {/* Shipment tab */}
+      {activeTab === 'Shipment' && (
+        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+          <table className="w-full text-sm">
+            <thead><tr className="bg-gray-50 border-b">
+              <th className="text-left py-3 px-4 font-semibold text-gray-500">Shipment No.</th>
+              <th className="text-left py-3 px-4 font-semibold text-gray-500">HBL</th>
+              <th className="text-left py-3 px-4 font-semibold text-gray-500">Origin</th>
+              <th className="text-left py-3 px-4 font-semibold text-gray-500">Destination</th>
+              <th className="text-left py-3 px-4 font-semibold text-gray-500">Status</th>
+              <th className="text-left py-3 px-4 font-semibold text-gray-500">ETA</th>
+            </tr></thead>
+            <tbody>
+              <tr className="border-b border-gray-100 hover:bg-gray-50">
+                <td className="py-3 px-4 text-primary-600 font-medium cursor-pointer hover:underline" onClick={() => navigate('/international/shipments/SSHAS2608072')}>SSHAS2608072</td>
+                <td className="py-3 px-4 text-gray-700">SSGNS2607829</td>
+                <td className="py-3 px-4 text-gray-600">Haiphong, VN</td>
+                <td className="py-3 px-4 text-gray-600">Savannah, US</td>
+                <td className="py-3 px-4"><span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-medium">In Transit</span></td>
+                <td className="py-3 px-4 text-gray-600">Jun 13, 2026</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       )}
 
