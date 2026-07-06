@@ -60,6 +60,7 @@ export default function ShipmentTracking() {
   const [activeTab, setActiveTab] = useState('all')
   const [showFilters, setShowFilters] = useState(false)
   const [hasData, setHasData] = useState(true)
+  const [showRecentPanel, setShowRecentPanel] = useState(false)
   const [recentSearches] = useState(['SSHAS2608072', 'WHSU8555505', 'SSGNS2607829', '039GX40070'])
 
   const filtered = SHIPMENT_DATA.filter(s => {
@@ -109,9 +110,27 @@ export default function ShipmentTracking() {
           {recentSearches.slice(0, 3).map(s => (
             <button key={s} onClick={() => navigate(`/international/tracking2/${s}`)} className="text-primary-600 hover:text-primary-700 hover:underline font-medium">{s}</button>
           ))}
-          <button className="text-gray-400 hover:text-primary-600 flex items-center gap-0.5 ml-1">
+          <button onClick={() => setShowRecentPanel(!showRecentPanel)} className="text-gray-400 hover:text-primary-600 flex items-center gap-0.5 ml-1 border border-gray-200 px-2 py-0.5 rounded hover:border-primary-200 hover:bg-primary-50 transition-colors">
             More <ArrowRight size={10} />
           </button>
+        </div>
+      )}
+
+      {/* Recent Searches expanded panel */}
+      {showRecentPanel && (
+        <div className="mb-4 bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-xs font-semibold text-gray-700">Recent Searches</p>
+            <button onClick={() => setShowRecentPanel(false)} className="text-[10px] text-gray-400 hover:text-gray-600">Close</button>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            {recentSearches.map(s => (
+              <button key={s} onClick={() => navigate(`/international/tracking2/${s}`)} className="text-left px-3 py-2 rounded-lg hover:bg-primary-50 border border-gray-100 hover:border-primary-200 transition-colors">
+                <p className="text-xs font-medium text-primary-600 hover:underline">{s}</p>
+                <p className="text-[9px] text-gray-400">Searched recently</p>
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
