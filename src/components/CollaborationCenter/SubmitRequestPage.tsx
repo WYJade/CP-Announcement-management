@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import {
   ArrowLeft, Sparkles, AlertCircle, Loader2,
   Paperclip, Info, Zap, Package, Truck, DollarSign,
-  MessageSquare, Clock, HelpCircle, BoxSelect,
+  MessageSquare, Clock, HelpCircle, BoxSelect, Check,
 } from 'lucide-react'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -407,7 +407,7 @@ export default function SubmitRequestPage() {
               <button onClick={() => setStep(1)} className="text-sm text-gray-500 hover:text-gray-700">&larr; Back</button>
               <div className="flex items-center gap-3">
                 <button onClick={() => navigate('/support/requests')} className="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50">Cancel</button>
-                <button onClick={() => alert('Request submitted successfully! You will receive a confirmation email.')} className="px-5 py-2 text-sm font-medium bg-primary-600 text-white rounded-lg hover:bg-primary-700">Review & Submit</button>
+                <button onClick={() => setStep(3)} className="px-5 py-2 text-sm font-medium bg-primary-600 text-white rounded-lg hover:bg-primary-700">Review & Submit</button>
               </div>
             </div>
           </div>
@@ -493,6 +493,47 @@ export default function SubmitRequestPage() {
             </div>
           </div>
           )}
+        </div>
+      )}
+
+      {/* ═══ STEP 3: Confirm & Submit ═══ */}
+      {step === 3 && (
+        <div className="max-w-3xl mx-auto">
+          <div className="text-center mb-8">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Check size={28} className="text-green-600" />
+            </div>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Request Submitted Successfully!</h2>
+            <p className="text-sm text-gray-500">Your request has been submitted and assigned ticket number <span className="font-semibold text-gray-800">WI-012</span>.</p>
+            <p className="text-xs text-gray-400 mt-1">A confirmation email has been sent to {email}.</p>
+          </div>
+
+          {/* Summary card */}
+          <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
+            <h3 className="text-sm font-semibold text-gray-900 mb-4">Request Summary</h3>
+            <div className="grid grid-cols-2 gap-4 text-xs">
+              <div><p className="text-gray-400 uppercase text-[10px]">Subject</p><p className="text-gray-800 font-medium">{subject || 'N/A'}</p></div>
+              <div><p className="text-gray-400 uppercase text-[10px]">Priority</p><p className="text-gray-800 font-medium">{priority}</p></div>
+              <div><p className="text-gray-400 uppercase text-[10px]">Related Type</p><p className="text-gray-800 font-medium">{relatedType || 'N/A'}</p></div>
+              <div><p className="text-gray-400 uppercase text-[10px]">Related ID</p><p className="text-gray-800 font-medium">{relatedId || 'N/A'}</p></div>
+              <div className="col-span-2"><p className="text-gray-400 uppercase text-[10px]">Description</p><p className="text-gray-700 leading-relaxed mt-1">{description.slice(0, 200)}{description.length > 200 ? '...' : ''}</p></div>
+            </div>
+          </div>
+
+          {/* Next steps */}
+          <div className="bg-blue-50 border border-blue-100 rounded-xl p-5 mb-6">
+            <p className="text-xs font-semibold text-blue-700 mb-2">What happens next?</p>
+            <ol className="text-xs text-blue-600/80 space-y-1.5 list-decimal list-inside">
+              <li>Our support team will review your request within 2 business hours</li>
+              <li>You will receive email updates on status changes</li>
+              <li>Track progress anytime from My Requests page</li>
+            </ol>
+          </div>
+
+          <div className="flex items-center justify-center gap-4">
+            <button onClick={() => navigate('/support/requests')} className="px-5 py-2.5 text-sm font-medium bg-primary-600 text-white rounded-lg hover:bg-primary-700">View My Requests</button>
+            <button onClick={() => { setStep(1); setDescription(''); setSubject(''); setAiResult(null); setAiApplied(false) }} className="px-5 py-2.5 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50">Submit Another Request</button>
+          </div>
         </div>
       )}
 
