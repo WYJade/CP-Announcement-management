@@ -123,10 +123,10 @@ export default function ShipmentTracking() {
             <p className="text-xs font-semibold text-gray-700">Recent Searches</p>
             <button onClick={() => setShowRecentPanel(false)} className="text-[10px] text-gray-400 hover:text-gray-600">Close</button>
           </div>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-4 gap-2">
             {recentSearches.map(s => (
               <button key={s} onClick={() => navigate(`/international/tracking2/${s}`)} className="text-left px-3 py-2 rounded-lg hover:bg-primary-50 border border-gray-100 hover:border-primary-200 transition-colors">
-                <p className="text-xs font-medium text-primary-600 hover:underline">{s}</p>
+                <p className="text-xs font-medium text-primary-600 hover:underline truncate">{s}</p>
                 <p className="text-[9px] text-gray-400">Searched recently</p>
               </button>
             ))}
