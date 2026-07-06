@@ -165,8 +165,8 @@ export default function ShipmentTracking() {
       {/* Alert Cards */}
       <div className="grid grid-cols-4 gap-3 mb-5">
         <div className="bg-red-50 border border-red-100 rounded-lg p-3">
-          <div className="flex items-center gap-1.5 text-xs font-semibold text-red-700 mb-1"><AlertTriangle size={12} /> 3 Delayed</div>
-          <p className="text-[10px] text-red-600">Shipments behind schedule</p>
+          <div className="flex items-center gap-1.5 text-xs font-semibold text-red-700 mb-1"><AlertTriangle size={12} /> 3 LFD Exceeded</div>
+          <p className="text-[10px] text-red-600">Containers past last free day</p>
         </div>
         <div className="bg-amber-50 border border-amber-100 rounded-lg p-3">
           <div className="flex items-center gap-1.5 text-xs font-semibold text-amber-700 mb-1"><FileCheck size={12} /> 2 Customs Hold</div>
