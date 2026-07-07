@@ -184,7 +184,19 @@ const menuItems: MenuItem[] = [
     expandable: true,
     children: [
       { id: 'backup-tracking', label: 'End-to-End Tracking', path: '/backup/tracking' },
-      { id: 'backup-intl-d', label: 'International-D', path: '/international/containers' },
+    ],
+  },
+  {
+    id: 'international-d',
+    label: 'International-D',
+    icon: <Navigation size={16} />,
+    expandable: true,
+    children: [
+      { id: 'intl-d-containers', label: 'Containers', path: '/international/containers' },
+      { id: 'intl-d-shipments', label: 'Shipments', path: '/international/shipments' },
+      { id: 'intl-d-customs', label: 'Customs Entries', path: '/international/customs' },
+      { id: 'intl-d-drayage', label: 'Drayage Loads', path: '/international/drayage' },
+      { id: 'intl-d-tracking', label: 'End to End Tracking', path: '/international/tracking2' },
     ],
   },
 ]
