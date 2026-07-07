@@ -128,7 +128,145 @@ const NAV_ITEMS = [
   { id: 'marketplace', label: 'Marketplace', icon: Store },
 ]
 
-// ─── Component ───────────────────────────────────────────────────────────────
+// ─── Chat Module Data ─────────────────────────────────────────────────────────
+
+const CHAT_MODULES = [
+  { id: 'sales', label: 'Sales Orders', refs: ['ORD-8821', 'ORD-8820', 'ORD-8819', 'ORD-8818', 'ORD-8817', 'ORD-8816', 'ORD-8815', 'ORD-8814', 'ORD-8813', 'ORD-8812'] },
+  { id: 'inbound', label: 'Inbound', refs: ['RN-38199', 'RN-38198', 'RN-38197', 'RN-38196', 'RN-38195', 'ASN-20260601', 'ASN-20260602', 'ASN-20260603'] },
+  { id: 'inventory', label: 'Inventory', refs: ['SKU-A100', 'SKU-B200', 'SKU-C350', 'SKU-D410', 'SKU-E520', 'FW-DENIM-001', 'FW-2024-BLK', 'TCORE-CABLE'] },
+  { id: 'outbound', label: 'Outbound', refs: ['SHP-10021', 'SHP-10022', 'SHP-10023', 'SHP-10024', 'SHP-10025', 'LOAD-4401', 'LOAD-4402', 'LOAD-4403'] },
+  { id: 'shipment', label: 'Shipment', refs: ['SSHAS2608072', 'SSHAS2608135', 'SSHAS2608099', 'SSHAS2608130', 'SSHAS2608200', 'SSHAS2608250', 'SSHAS2608260', 'SSHAS2608270'] },
+  { id: 'invoice', label: 'Invoice', refs: ['INV-19043770', 'INV-19043771', 'INV-19043772', 'INV-19043773', 'INV-19043774', 'INV-19043775'] },
+]
+
+function ChatPanel() {
+  const [input, setInput] = useState('')
+  const [showModules, setShowModules] = useState(false)
+  const [selectedModule, setSelectedModule] = useState<string | null>(null)
+  const [showAllRefs, setShowAllRefs] = useState(false)
+  const [messages, setMessages] = useState<{ role: 'user' | 'ai'; text: string }[]>([])
+  const [selectedRef, setSelectedRef] = useState('')
+
+  const handleInputChange = (val: string) => {
+    setInput(val)
+    if (val.endsWith('@')) {
+      setShowModules(true)
+      setSelectedModule(null)
+    } else if (!val.includes('@')) {
+      setShowModules(false)
+      setSelectedModule(null)
+    }
+  }
+
+  const handleSelectModule = (mod: string) => {
+    setSelectedModule(mod)
+    setShowModules(false)
+  }
+
+  const handleSelectRef = (ref: string) => {
+    setSelectedRef(ref)
+    setInput(input.replace(/@$/, '') + `@${CHAT_MODULES.find(m => m.id === selectedModule)?.label}/${ref} `)
+    setSelectedModule(null)
+  }
+
+  const handleSend = () => {
+    if (!input.trim()) return
+    setMessages(prev => [...prev, { role: 'user', text: input }])
+    setInput('')
+    setSelectedModule(null)
+    setShowModules(false)
+    // Simulate AI response
+    setTimeout(() => {
+      setMessages(prev => [...prev, { role: 'ai', text: `Based on the records, I found the following information for your query. The item is currently in processing status. Would you like me to check more details or take any action?` }])
+    }, 1000)
+  }
+
+  const currentModuleRefs = CHAT_MODULES.find(m => m.id === selectedModule)?.refs || []
+  const displayRefs = showAllRefs ? currentModuleRefs : currentModuleRefs.slice(0, 20)
+
+  return (
+    <div className="flex flex-col h-full">
+      {/* Chat header */}
+      <div className="px-6 py-4 border-b border-gray-200 bg-white">
+        <h2 className="text-lg font-bold text-gray-900">Chat</h2>
+        <p className="text-[10px] text-gray-400">AI-powered query assistant. Type @ to select a module and reference.</p>
+      </div>
+
+      {/* Messages area */}
+      <div className="flex-1 overflow-y-auto p-6">
+        {messages.length === 0 && (
+          <div className="text-center py-16">
+            <div className="w-14 h-14 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <MessageSquare size={22} className="text-primary-600" />
+            </div>
+            <h3 className="text-lg font-bold text-gray-900 mb-2">How can I help you?</h3>
+            <p className="text-sm text-gray-500 max-w-md mx-auto">Ask about order status, SLA, inventory, shipments, or any system query. Type <span className="bg-gray-100 px-1.5 py-0.5 rounded font-mono text-xs">@</span> to select a module.</p>
+          </div>
+        )}
+        {messages.map((msg, i) => (
+          <div key={i} className={`mb-4 flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+            <div className={`max-w-[70%] px-4 py-3 rounded-xl text-sm ${msg.role === 'user' ? 'bg-primary-600 text-white' : 'bg-white border border-gray-200 text-gray-700'}`}>
+              {msg.text}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Module/Ref selector popup */}
+      {(showModules || selectedModule) && (
+        <div className="mx-6 mb-2 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
+          {showModules && !selectedModule && (
+            <div>
+              <p className="px-4 py-2 text-[10px] text-gray-400 uppercase font-semibold border-b border-gray-100">Select Module</p>
+              {CHAT_MODULES.map(mod => (
+                <button key={mod.id} onClick={() => handleSelectModule(mod.id)} className="w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 flex items-center justify-between border-b border-gray-50 last:border-0">
+                  <span className="font-medium text-gray-800">{mod.label}</span>
+                  <span className="text-[10px] text-gray-400">{mod.refs.length} items</span>
+                </button>
+              ))}
+            </div>
+          )}
+          {selectedModule && (
+            <div>
+              <div className="px-4 py-2 text-[10px] text-gray-400 uppercase font-semibold border-b border-gray-100 flex items-center justify-between">
+                <span>{CHAT_MODULES.find(m => m.id === selectedModule)?.label} — Select Reference</span>
+                <button onClick={() => setSelectedModule(null)} className="text-gray-400 hover:text-gray-600 text-xs">Back</button>
+              </div>
+              <div className="max-h-60 overflow-y-auto">
+                {displayRefs.map(ref => (
+                  <button key={ref} onClick={() => handleSelectRef(ref)} className="w-full text-left px-4 py-2 text-sm text-primary-600 font-medium hover:bg-primary-50 border-b border-gray-50 last:border-0">{ref}</button>
+                ))}
+              </div>
+              {currentModuleRefs.length > 20 && !showAllRefs && (
+                <button onClick={() => setShowAllRefs(true)} className="w-full px-4 py-2 text-xs text-primary-600 font-medium hover:bg-gray-50 border-t border-gray-100">More →</button>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Input area */}
+      <div className="px-6 py-4 border-t border-gray-200 bg-white">
+        <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5">
+          <input
+            type="text"
+            value={input}
+            onChange={e => handleInputChange(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter') handleSend() }}
+            placeholder="Type @ to select module, then ask your question..."
+            className="flex-1 bg-transparent text-sm outline-none placeholder-gray-400"
+          />
+          <button onClick={handleSend} disabled={!input.trim()} className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${input.trim() ? 'bg-primary-600 text-white hover:bg-primary-700' : 'bg-gray-200 text-gray-400'}`}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </div>
+        <p className="text-[9px] text-gray-400 mt-1.5 text-center">Type <span className="font-mono bg-gray-100 px-1 rounded">@</span> to select: Sales Orders · Inbound · Inventory · Outbound · Shipment · Invoice</p>
+      </div>
+    </div>
+  )
+}
+
+// ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function AgentWorkstation() {
   const [activeNav, setActiveNav] = useState('workstation')
@@ -243,8 +381,14 @@ export default function AgentWorkstation() {
         </div>
       </div>
 
-      {/* Main content - Agent Workstation */}
-      <div className="flex-1 overflow-y-auto p-6">
+      {/* Main content */}
+      <div className="flex-1 overflow-y-auto">
+        {/* Chat View */}
+        {activeNav === 'chat' && <ChatPanel />}
+
+        {/* Agent Workstation View */}
+        {activeNav === 'workstation' && (
+        <div className="p-6">
         <div>
           <div className="flex items-center gap-3 mb-6">
             <Zap size={20} className="text-primary-600" />
@@ -340,6 +484,8 @@ export default function AgentWorkstation() {
             </div>
           </div>
         </div>
+      </div>
+      )}
       </div>
 
       {/* Task detail popup */}
