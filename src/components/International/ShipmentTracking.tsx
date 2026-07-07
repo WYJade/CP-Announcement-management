@@ -26,20 +26,20 @@ const HAS_DATA = true // Toggle to show search page vs data page
 
 const SHIPMENT_DATA: ShipmentRecord[] = [
   { id: 'SSHAS2608072', shipmentNo: 'SSHAS2608072', hbl: 'SSGNS2607829', status: 'In Transit', containers: ['WHSU8555505'], currentMilestone: 'Vessel Departed POL', origin: 'Haiphong, VN', destination: 'Savannah, US', eta: 'Jun 13, 2026', customer: 'ADOORN LLC', receivedTime: '-', lastUpdated: 'Jun 15, 2026 08:30', alert: 'lfd' },
-  { id: 'SSHAS2608135', shipmentNo: 'SSHAS2608135', hbl: 'SSHAS2608135', status: 'Customs', containers: ['XYLU8225020', 'SELU4350353'], currentMilestone: 'Customs Released', origin: 'Shanghai, CN', destination: 'Los Angeles, US', eta: 'Jun 01, 2026', customer: 'THE ONLY BEAN LLC', receivedTime: '-', lastUpdated: 'Jun 14, 2026 14:20', alert: 'customs' },
+  { id: 'SSHAS2608135', shipmentNo: 'SSHAS2608135', hbl: 'SSHAS2608135', status: 'Customs Released', containers: ['XYLU8225020', 'SELU4350353'], currentMilestone: 'Customs Released', origin: 'Shanghai, CN', destination: 'Los Angeles, US', eta: 'Jun 01, 2026', customer: 'THE ONLY BEAN LLC', receivedTime: '-', lastUpdated: 'Jun 14, 2026 14:20', alert: 'customs' },
   { id: 'SSHAS2608099', shipmentNo: 'SSHAS2608099', hbl: 'HLXU2608001', status: 'In Transit', containers: ['HLXU3456789'], currentMilestone: 'In Transit - Mid Pacific', origin: 'Ho Chi Minh, VN', destination: 'New York, US', eta: 'Jul 10, 2026', customer: 'ORGAIN LLC', receivedTime: '-', lastUpdated: 'Jun 10, 2026 09:00', alert: 'lfd' },
-  { id: 'SSHAS2608130', shipmentNo: 'SSHAS2608130', hbl: 'SSHAS2608130', status: 'Completed', containers: ['ONEU8472065'], currentMilestone: 'Received at Warehouse', origin: 'Ningbo, CN', destination: 'Long Beach, US', eta: 'May 28, 2026', customer: 'VITA COCO', receivedTime: 'Jun 05, 2026', lastUpdated: 'Jun 05, 2026 16:45', alert: '' },
-  { id: 'SSHAS2608200', shipmentNo: 'SSHAS2608200', hbl: 'SSHAS2608200', status: 'Drayage', containers: ['MSCU7234891', 'TCKU9988776'], currentMilestone: 'Out for Delivery', origin: 'Shanghai, CN', destination: 'Long Beach, US', eta: 'Jun 12, 2026', customer: 'PLEASS GLOBAL', receivedTime: '-', lastUpdated: 'Jun 13, 2026 07:00', alert: 'approaching-lfd' },
-  { id: 'SSHAS2608250', shipmentNo: 'SSHAS2608250', hbl: 'SSHAS2608250', status: 'In Transit', containers: ['CMAU5567890'], currentMilestone: 'Approaching POD', origin: 'Shenzhen, CN', destination: 'Savannah, US', eta: 'Jun 25, 2026', customer: 'ADOORN LLC', receivedTime: '-', lastUpdated: 'Jun 14, 2026 10:00', alert: 'approaching-lfd' },
-  { id: 'SSHAS2608260', shipmentNo: 'SSHAS2608260', hbl: 'SSHAS2608260', status: 'Drayage', containers: ['TRLU7494622'], currentMilestone: 'Dispatched to Warehouse', origin: 'Ningbo, CN', destination: 'Long Beach, US', eta: 'Jun 10, 2026', customer: 'ORGAIN LLC', receivedTime: '-', lastUpdated: 'Jun 15, 2026 06:00', alert: 'approaching-lfd' },
-  { id: 'SSHAS2608270', shipmentNo: 'SSHAS2608270', hbl: 'SSHAS2608270', status: 'Warehouse Receiving', containers: ['KKFU9159476'], currentMilestone: 'Unloading at Warehouse', origin: 'Shanghai, CN', destination: 'Long Beach, US', eta: 'Jun 08, 2026', customer: 'VITA COCO', receivedTime: '-', lastUpdated: 'Jun 14, 2026 15:30', alert: 'wh-receiving' },
-  { id: 'SSHAS2608280', shipmentNo: 'SSHAS2608280', hbl: 'SSHAS2608280', status: 'Customs', containers: ['NYKU4064208'], currentMilestone: 'Customs Hold', origin: 'Qingdao, CN', destination: 'Savannah, US', eta: 'Jun 11, 2026', customer: 'ADOORN LLC', receivedTime: '-', lastUpdated: 'Jun 13, 2026 12:00', alert: 'customs' },
-  { id: 'SSHAS2608290', shipmentNo: 'SSHAS2608290', hbl: 'SSHAS2608290', status: 'Warehouse Receiving', containers: ['HAMU1732295'], currentMilestone: 'Scheduled Receiving', origin: 'Shanghai, CN', destination: 'Savannah, US', eta: 'Jun 05, 2026', customer: 'ORGAIN LLC', receivedTime: '-', lastUpdated: 'Jun 15, 2026 09:30', alert: 'wh-receiving' },
-  { id: 'SSHAS2608300', shipmentNo: 'SSHAS2608300', hbl: 'SSHAS2608300', status: 'In Transit', containers: ['FCIU5663916'], currentMilestone: 'LFD Exceeded - Demurrage', origin: 'Ningbo, CN', destination: 'Long Beach, US', eta: 'Jun 02, 2026', customer: 'PLEASS GLOBAL', receivedTime: '-', lastUpdated: 'Jun 12, 2026 11:00', alert: 'lfd' },
-  { id: 'SSHAS2608310', shipmentNo: 'SSHAS2608310', hbl: 'SSHAS2608310', status: 'Warehouse Receiving', containers: ['APZU3394882'], currentMilestone: 'Appointment Confirmed', origin: 'Ho Chi Minh, VN', destination: 'New York, US', eta: 'Jun 06, 2026', customer: 'THE ONLY BEAN LLC', receivedTime: '-', lastUpdated: 'Jun 14, 2026 08:00', alert: 'wh-receiving' },
-  { id: 'SSHAS2608320', shipmentNo: 'SSHAS2608320', hbl: 'SSHAS2608320', status: 'Warehouse Receiving', containers: ['MRSU546732'], currentMilestone: 'Pending Unload', origin: 'Shenzhen, CN', destination: 'Savannah, US', eta: 'Jun 07, 2026', customer: 'VITA COCO', receivedTime: '-', lastUpdated: 'Jun 15, 2026 07:00', alert: 'wh-receiving' },
-  { id: 'SSHAS2608330', shipmentNo: 'SSHAS2608330', hbl: 'SSHAS2608330', status: 'Drayage', containers: ['MAGU5754435'], currentMilestone: 'Approaching LFD', origin: 'Qingdao, CN', destination: 'Long Beach, US', eta: 'Jun 09, 2026', customer: 'ORGAIN LLC', receivedTime: '-', lastUpdated: 'Jun 14, 2026 16:00', alert: 'approaching-lfd' },
-  { id: 'SSHAS2608340', shipmentNo: 'SSHAS2608340', hbl: 'SSHAS2608340', status: 'Drayage', containers: ['NYKU3736566'], currentMilestone: 'Approaching LFD', origin: 'Shanghai, CN', destination: 'Los Angeles, US', eta: 'Jun 10, 2026', customer: 'ADOORN LLC', receivedTime: '-', lastUpdated: 'Jun 15, 2026 10:00', alert: 'approaching-lfd' },
+  { id: 'SSHAS2608130', shipmentNo: 'SSHAS2608130', hbl: 'SSHAS2608130', status: 'Received', containers: ['ONEU8472065'], currentMilestone: 'Received at Warehouse', origin: 'Ningbo, CN', destination: 'Long Beach, US', eta: 'May 28, 2026', customer: 'VITA COCO', receivedTime: 'Jun 05, 2026', lastUpdated: 'Jun 05, 2026 16:45', alert: '' },
+  { id: 'SSHAS2608200', shipmentNo: 'SSHAS2608200', hbl: 'SSHAS2608200', status: 'Dispatched', containers: ['MSCU7234891', 'TCKU9988776'], currentMilestone: 'Out for Delivery', origin: 'Shanghai, CN', destination: 'Long Beach, US', eta: 'Jun 12, 2026', customer: 'PLEASS GLOBAL', receivedTime: '-', lastUpdated: 'Jun 13, 2026 07:00', alert: 'approaching-lfd' },
+  { id: 'SSHAS2608250', shipmentNo: 'SSHAS2608250', hbl: 'SSHAS2608250', status: 'Booked', containers: ['CMAU5567890'], currentMilestone: 'Booked - Awaiting Pickup', origin: 'Shenzhen, CN', destination: 'Savannah, US', eta: 'Jun 25, 2026', customer: 'ADOORN LLC', receivedTime: '-', lastUpdated: 'Jun 14, 2026 10:00', alert: '' },
+  { id: 'SSHAS2608260', shipmentNo: 'SSHAS2608260', hbl: 'SSHAS2608260', status: 'OFD', containers: ['TRLU7494622'], currentMilestone: 'Out for Final Delivery', origin: 'Ningbo, CN', destination: 'Long Beach, US', eta: 'Jun 10, 2026', customer: 'ORGAIN LLC', receivedTime: '-', lastUpdated: 'Jun 15, 2026 06:00', alert: 'approaching-lfd' },
+  { id: 'SSHAS2608270', shipmentNo: 'SSHAS2608270', hbl: 'SSHAS2608270', status: 'Receiving', containers: ['KKFU9159476'], currentMilestone: 'Unloading at Warehouse', origin: 'Shanghai, CN', destination: 'Long Beach, US', eta: 'Jun 08, 2026', customer: 'VITA COCO', receivedTime: '-', lastUpdated: 'Jun 14, 2026 15:30', alert: 'wh-receiving' },
+  { id: 'SSHAS2608280', shipmentNo: 'SSHAS2608280', hbl: 'SSHAS2608280', status: 'Customs Released', containers: ['NYKU4064208'], currentMilestone: 'Customs Hold Released', origin: 'Qingdao, CN', destination: 'Savannah, US', eta: 'Jun 11, 2026', customer: 'ADOORN LLC', receivedTime: '-', lastUpdated: 'Jun 13, 2026 12:00', alert: 'customs' },
+  { id: 'SSHAS2608290', shipmentNo: 'SSHAS2608290', hbl: 'SSHAS2608290', status: 'Receiving', containers: ['HAMU1732295'], currentMilestone: 'Scheduled Receiving', origin: 'Shanghai, CN', destination: 'Savannah, US', eta: 'Jun 05, 2026', customer: 'ORGAIN LLC', receivedTime: '-', lastUpdated: 'Jun 15, 2026 09:30', alert: 'wh-receiving' },
+  { id: 'SSHAS2608300', shipmentNo: 'SSHAS2608300', hbl: 'SSHAS2608300', status: 'Arrived', containers: ['FCIU5663916'], currentMilestone: 'Arrived at POD', origin: 'Ningbo, CN', destination: 'Long Beach, US', eta: 'Jun 02, 2026', customer: 'PLEASS GLOBAL', receivedTime: '-', lastUpdated: 'Jun 12, 2026 11:00', alert: 'lfd' },
+  { id: 'SSHAS2608310', shipmentNo: 'SSHAS2608310', hbl: 'SSHAS2608310', status: 'Available', containers: ['APZU3394882'], currentMilestone: 'Available for Pickup', origin: 'Ho Chi Minh, VN', destination: 'New York, US', eta: 'Jun 06, 2026', customer: 'THE ONLY BEAN LLC', receivedTime: '-', lastUpdated: 'Jun 14, 2026 08:00', alert: 'approaching-lfd' },
+  { id: 'SSHAS2608320', shipmentNo: 'SSHAS2608320', hbl: 'SSHAS2608320', status: 'Delivered', containers: ['MRSU546732'], currentMilestone: 'Delivered to Warehouse', origin: 'Shenzhen, CN', destination: 'Savannah, US', eta: 'Jun 07, 2026', customer: 'VITA COCO', receivedTime: '-', lastUpdated: 'Jun 15, 2026 07:00', alert: 'wh-receiving' },
+  { id: 'SSHAS2608330', shipmentNo: 'SSHAS2608330', hbl: 'SSHAS2608330', status: 'Available', containers: ['MAGU5754435'], currentMilestone: 'Container Available', origin: 'Qingdao, CN', destination: 'Long Beach, US', eta: 'Jun 09, 2026', customer: 'ORGAIN LLC', receivedTime: '-', lastUpdated: 'Jun 14, 2026 16:00', alert: 'approaching-lfd' },
+  { id: 'SSHAS2608340', shipmentNo: 'SSHAS2608340', hbl: 'SSHAS2608340', status: 'Dispatched', containers: ['NYKU3736566'], currentMilestone: 'Dispatched to Warehouse', origin: 'Shanghai, CN', destination: 'Los Angeles, US', eta: 'Jun 10, 2026', customer: 'ADOORN LLC', receivedTime: '-', lastUpdated: 'Jun 15, 2026 10:00', alert: 'approaching-lfd' },
 ]
 
 const STATUS_TABS = [
@@ -52,10 +52,16 @@ const STATUS_TABS = [
 ]
 
 function statusColor(status: string) {
+  if (status === 'Booked') return 'bg-gray-100 text-gray-700'
   if (status === 'In Transit') return 'bg-blue-100 text-blue-700'
-  if (status === 'Customs') return 'bg-teal-100 text-teal-700'
-  if (status === 'Drayage') return 'bg-violet-100 text-violet-700'
-  if (status === 'Warehouse Receiving') return 'bg-green-100 text-green-700'
+  if (status === 'Arrived') return 'bg-indigo-100 text-indigo-700'
+  if (status === 'Customs Released') return 'bg-teal-100 text-teal-700'
+  if (status === 'Available') return 'bg-cyan-100 text-cyan-700'
+  if (status === 'Dispatched') return 'bg-violet-100 text-violet-700'
+  if (status === 'OFD') return 'bg-amber-100 text-amber-700'
+  if (status === 'Delivered') return 'bg-emerald-100 text-emerald-700'
+  if (status === 'Receiving') return 'bg-lime-100 text-lime-700'
+  if (status === 'Received') return 'bg-green-100 text-green-700'
   if (status === 'Completed') return 'bg-gray-100 text-gray-600'
   return 'bg-gray-100 text-gray-600'
 }
@@ -78,8 +84,15 @@ export default function ShipmentTracking() {
       if (s.alert !== alertFilter) return false
     }
     if (activeTab !== 'all') {
-      const tabStatusMap: Record<string, string> = { 'in-transit': 'In Transit', customs: 'Customs', drayage: 'Drayage', warehouse: 'Warehouse Receiving', completed: 'Completed' }
-      if (s.status !== tabStatusMap[activeTab]) return false
+      const tabStatusMap: Record<string, string[]> = {
+        'in-transit': ['Booked', 'In Transit', 'Arrived'],
+        customs: ['Customs Released'],
+        drayage: ['Available', 'Dispatched', 'OFD', 'Delivered'],
+        warehouse: ['Receiving', 'Received'],
+        completed: ['Received'],
+      }
+      const allowedStatuses = tabStatusMap[activeTab] || []
+      if (!allowedStatuses.includes(s.status)) return false
     }
     if (search) {
       const q = search.toLowerCase()
@@ -183,10 +196,15 @@ export default function ShipmentTracking() {
       {/* Status Summary tabs */}
       <div className="flex gap-1 mb-4 border-b border-gray-200">
         {STATUS_TABS.map(tab => {
-          const count = tab.key === 'all' ? SHIPMENT_DATA.length : SHIPMENT_DATA.filter(s => {
-            const map: Record<string, string> = { 'in-transit': 'In Transit', customs: 'Customs', drayage: 'Drayage', warehouse: 'Warehouse Receiving', completed: 'Completed' }
-            return s.status === map[tab.key]
-          }).length
+          const tabStatusMap: Record<string, string[]> = {
+            all: [],
+            'in-transit': ['Booked', 'In Transit', 'Arrived'],
+            customs: ['Customs Released'],
+            drayage: ['Available', 'Dispatched', 'OFD', 'Delivered'],
+            warehouse: ['Receiving', 'Received'],
+            completed: ['Received'],
+          }
+          const count = tab.key === 'all' ? SHIPMENT_DATA.length : SHIPMENT_DATA.filter(s => (tabStatusMap[tab.key] || []).includes(s.status)).length
           return (
             <button key={tab.key} onClick={() => setActiveTab(tab.key)}
               className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${activeTab === tab.key ? 'border-primary-600 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>
