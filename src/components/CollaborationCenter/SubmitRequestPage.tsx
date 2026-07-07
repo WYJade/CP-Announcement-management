@@ -180,6 +180,20 @@ export default function SubmitRequestPage() {
 
   const topicLabel = TOPICS.find(t => t.id === selectedTopic)?.label || ''
 
+  // VAS services vary by topic
+  const VAS_BY_TOPIC: Record<string, { name: string; enabled: boolean; price?: string }[]> = {
+    urgent: [{ name: 'Expedite Processing', enabled: true }, { name: 'Priority Support', enabled: false, price: '$35' }],
+    inventory: [{ name: 'Photo Request', enabled: true }, { name: 'SKU Inspection', enabled: false, price: '$45' }, { name: 'Inventory Audit Service', enabled: true }],
+    shipping: [{ name: 'Carrier Tracking Alert', enabled: true }, { name: 'Delivery Confirmation Photo', enabled: false, price: '$15' }],
+    vas: [{ name: 'Kitting Service', enabled: true }, { name: 'Relabeling', enabled: true }, { name: 'Custom Packaging', enabled: false, price: '$30' }],
+    inbound: [{ name: 'Photo Request', enabled: true }, { name: 'Appointment Scheduling', enabled: true }, { name: 'Putaway Verification', enabled: false, price: '$25' }],
+    customs: [{ name: 'Document Review', enabled: true }, { name: 'Customs Brokerage Support', enabled: false, price: '$55' }],
+    billing: [{ name: 'Invoice Dispute Assist', enabled: true }, { name: 'Payment Plan Setup', enabled: false, price: '$0' }],
+    other: [{ name: 'Photo Request', enabled: true }, { name: 'General Support', enabled: true }],
+  }
+  const vasServices = VAS_BY_TOPIC[selectedTopic || 'inventory'] || VAS_BY_TOPIC.inventory
+  const vasEnabledCount = vasServices.filter(s => s.enabled || serviceEnabled).length
+
   return (
     <div className="p-6 max-w-5xl mx-auto">
       {/* Header */}
@@ -238,50 +252,34 @@ export default function SubmitRequestPage() {
             {/* VAS recommendation area */}
             <div className="bg-gradient-to-r from-violet-50 to-purple-50 border border-violet-200 rounded-xl p-4">
               <p className="text-xs text-violet-700 font-medium flex items-center gap-1.5 mb-3">
-                <Sparkles size={13} /> VAS Recommendation for "{topicLabel}" &middot; Smart Recommend &middot; {serviceEnabled ? '3/3' : '2/3'} Enabled
+                <Sparkles size={13} /> VAS Recommendation for "{topicLabel}" &middot; Smart Recommend &middot; {vasEnabledCount}/{vasServices.length} Enabled
               </p>
               <div className="space-y-2">
-                <div className="flex items-center justify-between bg-white rounded-lg px-4 py-3 border border-green-200">
-                  <div className="flex items-center gap-2">
-                    <span className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg></span>
-                    <span className="text-sm font-medium text-gray-800">Photo Request</span>
-                    <span className="text-[10px] text-green-600 bg-green-50 px-2 py-0.5 rounded-full font-medium">Enabled &middot; Ready to use</span>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between bg-white rounded-lg px-4 py-3 border border-gray-200">
-                  <div className="flex items-center gap-2">
-                    {serviceEnabled ? (
-                      <span className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg></span>
-                    ) : (
-                      <span className="w-5 h-5 bg-amber-400 rounded-full flex items-center justify-center text-white text-[9px] font-bold">!</span>
-                    )}
-                    <span className="text-sm font-medium text-gray-800">SKU Inspection</span>
-                    {serviceEnabled ? (
-                      <span className="text-[10px] text-green-600 bg-green-50 px-2 py-0.5 rounded-full font-medium">Enabled &middot; Ready to use</span>
-                    ) : (
-                      <span className="text-[10px] text-gray-500">Professional cargo inspection</span>
-                    )}
-                  </div>
-                  {!serviceEnabled && (
-                    <div className="flex items-center gap-3">
-                      <span className="text-sm font-semibold text-gray-700">$45</span>
-                      <button onClick={() => setServiceModal('sku-inspection')} className="text-xs text-primary-600 font-medium hover:underline">Learn More</button>
-                    </div>
-                  )}
-                </div>
-                {showMoreServices && (
-                  <div className="flex items-center justify-between bg-white rounded-lg px-4 py-3 border border-green-200">
+                {vasServices.slice(0, showMoreServices ? vasServices.length : 2).map((svc, i) => (
+                  <div key={i} className={`flex items-center justify-between bg-white rounded-lg px-4 py-3 border ${svc.enabled ? 'border-green-200' : 'border-gray-200'}`}>
                     <div className="flex items-center gap-2">
-                      <span className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg></span>
-                      <span className="text-sm font-medium text-gray-800">Inventory Audit Service</span>
-                      <span className="text-[10px] text-green-600 bg-green-50 px-2 py-0.5 rounded-full font-medium">Enabled &middot; Ready to use</span>
+                      {svc.enabled ? (
+                        <span className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+                      ) : (
+                        <span className="w-5 h-5 bg-amber-400 rounded-full flex items-center justify-center text-white text-[9px] font-bold">!</span>
+                      )}
+                      <span className="text-sm font-medium text-gray-800">{svc.name}</span>
+                      {svc.enabled && <span className="text-[10px] text-green-600 bg-green-50 px-2 py-0.5 rounded-full font-medium">Enabled &middot; Ready to use</span>}
                     </div>
+                    {!svc.enabled && svc.price && (
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm font-semibold text-gray-700">{svc.price}</span>
+                        <button onClick={() => setServiceModal('service')} className="text-xs text-primary-600 font-medium hover:underline">Learn More</button>
+                      </div>
+                    )}
                   </div>
-                )}
+                ))}
               </div>
-              <button onClick={() => setShowMoreServices(!showMoreServices)} className="text-xs text-primary-600 hover:underline mt-3 block mx-auto">
-                {showMoreServices ? 'Hide' : 'View more services (1)'}
-              </button>
+              {vasServices.length > 2 && (
+                <button onClick={() => setShowMoreServices(!showMoreServices)} className="text-xs text-primary-600 hover:underline mt-3 block mx-auto">
+                  {showMoreServices ? 'Hide' : `View more services (${vasServices.length - 2})`}
+                </button>
+              )}
             </div>
 
             {/* Email */}
