@@ -105,8 +105,8 @@ const TIMELINE_PHASES: PhaseNode[] = [
   },
 ]
 
-const TABS = ['Containers & Drayage', 'Items SKUs', 'Customs Clearance', 'Drayage Load', 'Documents']
-const MAIN_TABS = ['Overview', 'Containers & Drayage', 'Items SKUs', 'Customs Clearance', 'Drayage Load', 'Documents']
+const TABS = ['Containers & Drayage', 'Items SKUs', 'Customs Clearance', 'Drayage Load']
+const MAIN_TABS = ['Overview', 'Containers & Drayage', 'Items SKUs', 'Customs Clearance', 'Drayage Load']
 
 export default function IntlTrackingDetail() {
   const { id } = useParams()
@@ -155,7 +155,7 @@ export default function IntlTrackingDetail() {
 
   return (
     <div className="p-6 max-w-[1400px] mx-auto">
-      <button onClick={() => navigate(basePath)} className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 mb-5"><ArrowLeft size={14} /> Back to End-to-End Tracking</button>
+      <button onClick={() => navigate(basePath)} className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 mb-5"><ArrowLeft size={14} /> Back to Shipment Tracking</button>
 
       {/* Main Tabs */}
       <div className="flex gap-6 mb-5 border-b border-gray-200">
@@ -384,14 +384,6 @@ export default function IntlTrackingDetail() {
                 <td className="py-2.5 px-3 text-gray-400">-</td>
               </tr>
             </tbody>
-          </table>
-        </div>
-      )}
-      {activeTab === 'Documents' && (
-        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden p-5">
-          <table className="w-full text-xs">
-            <thead><tr className="bg-gray-50 border-b">{['Document Type', 'Reference No.', 'File Name', 'Updated'].map(h => (<th key={h} className="text-left py-2.5 px-3 font-semibold text-gray-500">{h}</th>))}</tr></thead>
-            <tbody>{D.documents.filter(doc => doc.type !== 'MBL').map((doc, i) => (<tr key={i} className="border-b border-gray-100 hover:bg-gray-50"><td className="py-2.5 px-3 font-medium">{doc.type}</td><td className="py-2.5 px-3">{doc.docNo}</td><td className="py-2.5 px-3">{doc.fileName ? <a href="#" onClick={e => { e.preventDefault() }} download={doc.fileName} className="text-primary-600 hover:underline font-medium">{doc.fileName}</a> : <span className="text-gray-400">-</span>}</td><td className="py-2.5 px-3">{doc.time}</td></tr>))}</tbody>
           </table>
         </div>
       )}
