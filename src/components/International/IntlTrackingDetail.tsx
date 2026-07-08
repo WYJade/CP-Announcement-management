@@ -195,7 +195,7 @@ export default function IntlTrackingDetail() {
                   <div><p className="text-[9px] text-gray-400 uppercase">Cargo Value</p><p className="text-base font-bold text-gray-900">$31,720</p><p className="text-[9px] text-gray-400">Declared USD</p></div>
                   <div><p className="text-[9px] text-gray-400 uppercase">Import Duty</p><p className="text-base font-bold text-gray-900">$8,991</p><p className="text-[9px] text-gray-400">Incl. Section 301</p></div>
                 </div>
-                <div className="mt-3"><p className="text-[9px] text-gray-400 uppercase">Weight / Volume</p><p className="text-base font-bold text-gray-900">{D.totalWeight}</p><p className="text-[9px] text-gray-400">40HC &middot; {D.volume}</p></div>
+                <div className="mt-3"><p className="text-[9px] text-gray-400 uppercase">Weight</p><p className="text-base font-bold text-gray-900">{D.totalWeight}</p><p className="text-[9px] text-gray-400">40HC</p></div>
               </div>
 
               {/* Live Map */}

@@ -222,7 +222,7 @@ export default function ShipmentTracking() {
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-gray-50 border-b border-gray-200">
-              {['Shipment No. / HBL', 'Status', 'Container(s)', 'Current Milestone', 'Origin', 'Destination', 'ETA (ARV)', 'Customer', 'Received Time', 'Last Updated'].map(h => (
+              {['Shipment No. / HBL', 'Status', 'Container(s)', 'Origin', 'Destination', 'ETA (ARV)', 'Customer', 'Received Time', 'Last Updated'].map(h => (
                 <th key={h} className="text-left py-3 px-3 text-xs font-semibold text-gray-500 whitespace-nowrap">{h}</th>
               ))}
             </tr>
@@ -236,7 +236,6 @@ export default function ShipmentTracking() {
                 </td>
                 <td className="py-3 px-3"><span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-semibold ${statusColor(row.status)}`}>{row.status}</span></td>
                 <td className="py-3 px-3 text-xs text-gray-700 font-mono">{row.containers.join(', ')}</td>
-                <td className="py-3 px-3 text-xs text-gray-700">{row.currentMilestone}</td>
                 <td className="py-3 px-3 text-xs text-gray-600">{row.origin}</td>
                 <td className="py-3 px-3 text-xs text-gray-600">{row.destination}</td>
                 <td className="py-3 px-3 text-xs text-gray-600">{row.eta}</td>
@@ -245,7 +244,7 @@ export default function ShipmentTracking() {
                 <td className="py-3 px-3 text-xs text-gray-400">{row.lastUpdated}</td>
               </tr>
             ))}
-            {filtered.length === 0 && <tr><td colSpan={10} className="text-center py-16"><p className="text-sm text-gray-500 font-medium">No shipments found matching your search criteria.</p><p className="text-xs text-gray-400 mt-1">Adjust your search keyword or filters to try again</p></td></tr>}
+            {filtered.length === 0 && <tr><td colSpan={9} className="text-center py-16"><p className="text-sm text-gray-500 font-medium">No shipments found matching your search criteria.</p><p className="text-xs text-gray-400 mt-1">Adjust your search keyword or filters to try again</p></td></tr>}
           </tbody>
         </table>
       </div>
