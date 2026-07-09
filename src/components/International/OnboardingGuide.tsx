@@ -1,11 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { ChevronLeft, ChevronRight, X, Search, Clock, AlertTriangle, FileCheck, Warehouse, BarChart3, Map, Package, Truck, List } from 'lucide-react'
 
-// ─── LocalStorage Keys ───────────────────────────────────────────────────────
-const ONBOARDING_SHOWN_KEY = 'shipment-tracking-onboarding-shown'
-const LIST_TOUR_DONE_KEY = 'shipment-tracking-list-tour-done'
-const DETAIL_TOUR_DONE_KEY = 'shipment-tracking-detail-tour-done'
-
 // ─── Carousel Slides Data ────────────────────────────────────────────────────
 const CAROUSEL_SLIDES = [
   {
@@ -428,20 +423,8 @@ export function GuidedTour({ steps, onComplete }: GuidedTourProps) {
 
 // ─── Hook: useOnboardingGuide ────────────────────────────────────────────────
 export function useOnboardingGuide() {
-  const [showDialog, setShowDialog] = useState(false)
+  const [showDialog, setShowDialog] = useState(true)
   const [showListTour, setShowListTour] = useState(false)
-
-  useEffect(() => {
-    try {
-      const shown = localStorage.getItem(ONBOARDING_SHOWN_KEY)
-      if (!shown) {
-        setShowDialog(true)
-        localStorage.setItem(ONBOARDING_SHOWN_KEY, 'true')
-      }
-    } catch {
-      // localStorage unavailable, skip
-    }
-  }, [])
 
   const handleDialogClose = (startTour: boolean) => {
     setShowDialog(false)
@@ -452,27 +435,14 @@ export function useOnboardingGuide() {
 
   const handleListTourComplete = () => {
     setShowListTour(false)
-    try {
-      localStorage.setItem(LIST_TOUR_DONE_KEY, 'true')
-    } catch {}
   }
 
   return { showDialog, showListTour, handleDialogClose, handleListTourComplete }
 }
 
 export function useDetailTourGuide() {
-  const [showDetailTour, setShowDetailTour] = useState(false)
+  const [showDetailTour, setShowDetailTour] = useState(true)
   const [tourPhase, setTourPhase] = useState<'overview' | 'tabs'>('overview')
-
-  useEffect(() => {
-    try {
-      const listDone = localStorage.getItem(LIST_TOUR_DONE_KEY)
-      const detailDone = localStorage.getItem(DETAIL_TOUR_DONE_KEY)
-      if (listDone && !detailDone) {
-        setTimeout(() => setShowDetailTour(true), 500)
-      }
-    } catch {}
-  }, [])
 
   const handleOverviewComplete = () => {
     setTourPhase('tabs')
@@ -480,9 +450,6 @@ export function useDetailTourGuide() {
 
   const handleTabsComplete = () => {
     setShowDetailTour(false)
-    try {
-      localStorage.setItem(DETAIL_TOUR_DONE_KEY, 'true')
-    } catch {}
   }
 
   return { showDetailTour, tourPhase, handleOverviewComplete, handleTabsComplete }
