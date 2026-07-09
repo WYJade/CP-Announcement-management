@@ -5,16 +5,9 @@ import { ChevronLeft, ChevronRight, X, Search, Clock, AlertTriangle, FileCheck, 
 const CAROUSEL_SLIDES = [
   {
     title: 'Welcome to Shipment Tracking',
-    description: 'Your new end-to-end visibility hub. Track shipments from booking to warehouse delivery with powerful search, real-time alerts, and detailed milestone tracking.',
+    description: 'Your end-to-end visibility hub. Quickly find shipments by No., HBL, Container, or Load#. Risk alert cards highlight items needing attention. Status tabs let you filter by tracking stage with one click.',
     icon: <Package size={40} className="text-primary-600" />,
-    features: ['Quick Search & Recent History', 'Risk Alert Cards', 'Status-based Filtering', 'Detailed Shipment Table'],
-    category: 'list',
-  },
-  {
-    title: 'Search, Alerts & Status Filtering',
-    description: 'Quickly find shipments by No., HBL, Container, or Load#. Risk alert cards highlight shipments needing attention (Customs Hold, Approaching LFD, LFD Exceeded, Warehouse Receiving). Status tabs let you filter by tracking stage with one click.',
-    icon: <Search size={40} className="text-blue-600" />,
-    features: ['Quick Search', 'Risk Alert Cards', 'Status Tabs'],
+    features: ['Quick Search', 'Risk Alert Cards', 'Status Filtering', 'Shipment Table'],
     category: 'list',
   },
   {
@@ -143,12 +136,6 @@ export const LIST_TOUR_STEPS: TourStep[] = [
     targetSelector: '[data-tour="search-bar"]',
     title: 'Quick Search',
     description: 'Search by Shipment No., HBL, MBL, Container No., BOL, or Load# to find shipments instantly.',
-    position: 'bottom',
-  },
-  {
-    targetSelector: '[data-tour="recent-searches"]',
-    title: 'Recent Searches',
-    description: 'Quickly revisit your previously searched shipments with one click.',
     position: 'bottom',
   },
   {

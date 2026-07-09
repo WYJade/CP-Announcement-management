@@ -172,8 +172,7 @@ export default function ShipmentTracking() {
       {/* Advanced Filters panel */}
       {showFilters && (
         <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-4">
-          <div className="grid grid-cols-4 gap-3">
-            <div><label className="block text-[10px] text-gray-500 uppercase font-semibold mb-1">Status</label><select className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"><option>All</option></select></div>
+          <div className="grid grid-cols-3 gap-3">
             <div><label className="block text-[10px] text-gray-500 uppercase font-semibold mb-1">Date Range</label><input type="text" placeholder="Select range" className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" /></div>
             <div><label className="block text-[10px] text-gray-500 uppercase font-semibold mb-1">Origin</label><select className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"><option>All</option></select></div>
             <div><label className="block text-[10px] text-gray-500 uppercase font-semibold mb-1">Destination</label><select className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"><option>All</option></select></div>
