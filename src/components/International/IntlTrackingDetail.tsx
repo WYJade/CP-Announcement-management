@@ -179,7 +179,6 @@ export default function IntlTrackingDetail() {
 
               <div className="border-t border-gray-200 pt-3 space-y-3 text-xs">
                 <div><p className="text-[9px] text-gray-400 uppercase">Customer</p><p className="font-semibold text-gray-900">{D.customer}</p></div>
-                <div><p className="text-[9px] text-gray-400 uppercase">Carrier</p><p className="font-semibold text-gray-900">{D.carrier}</p></div>
                 <div><p className="text-[9px] text-gray-400 uppercase">Shipment No.</p><p className="font-semibold text-gray-900">{D.shipmentNo}</p></div>
                 <div><p className="text-[9px] text-gray-400 uppercase">HBL</p><p className="font-semibold text-gray-900">{D.hbl}</p></div>
                 <div><p className="text-[9px] text-gray-400 uppercase">MBL</p><p className="font-semibold text-gray-900">{D.mbl}</p></div>
