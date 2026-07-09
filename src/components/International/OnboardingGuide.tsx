@@ -11,24 +11,10 @@ const CAROUSEL_SLIDES = [
     category: 'list',
   },
   {
-    title: 'Quick Search',
-    description: 'Instantly find shipments by Shipment No., HBL, MBL, Container No., BOL, or Load#. Advanced filters let you narrow results by status, date, origin, and destination.',
+    title: 'Search, Alerts & Status Filtering',
+    description: 'Quickly find shipments by No., HBL, Container, or Load#. Risk alert cards highlight shipments needing attention (Customs Hold, Approaching LFD, LFD Exceeded, Warehouse Receiving). Status tabs let you filter by tracking stage with one click.',
     icon: <Search size={40} className="text-blue-600" />,
-    features: [],
-    category: 'list',
-  },
-  {
-    title: 'Risk Alert Cards',
-    description: 'See at-a-glance which shipments need attention. Cards show counts for Customs Hold, Approaching LFD, LFD Exceeded, and Warehouse Receiving — click to filter instantly.',
-    icon: <AlertTriangle size={40} className="text-orange-600" />,
-    features: [],
-    category: 'list',
-  },
-  {
-    title: 'Status Tabs & Shipment Table',
-    description: 'Filter by tracking status with one click. The table displays key details: shipment number, status, containers, origin, destination, ETA, and customer info.',
-    icon: <List size={40} className="text-violet-600" />,
-    features: [],
+    features: ['Quick Search', 'Risk Alert Cards', 'Status Tabs'],
     category: 'list',
   },
   {
@@ -39,31 +25,10 @@ const CAROUSEL_SLIDES = [
     category: 'detail',
   },
   {
-    title: 'Detail: Containers(Drayage)',
-    description: 'View container details, drayage load assignments, pickup terminals, delivery ETAs, and LFD information all in one structured table.',
+    title: 'Detail: Tabs',
+    description: 'Containers(Drayage) shows container details, LFD & delivery status. Items SKUs tracks received vs expected quantities. Customs Clearance shows entry & duty info. Drayage Load monitors loads — click Load # to view full details.',
     icon: <Truck size={40} className="text-violet-600" />,
-    features: [],
-    category: 'detail',
-  },
-  {
-    title: 'Detail: Items SKUs',
-    description: 'Track received quantities against expected, identify discrepancies and damaged items at the SKU level for full inventory reconciliation.',
-    icon: <Package size={40} className="text-cyan-600" />,
-    features: [],
-    category: 'detail',
-  },
-  {
-    title: 'Detail: Customs Clearance',
-    description: 'Check customs status, entry numbers, port of entry, broker info, duty amounts, and HTS codes — all your customs data in one place.',
-    icon: <FileCheck size={40} className="text-teal-600" />,
-    features: [],
-    category: 'detail',
-  },
-  {
-    title: 'Detail: Drayage Load',
-    description: 'Monitor drayage loads with driver info, pickup/delivery dates, and status. Click Load # to navigate directly to the load detail page for full information.',
-    icon: <Truck size={40} className="text-amber-600" />,
-    features: [],
+    features: ['Containers(Drayage)', 'Items SKUs', 'Customs Clearance', 'Drayage Load'],
     category: 'detail',
   },
 ]
@@ -198,39 +163,15 @@ export const LIST_TOUR_STEPS: TourStep[] = [
     description: 'Filter shipments by current tracking status — from Booked to Received.',
     position: 'bottom',
   },
-  {
-    targetSelector: '[data-tour="shipment-table"]',
-    title: 'Shipment Table',
-    description: 'View all shipment details including status, containers, origin, destination, ETA, and customer.',
-    position: 'top',
-  },
 ]
 
 // ─── Detail Page Tour Steps ──────────────────────────────────────────────────
 export const DETAIL_OVERVIEW_STEPS: TourStep[] = [
   {
-    targetSelector: '[data-tour="info-panel"]',
-    title: 'Shipment Info',
-    description: 'View key shipment details: customer, HBL, MBL, container, carrier, milestones, and ETAs.',
-    position: 'right',
-  },
-  {
-    targetSelector: '[data-tour="progress-bar"]',
-    title: 'Overall Progress',
-    description: 'Track shipment journey completion across Ocean, Customs, Drayage, and Warehouse phases.',
+    targetSelector: '[data-tour="overview-content"]',
+    title: 'Overview',
+    description: 'Shipment Info shows key details (customer, HBL, container, ETAs). Progress bar tracks overall journey completion. Business Milestone Timeline shows phase-by-phase tracking. Live Map visualizes real-time location.',
     position: 'bottom',
-  },
-  {
-    targetSelector: '[data-tour="milestone-timeline"]',
-    title: 'Business Milestone Timeline',
-    description: 'Follow the shipment through every milestone — from booking to warehouse receiving.',
-    position: 'left',
-  },
-  {
-    targetSelector: '[data-tour="live-map"]',
-    title: 'Live Map',
-    description: 'See real-time shipment location on an interactive map.',
-    position: 'right',
   },
 ]
 
@@ -323,8 +264,8 @@ export function GuidedTour({ steps, onComplete }: GuidedTourProps) {
   let tooltipStyle: React.CSSProperties = {}
   let arrowPath = ''
 
-  const tooltipW = 280
-  const tooltipH = 120
+  const tooltipW = 320
+  const tooltipH = 140
   const gap = 16
 
   if (step.position === 'bottom') {

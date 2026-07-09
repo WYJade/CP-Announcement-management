@@ -168,7 +168,7 @@ export default function IntlTrackingDetail() {
 
       {/* ═══ Tab: Overview (left info + draggable splitter + right timeline) ═══ */}
       {activeTab === 'Overview' && (
-        <div ref={containerRef} className="flex border border-gray-200 rounded-xl overflow-hidden" style={{ minHeight: '600px' }}>
+        <div ref={containerRef} data-tour="overview-content" className="flex border border-gray-200 rounded-xl overflow-hidden" style={{ minHeight: '600px' }}>
           {/* Left: Info Panel */}
           <div data-tour="info-panel" className="shrink-0 overflow-y-auto bg-gray-50/80" style={{ width: `${leftWidth}px` }}>
             <div className="p-5 space-y-4">

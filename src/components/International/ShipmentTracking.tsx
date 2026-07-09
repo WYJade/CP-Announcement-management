@@ -220,7 +220,7 @@ export default function ShipmentTracking() {
       </div>
 
       {/* Shipment List Table */}
-      <div data-tour="shipment-table" className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-gray-50 border-b border-gray-200">
