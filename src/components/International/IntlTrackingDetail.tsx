@@ -160,10 +160,13 @@ export default function IntlTrackingDetail() {
       <button onClick={() => navigate(basePath)} className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 mb-5"><ArrowLeft size={14} /> Back to Shipment Tracking</button>
 
       {/* Main Tabs */}
-      <div data-tour="detail-tabs-row" className="flex gap-6 mb-5 border-b border-gray-200">
-        {MAIN_TABS.map(tab => (
-          <button key={tab} onClick={() => setActiveTab(tab)} data-tour={tab === 'Containers(Drayage)' ? 'tab-containers' : tab === 'Items SKUs' ? 'tab-items' : tab === 'Customs Clearance' ? 'tab-customs' : tab === 'Drayage Load' ? 'tab-drayage' : undefined} className={`pb-2.5 text-sm font-semibold border-b-2 transition-colors ${activeTab === tab ? 'border-primary-600 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>{tab}</button>
-        ))}
+      <div className="flex gap-6 mb-5 border-b border-gray-200">
+        <button onClick={() => setActiveTab('Overview')} className={`pb-2.5 text-sm font-semibold border-b-2 transition-colors ${activeTab === 'Overview' ? 'border-primary-600 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>Overview</button>
+        <div data-tour="detail-tabs-only" className="flex gap-6">
+          {MAIN_TABS.slice(1).map(tab => (
+            <button key={tab} onClick={() => setActiveTab(tab)} className={`pb-2.5 text-sm font-semibold border-b-2 transition-colors ${activeTab === tab ? 'border-primary-600 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>{tab}</button>
+          ))}
+        </div>
       </div>
 
       {/* ═══ Tab: Overview (left info + draggable splitter + right timeline) ═══ */}

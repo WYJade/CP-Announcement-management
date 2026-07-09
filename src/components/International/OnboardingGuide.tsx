@@ -161,7 +161,7 @@ export const DETAIL_OVERVIEW_STEPS: TourStep[] = [
     position: 'left',
   },
   {
-    targetSelector: '[data-tour="detail-tabs-row"]',
+    targetSelector: '[data-tour="detail-tabs-only"]',
     title: 'Detail Tabs',
     description: 'Containers(Drayage): container details, LFD & delivery status. Items SKUs: received vs expected quantities. Customs Clearance: entry, duty & broker info. Drayage Load: monitor loads, click Load # for full details.',
     position: 'bottom',
