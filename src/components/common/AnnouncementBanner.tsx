@@ -237,7 +237,7 @@ function AnnouncementBanner() {
 
   return (
     <>
-      <div className="space-y-2" aria-label="Announcements">
+      <div className="space-y-3" aria-label="Announcements">
         {visibleBanners.map((banner) => (
           <BannerPopupItem
             key={banner.id}
