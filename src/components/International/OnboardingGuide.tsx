@@ -386,17 +386,10 @@ export function GuidedTour({ steps, onComplete }: GuidedTourProps) {
         </defs>
         <rect x="0" y="0" width="100%" height="100%" fill="rgba(0,0,0,0.5)" mask="url(#tour-mask)" />
         {/* Highlight border */}
-        <rect x={highlightX} y={highlightY} width={highlightW} height={highlightH} rx="8" ry="8" fill="none" stroke="#6366f1" strokeWidth="2" />
-        {/* Arrow pointer - thick red diagonal style */}
+        <rect x={highlightX} y={highlightY} width={highlightW} height={highlightH} rx="8" ry="8" fill="none" stroke="rgba(99,102,241,0.6)" strokeWidth="1.5" />
+        {/* Subtle connecting line */}
         {arrowPath && (
-          <>
-            <defs>
-              <marker id="arrowhead" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
-                <polygon points="0,0 12,6 0,12" fill="#ef4444" />
-              </marker>
-            </defs>
-            <path d={arrowPath} fill="none" stroke="#ef4444" strokeWidth="4" strokeLinecap="round" markerEnd="url(#arrowhead)" />
-          </>
+          <path d={arrowPath} fill="none" stroke="rgba(99,102,241,0.4)" strokeWidth="1.5" strokeDasharray="4 3" strokeLinecap="round" />
         )}
       </svg>
 
