@@ -158,7 +158,7 @@ export const DETAIL_OVERVIEW_STEPS: TourStep[] = [
     targetSelector: '[data-tour="overview-content"]',
     title: 'Overview',
     description: 'Shipment Info shows key details (customer, HBL, container, ETAs). Progress bar tracks overall journey completion. Business Milestone Timeline shows phase-by-phase tracking. Live Map visualizes real-time location.',
-    position: 'bottom',
+    position: 'left',
   },
 ]
 
@@ -290,11 +290,12 @@ export function GuidedTour({ steps, onComplete }: GuidedTourProps) {
     const cpY = (startY + endY) / 2
     arrowPath = `M${startX},${startY} Q${cpX},${cpY} ${endX},${endY}`
   } else if (step.position === 'left') {
-    const tooltipX = highlightX - tooltipW - gap
-    const tooltipY = highlightY + highlightH / 2 - tooltipH / 2
+    const leftTooltipW = 200
+    const tooltipX = highlightX - leftTooltipW - gap
+    const tooltipY = highlightY + 40
     tooltipStyle = { left: Math.max(16, tooltipX), top: Math.max(16, tooltipY) }
-    const startX = (tooltipStyle.left as number) + tooltipW
-    const startY = (tooltipStyle.top as number) + tooltipH / 2
+    const startX = (tooltipStyle.left as number) + leftTooltipW
+    const startY = (tooltipStyle.top as number) + 60
     const endX = highlightX - 4
     const endY = highlightY + highlightH / 2
     const cpX = startX + 20
@@ -334,7 +335,7 @@ export function GuidedTour({ steps, onComplete }: GuidedTourProps) {
       />
 
       {/* Tooltip */}
-      <div className="absolute bg-white rounded-xl shadow-xl border border-gray-200 p-4 transition-all duration-300" style={{ ...tooltipStyle, width: tooltipW, zIndex: 9999 }}>
+      <div className={`absolute bg-white rounded-xl shadow-xl border border-gray-200 p-4 transition-all duration-300 ${step.position === 'left' ? 'w-[200px]' : ''}`} style={{ ...tooltipStyle, width: step.position === 'left' ? 200 : tooltipW, zIndex: 9999 }}>
         <p className="text-sm font-bold text-gray-900 mb-1">{step.title}</p>
         <p className="text-xs text-gray-600 leading-relaxed">{step.description}</p>
         <div className="flex items-center justify-between mt-3">
