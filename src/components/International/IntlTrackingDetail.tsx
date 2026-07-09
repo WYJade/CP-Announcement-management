@@ -106,8 +106,8 @@ const TIMELINE_PHASES: PhaseNode[] = [
   },
 ]
 
-const TABS = ['Containers & Drayage', 'Items SKUs', 'Customs Clearance', 'Drayage Load']
-const MAIN_TABS = ['Overview', 'Containers & Drayage', 'Items SKUs', 'Customs Clearance', 'Drayage Load']
+const TABS = ['Containers(Drayage)', 'Items SKUs', 'Customs Clearance', 'Drayage Load']
+const MAIN_TABS = ['Overview', 'Containers(Drayage)', 'Items SKUs', 'Customs Clearance', 'Drayage Load']
 
 export default function IntlTrackingDetail() {
   const { id } = useParams()
@@ -162,7 +162,7 @@ export default function IntlTrackingDetail() {
       {/* Main Tabs */}
       <div className="flex gap-6 mb-5 border-b border-gray-200">
         {MAIN_TABS.map(tab => (
-          <button key={tab} onClick={() => setActiveTab(tab)} data-tour={tab === 'Containers & Drayage' ? 'tab-containers' : tab === 'Items SKUs' ? 'tab-items' : tab === 'Customs Clearance' ? 'tab-customs' : tab === 'Drayage Load' ? 'tab-drayage' : undefined} className={`pb-2.5 text-sm font-semibold border-b-2 transition-colors ${activeTab === tab ? 'border-primary-600 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>{tab}</button>
+          <button key={tab} onClick={() => setActiveTab(tab)} data-tour={tab === 'Containers(Drayage)' ? 'tab-containers' : tab === 'Items SKUs' ? 'tab-items' : tab === 'Customs Clearance' ? 'tab-customs' : tab === 'Drayage Load' ? 'tab-drayage' : undefined} className={`pb-2.5 text-sm font-semibold border-b-2 transition-colors ${activeTab === tab ? 'border-primary-600 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>{tab}</button>
         ))}
       </div>
 
@@ -345,7 +345,7 @@ export default function IntlTrackingDetail() {
       )}
 
       {/* ═══ Content Tabs (directly after Overview) ═══ */}
-      {activeTab === 'Containers & Drayage' && (
+      {activeTab === 'Containers(Drayage)' && (
         <div className="bg-white border border-gray-200 rounded-xl overflow-hidden p-5">
           <table className="w-full text-xs">
             <thead><tr className="bg-gray-50 border-b">{['Container No.', 'Size', 'Seal', 'Drayage Load No.', 'Status', 'Pickup Terminal', 'Dest. Warehouse', 'LFD', 'Delivery ETA', 'Delivered'].map(h => (<th key={h} className="text-left py-2.5 px-3 font-semibold text-gray-500">{h}</th>))}</tr></thead>

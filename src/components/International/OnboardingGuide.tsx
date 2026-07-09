@@ -39,7 +39,7 @@ const CAROUSEL_SLIDES = [
     category: 'detail',
   },
   {
-    title: 'Detail: Containers & Drayage',
+    title: 'Detail: Containers(Drayage)',
     description: 'View container details, drayage load assignments, pickup terminals, delivery ETAs, and LFD information all in one structured table.',
     icon: <Truck size={40} className="text-violet-600" />,
     features: [],
@@ -237,7 +237,7 @@ export const DETAIL_OVERVIEW_STEPS: TourStep[] = [
 export const DETAIL_TAB_STEPS: TourStep[] = [
   {
     targetSelector: '[data-tour="tab-containers"]',
-    title: 'Containers & Drayage',
+    title: 'Containers(Drayage)',
     description: 'View container details, drayage assignments, LFD, and delivery status.',
     position: 'bottom',
   },
@@ -386,16 +386,20 @@ export function GuidedTour({ steps, onComplete }: GuidedTourProps) {
         </defs>
         <rect x="0" y="0" width="100%" height="100%" fill="rgba(0,0,0,0.5)" mask="url(#tour-mask)" />
         {/* Highlight border */}
-        <rect x={highlightX} y={highlightY} width={highlightW} height={highlightH} rx="8" ry="8" fill="none" stroke="#6366f1" strokeWidth="2" strokeDasharray="6 3" />
-        {/* Curved arrow */}
+        <rect x={highlightX} y={highlightY} width={highlightW} height={highlightH} rx="8" ry="8" fill="none" stroke="#6366f1" strokeWidth="2" />
+        {/* Curved arrow - thick gradient style */}
         {arrowPath && (
           <>
-            <path d={arrowPath} fill="none" stroke="#6366f1" strokeWidth="2" markerEnd="url(#arrowhead)" />
             <defs>
-              <marker id="arrowhead" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
-                <polygon points="0,0 8,4 0,8" fill="#6366f1" />
+              <linearGradient id="arrow-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#f97316" />
+                <stop offset="100%" stopColor="#ef4444" />
+              </linearGradient>
+              <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+                <polygon points="0,0 10,5 0,10" fill="#ef4444" />
               </marker>
             </defs>
+            <path d={arrowPath} fill="none" stroke="url(#arrow-gradient)" strokeWidth="3" strokeLinecap="round" markerEnd="url(#arrowhead)" />
           </>
         )}
       </svg>
