@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { ArrowLeft, ArrowRight, CheckCircle2, Circle, Truck, Eye, Clock, MapPin, GripVertical } from 'lucide-react'
+import { GuidedTour, DETAIL_OVERVIEW_STEPS, DETAIL_TAB_STEPS, useDetailTourGuide } from './OnboardingGuide'
 
 const D = {
   customer: 'ADOORN LLC', carrier: 'WAN HAI LINES', shipmentNo: 'SSHAS2608137', hbl: 'SSGNS2607829', mbl: '039GX40070',
@@ -116,6 +117,7 @@ export default function IntlTrackingDetail() {
   const [activeTab, setActiveTab] = useState(MAIN_TABS[0])
   const [viewDoc, setViewDoc] = useState<string | null>(null)
   const [mapFullscreen, setMapFullscreen] = useState(false)
+  const { showDetailTour, tourPhase, handleOverviewComplete, handleTabsComplete } = useDetailTourGuide()
 
   // ─── Draggable Splitter State ─────────────────────────────────────────────
   const [leftWidth, setLeftWidth] = useState(300)
@@ -160,7 +162,7 @@ export default function IntlTrackingDetail() {
       {/* Main Tabs */}
       <div className="flex gap-6 mb-5 border-b border-gray-200">
         {MAIN_TABS.map(tab => (
-          <button key={tab} onClick={() => setActiveTab(tab)} className={`pb-2.5 text-sm font-semibold border-b-2 transition-colors ${activeTab === tab ? 'border-primary-600 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>{tab}</button>
+          <button key={tab} onClick={() => setActiveTab(tab)} data-tour={tab === 'Containers & Drayage' ? 'tab-containers' : tab === 'Items SKUs' ? 'tab-items' : tab === 'Customs Clearance' ? 'tab-customs' : tab === 'Drayage Load' ? 'tab-drayage' : undefined} className={`pb-2.5 text-sm font-semibold border-b-2 transition-colors ${activeTab === tab ? 'border-primary-600 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>{tab}</button>
         ))}
       </div>
 
@@ -168,7 +170,7 @@ export default function IntlTrackingDetail() {
       {activeTab === 'Overview' && (
         <div ref={containerRef} className="flex border border-gray-200 rounded-xl overflow-hidden" style={{ minHeight: '600px' }}>
           {/* Left: Info Panel */}
-          <div className="shrink-0 overflow-y-auto bg-gray-50/80" style={{ width: `${leftWidth}px` }}>
+          <div data-tour="info-panel" className="shrink-0 overflow-y-auto bg-gray-50/80" style={{ width: `${leftWidth}px` }}>
             <div className="p-5 space-y-4">
               <div>
                 <div className="flex items-start justify-between mb-3">
@@ -198,7 +200,7 @@ export default function IntlTrackingDetail() {
               </div>
 
               {/* Live Map */}
-              <div className="border-t border-gray-200 pt-3">
+              <div data-tour="live-map" className="border-t border-gray-200 pt-3">
                 <p className="text-[9px] text-gray-400 uppercase font-semibold mb-2">Live Map</p>
                 <div className="bg-white border border-gray-200 rounded-lg overflow-hidden relative" style={{ height: '280px' }}>
                   {/* Embedded real map - OpenStreetMap tile view centered on Pacific (Asia to US) */}
@@ -260,7 +262,7 @@ export default function IntlTrackingDetail() {
             </div>
 
             {/* Progress bar */}
-            <div className="bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-xl p-4 mb-5">
+            <div data-tour="progress-bar" className="bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-xl p-4 mb-5">
               <div className="flex items-center justify-between mb-2">
                 <p className="text-xs font-semibold text-gray-700">Overall Progress</p>
                 <p className="text-lg font-bold text-primary-600">{D.progress}%</p>
@@ -274,7 +276,7 @@ export default function IntlTrackingDetail() {
             </div>
 
             {/* Business Milestone Timeline */}
-            <div className="bg-white border border-gray-200 rounded-xl p-6">
+            <div data-tour="milestone-timeline" className="bg-white border border-gray-200 rounded-xl p-6">
               <h3 className="text-sm font-bold text-gray-900 mb-5">Business Milestone Timeline</h3>
 
               {TIMELINE_PHASES.map((phase, pi) => {
@@ -418,6 +420,14 @@ export default function IntlTrackingDetail() {
             />
           </div>
         </div>
+      )}
+
+      {/* Detail Page Guided Tour */}
+      {showDetailTour && tourPhase === 'overview' && (
+        <GuidedTour steps={DETAIL_OVERVIEW_STEPS} onComplete={handleOverviewComplete} />
+      )}
+      {showDetailTour && tourPhase === 'tabs' && (
+        <GuidedTour steps={DETAIL_TAB_STEPS} onComplete={handleTabsComplete} />
       )}
     </div>
   )

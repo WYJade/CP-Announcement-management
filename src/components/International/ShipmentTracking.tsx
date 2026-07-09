@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Search, Filter, AlertTriangle, Clock, Ship, Package, FileCheck, Truck, Warehouse, ArrowRight, Sparkles, MapPin } from 'lucide-react'
+import { OnboardingDialog, GuidedTour, LIST_TOUR_STEPS, useOnboardingGuide } from './OnboardingGuide'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -84,6 +85,7 @@ export default function ShipmentTracking() {
   const [showRecentPanel, setShowRecentPanel] = useState(false)
   const [recentSearches] = useState(['SSHAS2608072', 'WHSU8555505', 'SSGNS2607829', '039GX40070'])
   const [alertFilter, setAlertFilter] = useState<string | null>(null)
+  const { showDialog, showListTour, handleDialogClose, handleListTourComplete } = useOnboardingGuide()
 
   // Compute alert counts dynamically from data
   const alertCounts = {
@@ -123,7 +125,7 @@ export default function ShipmentTracking() {
       </div>
 
       {/* Search + Advanced Filters */}
-      <div className="flex items-center gap-3 mb-2 mt-4">
+      <div data-tour="search-bar" className="flex items-center gap-3 mb-2 mt-4">
         <div className="relative flex-1">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input type="text" value={search} onChange={e => setSearch(e.target.value)}
@@ -138,7 +140,7 @@ export default function ShipmentTracking() {
 
       {/* Recent Searches */}
       {recentSearches.length > 0 && (
-        <div className="flex items-center gap-2 mb-4 text-xs">
+        <div data-tour="recent-searches" className="flex items-center gap-2 mb-4 text-xs">
           <span className="text-gray-400">Recent:</span>
           {recentSearches.slice(0, 3).map(s => (
             <button key={s} onClick={() => navigate(`/international/tracking2/${s}`)} className="text-primary-600 hover:text-primary-700 hover:underline font-medium">{s}</button>
@@ -180,7 +182,7 @@ export default function ShipmentTracking() {
       )}
 
       {/* Alert Cards - between Recent and Status tabs */}
-      <div className="grid grid-cols-4 gap-3 mb-4">
+      <div data-tour="alert-cards" className="grid grid-cols-4 gap-3 mb-4">
         <div onClick={() => setAlertFilter(alertFilter === 'customs' ? null : 'customs')} className={`cursor-pointer rounded-lg p-3 transition-all ${alertFilter === 'customs' ? 'bg-amber-100 border-2 border-amber-300 ring-1 ring-amber-200' : 'bg-amber-50 border border-amber-100 hover:border-amber-200'}`}>
           <div className="flex items-center gap-1.5 text-xs font-semibold text-amber-700 mb-1"><FileCheck size={12} /> {alertCounts.customs} Customs Hold</div>
           <p className="text-[10px] text-amber-600">Awaiting clearance</p>
@@ -201,7 +203,7 @@ export default function ShipmentTracking() {
       {alertFilter && <p className="text-[10px] text-gray-400 mb-2">Filtered by: <span className="font-medium text-gray-600">{alertFilter === 'lfd' ? 'LFD Exceeded' : alertFilter === 'customs' ? 'Customs Hold' : alertFilter === 'approaching-lfd' ? 'Approaching LFD' : 'Warehouse Receiving'}</span> &middot; <button onClick={() => setAlertFilter(null)} className="text-primary-600 hover:underline">Clear filter</button></p>}
 
       {/* Status pills row */}
-      <div className="flex gap-1.5 mb-4 flex-wrap items-center">
+      <div data-tour="status-tabs" className="flex gap-1.5 mb-4 flex-wrap items-center">
         <span className="text-[10px] text-gray-400 mr-1 uppercase font-semibold">Status:</span>
         {STATUS_TABS.map(tab => {
           const count = tab.key === 'all' ? SHIPMENT_DATA.length : SHIPMENT_DATA.filter(s => s.status === tab.key).length
@@ -218,7 +220,7 @@ export default function ShipmentTracking() {
       </div>
 
       {/* Shipment List Table */}
-      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+      <div data-tour="shipment-table" className="bg-white border border-gray-200 rounded-xl overflow-hidden">
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-gray-50 border-b border-gray-200">
@@ -248,6 +250,12 @@ export default function ShipmentTracking() {
           </tbody>
         </table>
       </div>
+
+      {/* Onboarding Dialog */}
+      {showDialog && <OnboardingDialog onClose={handleDialogClose} />}
+
+      {/* List Page Guided Tour */}
+      {showListTour && <GuidedTour steps={LIST_TOUR_STEPS} onComplete={handleListTourComplete} />}
     </div>
   )
 }
