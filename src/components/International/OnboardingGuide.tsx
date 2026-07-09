@@ -160,34 +160,15 @@ export const DETAIL_OVERVIEW_STEPS: TourStep[] = [
     description: 'Shipment Info shows key details (customer, HBL, container, ETAs). Progress bar tracks overall journey completion. Business Milestone Timeline shows phase-by-phase tracking. Live Map visualizes real-time location.',
     position: 'left',
   },
+  {
+    targetSelector: '[data-tour="detail-tabs-row"]',
+    title: 'Detail Tabs',
+    description: 'Containers(Drayage): container details, LFD & delivery status. Items SKUs: received vs expected quantities. Customs Clearance: entry, duty & broker info. Drayage Load: monitor loads, click Load # for full details.',
+    position: 'bottom',
+  },
 ]
 
-export const DETAIL_TAB_STEPS: TourStep[] = [
-  {
-    targetSelector: '[data-tour="tab-containers"]',
-    title: 'Containers(Drayage)',
-    description: 'View container details, drayage assignments, LFD, and delivery status.',
-    position: 'bottom',
-  },
-  {
-    targetSelector: '[data-tour="tab-items"]',
-    title: 'Items SKUs',
-    description: 'Check received vs expected quantities and identify discrepancies.',
-    position: 'bottom',
-  },
-  {
-    targetSelector: '[data-tour="tab-customs"]',
-    title: 'Customs Clearance',
-    description: 'Review customs status, entry details, duties, and broker info.',
-    position: 'bottom',
-  },
-  {
-    targetSelector: '[data-tour="tab-drayage"]',
-    title: 'Drayage Load',
-    description: 'Monitor loads and click Load # to view full load details.',
-    position: 'bottom',
-  },
-]
+export const DETAIL_TAB_STEPS: TourStep[] = []
 
 // ─── Guided Tour Overlay Component ───────────────────────────────────────────
 interface GuidedTourProps {
@@ -290,15 +271,15 @@ export function GuidedTour({ steps, onComplete }: GuidedTourProps) {
     const cpY = (startY + endY) / 2
     arrowPath = `M${startX},${startY} Q${cpX},${cpY} ${endX},${endY}`
   } else if (step.position === 'left') {
-    const leftTooltipW = 200
+    const leftTooltipW = 180
     const tooltipX = highlightX - leftTooltipW - gap
-    const tooltipY = highlightY + 40
-    tooltipStyle = { left: Math.max(16, tooltipX), top: Math.max(16, tooltipY) }
+    const tooltipY = highlightY + 16
+    tooltipStyle = { left: Math.max(16, tooltipX), top: Math.max(60, tooltipY) }
     const startX = (tooltipStyle.left as number) + leftTooltipW
-    const startY = (tooltipStyle.top as number) + 60
+    const startY = (tooltipStyle.top as number) + 50
     const endX = highlightX - 4
-    const endY = highlightY + highlightH / 2
-    const cpX = startX + 20
+    const endY = highlightY + 80
+    const cpX = startX + 16
     const cpY = (startY + endY) / 2
     arrowPath = `M${startX},${startY} Q${cpX},${cpY} ${endX},${endY}`
   }
@@ -335,7 +316,7 @@ export function GuidedTour({ steps, onComplete }: GuidedTourProps) {
       />
 
       {/* Tooltip */}
-      <div className={`absolute bg-white rounded-xl shadow-xl border border-gray-200 p-4 transition-all duration-300 ${step.position === 'left' ? 'w-[200px]' : ''}`} style={{ ...tooltipStyle, width: step.position === 'left' ? 200 : tooltipW, zIndex: 9999 }}>
+      <div className={`absolute bg-white rounded-xl shadow-xl border border-gray-200 p-4 transition-all duration-300 ${step.position === 'left' ? 'w-[180px]' : ''}`} style={{ ...tooltipStyle, width: step.position === 'left' ? 180 : tooltipW, zIndex: 9999 }}>
         <p className="text-sm font-bold text-gray-900 mb-1">{step.title}</p>
         <p className="text-xs text-gray-600 leading-relaxed">{step.description}</p>
         <div className="flex items-center justify-between mt-3">
@@ -373,15 +354,10 @@ export function useOnboardingGuide() {
 
 export function useDetailTourGuide() {
   const [showDetailTour, setShowDetailTour] = useState(true)
-  const [tourPhase, setTourPhase] = useState<'overview' | 'tabs'>('overview')
 
-  const handleOverviewComplete = () => {
-    setTourPhase('tabs')
-  }
-
-  const handleTabsComplete = () => {
+  const handleDetailTourComplete = () => {
     setShowDetailTour(false)
   }
 
-  return { showDetailTour, tourPhase, handleOverviewComplete, handleTabsComplete }
+  return { showDetailTour, handleDetailTourComplete }
 }

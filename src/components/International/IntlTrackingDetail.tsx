@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { ArrowLeft, ArrowRight, CheckCircle2, Circle, Truck, Eye, Clock, MapPin, GripVertical } from 'lucide-react'
-import { GuidedTour, DETAIL_OVERVIEW_STEPS, DETAIL_TAB_STEPS, useDetailTourGuide } from './OnboardingGuide'
+import { GuidedTour, DETAIL_OVERVIEW_STEPS, useDetailTourGuide } from './OnboardingGuide'
 
 const D = {
   customer: 'ADOORN LLC', carrier: 'WAN HAI LINES', shipmentNo: 'SSHAS2608137', hbl: 'SSGNS2607829', mbl: '039GX40070',
@@ -117,7 +117,7 @@ export default function IntlTrackingDetail() {
   const [activeTab, setActiveTab] = useState(MAIN_TABS[0])
   const [viewDoc, setViewDoc] = useState<string | null>(null)
   const [mapFullscreen, setMapFullscreen] = useState(false)
-  const { showDetailTour, tourPhase, handleOverviewComplete, handleTabsComplete } = useDetailTourGuide()
+  const { showDetailTour, handleDetailTourComplete } = useDetailTourGuide()
 
   // ─── Draggable Splitter State ─────────────────────────────────────────────
   const [leftWidth, setLeftWidth] = useState(300)
@@ -160,7 +160,7 @@ export default function IntlTrackingDetail() {
       <button onClick={() => navigate(basePath)} className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 mb-5"><ArrowLeft size={14} /> Back to Shipment Tracking</button>
 
       {/* Main Tabs */}
-      <div className="flex gap-6 mb-5 border-b border-gray-200">
+      <div data-tour="detail-tabs-row" className="flex gap-6 mb-5 border-b border-gray-200">
         {MAIN_TABS.map(tab => (
           <button key={tab} onClick={() => setActiveTab(tab)} data-tour={tab === 'Containers(Drayage)' ? 'tab-containers' : tab === 'Items SKUs' ? 'tab-items' : tab === 'Customs Clearance' ? 'tab-customs' : tab === 'Drayage Load' ? 'tab-drayage' : undefined} className={`pb-2.5 text-sm font-semibold border-b-2 transition-colors ${activeTab === tab ? 'border-primary-600 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>{tab}</button>
         ))}
@@ -423,11 +423,8 @@ export default function IntlTrackingDetail() {
       )}
 
       {/* Detail Page Guided Tour */}
-      {showDetailTour && tourPhase === 'overview' && (
-        <GuidedTour steps={DETAIL_OVERVIEW_STEPS} onComplete={handleOverviewComplete} />
-      )}
-      {showDetailTour && tourPhase === 'tabs' && (
-        <GuidedTour steps={DETAIL_TAB_STEPS} onComplete={handleTabsComplete} />
+      {showDetailTour && (
+        <GuidedTour steps={DETAIL_OVERVIEW_STEPS} onComplete={handleDetailTourComplete} />
       )}
     </div>
   )
