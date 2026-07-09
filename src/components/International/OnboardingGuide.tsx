@@ -95,9 +95,9 @@ export function OnboardingDialog({ onClose }: OnboardingDialogProps) {
       <div className="absolute inset-0 bg-black/50" onClick={() => onClose(false)} />
 
       {/* Dialog */}
-      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden" onClick={e => e.stopPropagation()}>
+      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-3xl mx-4 overflow-hidden" onClick={e => e.stopPropagation()}>
         {/* Header */}
-        <div className="flex items-center justify-between px-6 pt-5 pb-2">
+        <div className="flex items-center justify-between px-8 pt-5 pb-2">
           <span className="text-xs text-gray-400 font-medium">{currentSlide + 1} / {CAROUSEL_SLIDES.length}</span>
           <button onClick={() => onClose(false)} className="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100">
             <X size={16} />
@@ -105,26 +105,28 @@ export function OnboardingDialog({ onClose }: OnboardingDialogProps) {
         </div>
 
         {/* Content */}
-        <div className="px-6 pb-4 min-h-[280px] flex flex-col items-center text-center">
-          <div className="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center mb-4 shadow-sm border border-gray-100">
+        <div className="px-8 pb-6 min-h-[240px] flex gap-8 items-center">
+          <div className="w-20 h-20 rounded-2xl bg-gray-50 flex items-center justify-center shrink-0 shadow-sm border border-gray-100">
             {slide.icon}
           </div>
-          <h2 className="text-lg font-bold text-gray-900 mb-2">{slide.title}</h2>
-          <p className="text-sm text-gray-600 leading-relaxed mb-3">{slide.description}</p>
-          {slide.features.length > 0 && (
-            <div className="flex flex-wrap gap-2 justify-center">
-              {slide.features.map(f => (
-                <span key={f} className="text-[11px] px-2.5 py-1 bg-primary-50 text-primary-700 rounded-full font-medium border border-primary-100">{f}</span>
-              ))}
-            </div>
-          )}
-          {slide.category === 'detail' && currentSlide === CAROUSEL_SLIDES.length - 1 && (
-            <p className="text-[11px] text-amber-600 mt-2 font-medium">💡 Tip: Click Load # in Drayage Load tab to jump to load details</p>
-          )}
+          <div className="flex-1 text-left">
+            <h2 className="text-xl font-bold text-gray-900 mb-2">{slide.title}</h2>
+            <p className="text-sm text-gray-600 leading-relaxed mb-3">{slide.description}</p>
+            {slide.features.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {slide.features.map(f => (
+                  <span key={f} className="text-[11px] px-2.5 py-1 bg-primary-50 text-primary-700 rounded-full font-medium border border-primary-100">{f}</span>
+                ))}
+              </div>
+            )}
+            {slide.category === 'detail' && currentSlide === CAROUSEL_SLIDES.length - 1 && (
+              <p className="text-[11px] text-amber-600 mt-2 font-medium">💡 Tip: Click Load # in Drayage Load tab to jump to load details</p>
+            )}
+          </div>
         </div>
 
         {/* Navigation */}
-        <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-gray-50/50">
+        <div className="flex items-center justify-between px-8 py-4 border-t border-gray-100 bg-gray-50/50">
           <button
             onClick={() => setCurrentSlide(s => s - 1)}
             disabled={currentSlide === 0}
