@@ -493,8 +493,8 @@ export default function AgentWorkstation() {
         {activeNav === 'marketplace' && (
           <div className="w-full h-full">
             <iframe
-              src="https://oms-ba.item.pub/ai-native/marketplace/index.html"
-              className="w-full h-full border-0"
+              src="https://oms-ba.item.pub/ai-native/marketplace/index.html?hideNav=true&theme=light"
+              className="w-full h-full border-0 bg-white"
               title="Marketplace"
               style={{ minHeight: 'calc(100vh - 48px)' }}
             />
