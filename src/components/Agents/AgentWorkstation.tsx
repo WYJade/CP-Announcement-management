@@ -311,8 +311,8 @@ export default function AgentWorkstation() {
         </div>
       </div>
 
-      {/* Middle panel - My Agents list (hidden in chat mode) */}
-      {activeNav !== 'chat' && (
+      {/* Middle panel - My Agents list (hidden in chat mode and marketplace) */}
+      {activeNav !== 'chat' && activeNav !== 'marketplace' && (
       <div className="w-64 bg-white border-r border-gray-200 flex flex-col shrink-0 overflow-y-auto">
         <div className="p-3 border-b border-gray-100">
           <h3 className="text-sm font-bold text-gray-900 mb-2">My Agents</h3>
@@ -488,6 +488,18 @@ export default function AgentWorkstation() {
         </div>
       </div>
       )}
+
+        {/* Marketplace View */}
+        {activeNav === 'marketplace' && (
+          <div className="w-full h-full">
+            <iframe
+              src="https://oms-ba.item.pub/ai-native/marketplace/index.html"
+              className="w-full h-full border-0"
+              title="Marketplace"
+              style={{ minHeight: 'calc(100vh - 48px)' }}
+            />
+          </div>
+        )}
       </div>
 
       {/* Task detail popup */}
