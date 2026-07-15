@@ -357,11 +357,89 @@ export default function IntlTrackingDetail() {
         </div>
       )}
       {activeTab === 'Items SKUs' && (
-        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden p-5">
-          <table className="w-full text-xs">
-            <thead><tr className="bg-gray-50 border-b">{['SKU', 'Product Name', 'Variant', 'Expected', 'Received', 'Diff', 'Damaged', 'Unit', 'Status'].map(h => (<th key={h} className="text-left py-2.5 px-3 font-semibold text-gray-500">{h}</th>))}</tr></thead>
-            <tbody>{D.items.map((item, i) => (<tr key={i} className="border-b border-gray-100"><td className="py-2.5 px-3 font-mono text-primary-600">{item.sku}</td><td className="py-2.5 px-3">{item.name}</td><td className="py-2.5 px-3">{item.variant}</td><td className="py-2.5 px-3 font-medium">{item.expected}</td><td className="py-2.5 px-3 text-green-600 font-medium">{item.received}</td><td className="py-2.5 px-3 text-orange-600">{item.diff}</td><td className="py-2.5 px-3 text-red-600">{item.damaged}</td><td className="py-2.5 px-3">{item.unit}</td><td className="py-2.5 px-3"><span className="text-green-600 font-medium">{item.status}</span></td></tr>))}</tbody>
-          </table>
+        <div className="space-y-5">
+          {/* Items Table */}
+          <div className="bg-white border border-gray-200 rounded-xl overflow-hidden p-5">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-bold text-gray-900">Items</h3>
+            </div>
+            <table className="w-full text-xs">
+              <thead><tr className="bg-gray-50 border-b">{['Product Description', 'Product Identifier', 'Order Line No', 'Order Line Ref', 'Qty', 'Order Qty', 'Unit Value', 'Total Value'].map(h => (<th key={h} className="text-left py-2.5 px-3 font-semibold text-gray-500">{h}</th>))}</tr></thead>
+              <tbody>
+                <tr className="border-b border-gray-100">
+                  <td className="py-2.5 px-3">Post Mount Locking Mailbox - Small White</td>
+                  <td className="py-2.5 px-3 font-mono text-primary-600">ADPOST-SMALL-WHITE</td>
+                  <td className="py-2.5 px-3">1</td>
+                  <td className="py-2.5 px-3">PO-2026-001-L1</td>
+                  <td className="py-2.5 px-3 font-medium">72</td>
+                  <td className="py-2.5 px-3">72</td>
+                  <td className="py-2.5 px-3">$45.00</td>
+                  <td className="py-2.5 px-3 font-medium">$3,240.00</td>
+                </tr>
+                <tr className="border-b border-gray-100">
+                  <td className="py-2.5 px-3">Post Mount Locking Mailbox - Small Red</td>
+                  <td className="py-2.5 px-3 font-mono text-primary-600">ADPOST-SMALL-RED</td>
+                  <td className="py-2.5 px-3">2</td>
+                  <td className="py-2.5 px-3">PO-2026-001-L2</td>
+                  <td className="py-2.5 px-3 font-medium">72</td>
+                  <td className="py-2.5 px-3">72</td>
+                  <td className="py-2.5 px-3">$45.00</td>
+                  <td className="py-2.5 px-3 font-medium">$3,240.00</td>
+                </tr>
+                <tr className="border-b border-gray-100">
+                  <td className="py-2.5 px-3">Post Mount Locking Mailbox - Large White</td>
+                  <td className="py-2.5 px-3 font-mono text-primary-600">ADPOST-LARGE-WHITE</td>
+                  <td className="py-2.5 px-3">3</td>
+                  <td className="py-2.5 px-3">PO-2026-001-L3</td>
+                  <td className="py-2.5 px-3 font-medium">96</td>
+                  <td className="py-2.5 px-3">96</td>
+                  <td className="py-2.5 px-3">$58.00</td>
+                  <td className="py-2.5 px-3 font-medium">$5,568.00</td>
+                </tr>
+                <tr className="border-b border-gray-100">
+                  <td className="py-2.5 px-3">Post Mount Locking Mailbox - Large Red</td>
+                  <td className="py-2.5 px-3 font-mono text-primary-600">ADPOST-LARGE-RED</td>
+                  <td className="py-2.5 px-3">4</td>
+                  <td className="py-2.5 px-3">PO-2026-001-L4</td>
+                  <td className="py-2.5 px-3 font-medium">96</td>
+                  <td className="py-2.5 px-3">96</td>
+                  <td className="py-2.5 px-3">$58.00</td>
+                  <td className="py-2.5 px-3 font-medium">$5,568.00</td>
+                </tr>
+                <tr className="border-b border-gray-100">
+                  <td className="py-2.5 px-3">Package Box - Small Corrugated</td>
+                  <td className="py-2.5 px-3 font-mono text-primary-600">ADBOX-SMALL</td>
+                  <td className="py-2.5 px-3">5</td>
+                  <td className="py-2.5 px-3">PO-2026-001-L5</td>
+                  <td className="py-2.5 px-3 font-medium">55</td>
+                  <td className="py-2.5 px-3">55</td>
+                  <td className="py-2.5 px-3">$12.00</td>
+                  <td className="py-2.5 px-3 font-medium">$660.00</td>
+                </tr>
+                <tr className="border-b border-gray-100">
+                  <td className="py-2.5 px-3">Package Box - Large Corrugated</td>
+                  <td className="py-2.5 px-3 font-mono text-primary-600">ADBOX-LARGE</td>
+                  <td className="py-2.5 px-3">6</td>
+                  <td className="py-2.5 px-3">PO-2026-001-L6</td>
+                  <td className="py-2.5 px-3 font-medium">55</td>
+                  <td className="py-2.5 px-3">55</td>
+                  <td className="py-2.5 px-3">$15.00</td>
+                  <td className="py-2.5 px-3 font-medium">$825.00</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          {/* SKUs Table */}
+          <div className="bg-white border border-gray-200 rounded-xl overflow-hidden p-5">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-bold text-gray-900">SKUs</h3>
+            </div>
+            <table className="w-full text-xs">
+              <thead><tr className="bg-gray-50 border-b">{['SKU', 'Product Name', 'Variant', 'Expected', 'Received', 'Diff', 'Damaged', 'Unit', 'Status'].map(h => (<th key={h} className="text-left py-2.5 px-3 font-semibold text-gray-500">{h}</th>))}</tr></thead>
+              <tbody>{D.items.map((item, i) => (<tr key={i} className="border-b border-gray-100"><td className="py-2.5 px-3 font-mono text-primary-600">{item.sku}</td><td className="py-2.5 px-3">{item.name}</td><td className="py-2.5 px-3">{item.variant}</td><td className="py-2.5 px-3 font-medium">{item.expected}</td><td className="py-2.5 px-3 text-green-600 font-medium">{item.received}</td><td className="py-2.5 px-3 text-orange-600">{item.diff}</td><td className="py-2.5 px-3 text-red-600">{item.damaged}</td><td className="py-2.5 px-3">{item.unit}</td><td className="py-2.5 px-3"><span className="text-green-600 font-medium">{item.status}</span></td></tr>))}</tbody>
+            </table>
+          </div>
         </div>
       )}
       {activeTab === 'Customs Clearance' && (
