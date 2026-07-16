@@ -21,6 +21,12 @@ import {
   Users2,
   Navigation,
   Archive,
+  Bot,
+  MessageSquare,
+  Zap,
+  Store,
+  Heart,
+  Clock,
 } from 'lucide-react'
 import { useCollaboration } from '../../context/CollaborationContext'
 
@@ -160,6 +166,18 @@ const menuItems: MenuItem[] = [
     ],
   },
   {
+    id: 'agents',
+    label: 'Agents',
+    icon: <Bot size={16} />,
+    expandable: true,
+    children: [
+      { id: 'agent-chat', label: 'Chat', path: '/agents?nav=chat' },
+      { id: 'agent-workstation', label: 'Agent Workstation', path: '/agents?nav=workstation' },
+      { id: 'agent-customize', label: 'Customize', path: '/agents?nav=customize' },
+      { id: 'agent-marketplace', label: 'Marketplace', path: '/agents?nav=marketplace' },
+    ],
+  },
+  {
     id: 'warehouse-map',
     label: 'Warehouse Map',
     icon: <Map size={16} />,
@@ -220,8 +238,19 @@ function NavSidebar() {
   }
 
   return (
-    <div className="w-56 bg-white border-r border-gray-200 h-screen fixed left-16 top-0 z-40 overflow-y-auto">
+    <div className="w-56 bg-white border-r border-gray-200 h-screen fixed left-0 top-0 z-40 overflow-y-auto">
       <div className="py-4 px-3">
+        {/* Logo */}
+        <div className="flex items-center gap-2 px-3 mb-4">
+          <div className="w-7 h-7 bg-primary-600 rounded-lg flex items-center justify-center">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="white" />
+              <path d="M2 17L12 22L22 17" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M2 12L12 17L22 12" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </div>
+          <span className="text-sm font-bold text-gray-800">Client Portal</span>
+        </div>
         <nav className="space-y-0.5">
           {menuItems.map((item) => {
             const isCollaboration = item.id === 'support'

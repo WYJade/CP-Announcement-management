@@ -1,5 +1,4 @@
 import { Outlet, useLocation } from 'react-router-dom'
-import IconSidebar from './IconSidebar'
 import NavSidebar from './NavSidebar'
 import Header from './Header'
 import AnnouncementBanner from '../common/AnnouncementBanner'
@@ -10,12 +9,11 @@ function Layout() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <IconSidebar />
-      {!isAgentsPage && <NavSidebar />}
+      <NavSidebar />
       <Header />
-      <main className={`${isAgentsPage ? 'ml-16' : 'ml-72'} mt-14 p-4 overflow-auto`}>
-        {!isAgentsPage && <AnnouncementBanner />}
-        <div className={isAgentsPage ? '' : 'mt-3'}>
+      <main className={`ml-56 mt-14 p-4 overflow-auto`}>
+        <AnnouncementBanner />
+        <div className="mt-3">
           <Outlet />
         </div>
       </main>
