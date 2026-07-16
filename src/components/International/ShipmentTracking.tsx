@@ -250,6 +250,26 @@ export default function ShipmentTracking() {
         </table>
       </div>
 
+      {/* Pagination */}
+      <div className="flex items-center justify-between mt-3 text-xs text-gray-500 px-1">
+        <span>0 of {filtered.length} row(s) selected.</span>
+        <div className="flex items-center gap-3">
+          <span>Rows per page</span>
+          <select className="border border-gray-300 rounded px-2 py-1 text-xs">
+            <option>10</option>
+            <option>20</option>
+            <option>50</option>
+          </select>
+          <span>Page 1 of {Math.max(1, Math.ceil(filtered.length / 10))}</span>
+          <div className="flex gap-1">
+            <button className="px-2 py-1 border border-gray-300 rounded hover:bg-gray-50 text-gray-400">&laquo;</button>
+            <button className="px-2 py-1 border border-gray-300 rounded hover:bg-gray-50 text-gray-400">&lsaquo;</button>
+            <button className="px-2 py-1 border border-gray-300 rounded hover:bg-gray-50 text-gray-400">&rsaquo;</button>
+            <button className="px-2 py-1 border border-gray-300 rounded hover:bg-gray-50 text-gray-400">&raquo;</button>
+          </div>
+        </div>
+      </div>
+
       {/* Onboarding Dialog */}
       {showDialog && <OnboardingDialog onClose={handleDialogClose} />}
 
