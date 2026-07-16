@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   MessageSquare, Zap, Settings, Store, Search, Clock,
   AlertTriangle, ChevronRight, Star, Bot, X, ExternalLink,
@@ -269,50 +269,26 @@ function ChatPanel() {
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function AgentWorkstation() {
-  const [activeNav, setActiveNav] = useState('workstation')
+  // Read nav from URL query param
+  const urlParams = new URLSearchParams(window.location.search)
+  const navFromUrl = urlParams.get('nav') || 'workstation'
+  const [activeNav, setActiveNav] = useState(navFromUrl)
   const [selectedTask, setSelectedTask] = useState<AgentTask | null>(null)
 
-  return (
-    <div className="flex h-[calc(100vh-3.5rem)] -m-4 bg-gray-50">
-      {/* Left sidebar - AI Native Navigation */}
-      <div className="w-48 bg-white border-r border-gray-200 flex flex-col shrink-0 overflow-y-auto">
-        <div className="p-3 border-b border-gray-100">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 bg-primary-600 rounded-lg flex items-center justify-center">
-              <Bot size={14} className="text-white" />
-            </div>
-            <div>
-              <p className="text-xs font-bold text-gray-900">AI Native</p>
-              <p className="text-[10px] text-gray-400">Operations AI</p>
-            </div>
-          </div>
-        </div>
-        <nav className="p-2 space-y-0.5">
-          <p className="text-[10px] font-semibold text-gray-400 uppercase px-2 pt-2 pb-1">Agents</p>
-          {NAV_ITEMS.map(item => (
-            <button key={item.id} onClick={() => setActiveNav(item.id)}
-              className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-xs font-medium transition-colors ${
-                activeNav === item.id ? 'bg-primary-50 text-primary-700' : 'text-gray-600 hover:bg-gray-50'
-              }`}>
-              <item.icon size={14} />
-              {item.label}
-            </button>
-          ))}
-        </nav>
+  // Sync with URL changes
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const nav = params.get('nav')
+    if (nav && nav !== activeNav) {
+      setActiveNav(nav)
+    }
+  }, [window.location.search])
 
-        {/* Recents */}
-        <div className="px-2 py-2 border-t border-gray-100">
-          <p className="text-[10px] font-semibold text-primary-600 uppercase px-2 pt-1 pb-1">Recents</p>
-          <div className="space-y-0.5">
-            {['23 单批量重承诺方案', 'SKU-005 库存查询', 'VIP Gold 取消例外解释', '海风家居 7d SLA 趋势', 'Approval Gateway 流程', 'EDI 850 解析问题', '库存预警处理', '渠道库存同步异常'].map((item, i) => (
-              <button key={i} className="w-full text-left px-2.5 py-1.5 rounded-lg text-[11px] text-gray-600 hover:bg-gray-50 truncate">{item}</button>
-            ))}
-          </div>
-        </div>
-      </div>
+  return (
+    <div className="flex h-[calc(100vh-3.5rem)] -m-4 bg-white">
 
       {/* Middle panel - My Agents list (hidden in chat mode and marketplace) */}
-      {activeNav !== 'chat' && activeNav !== 'marketplace' && (
+      {activeNav !== 'chat' && activeNav !== 'marketplace' && activeNav !== 'customize' && (
       <div className="w-64 bg-white border-r border-gray-200 flex flex-col shrink-0 overflow-y-auto">
         <div className="p-3 border-b border-gray-100">
           <h3 className="text-sm font-bold text-gray-900 mb-2">My Agents</h3>
@@ -491,11 +467,23 @@ export default function AgentWorkstation() {
 
         {/* Marketplace View */}
         {activeNav === 'marketplace' && (
-          <div className="w-full h-full">
+          <div className="w-full h-full bg-white">
             <iframe
               src="https://oms-ba.item.pub/ai-native/marketplace/index.html?hideNav=true&theme=light"
               className="w-full h-full border-0 bg-white"
               title="Marketplace"
+              style={{ minHeight: 'calc(100vh - 48px)' }}
+            />
+          </div>
+        )}
+
+        {/* Customize View */}
+        {activeNav === 'customize' && (
+          <div className="w-full h-full bg-white">
+            <iframe
+              src="https://oms-ba.item.pub/ai-native/customize/index.html?hideNav=true&theme=light"
+              className="w-full h-full border-0 bg-white"
+              title="Customize"
               style={{ minHeight: 'calc(100vh - 48px)' }}
             />
           </div>
