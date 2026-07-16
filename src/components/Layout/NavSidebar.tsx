@@ -176,7 +176,7 @@ const menuItems: MenuItem[] = [
       { id: 'agent-customize', label: 'Customize', path: '/agents?nav=customize' },
       { id: 'agent-marketplace', label: 'Marketplace', path: '/agents?nav=marketplace' },
       { id: 'agent-recents-header', label: '── RECENTS ──' },
-      { id: 'agent-recents-bash', label: 'Bash批量测试', path: '/agents?nav=chat' },
+      { id: 'agent-recents-bash', label: '查询下SH20260716 对应的出入库记录', path: '/agents?nav=chat' },
     ],
   },
   {

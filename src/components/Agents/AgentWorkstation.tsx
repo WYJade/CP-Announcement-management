@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
 import {
   MessageSquare, Zap, Settings, Store, Search, Clock,
   AlertTriangle, ChevronRight, Star, Bot, X, ChevronDown,
@@ -38,10 +39,16 @@ const MARKETPLACE_AGENTS = [
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export default function AgentWorkstation() {
-  const urlParams = new URLSearchParams(window.location.search)
+  const location = useLocation()
+  const urlParams = new URLSearchParams(location.search)
   const navFromUrl = urlParams.get('nav') || 'workstation'
   const [activeNav, setActiveNav] = useState(navFromUrl)
-  const [recentsExpanded, setRecentsExpanded] = useState(true)
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search)
+    const nav = params.get('nav') || 'workstation'
+    setActiveNav(nav)
+  }, [location.search])
 
   return (
     <div className="flex h-[calc(100vh-3.5rem)] -m-4 bg-white">
@@ -68,7 +75,7 @@ function ChatView() {
       <div className="flex items-center gap-3 px-5 py-3 border-b border-gray-100">
         <Plus size={16} className="text-gray-400 cursor-pointer hover:text-gray-600" />
         <Clock size={16} className="text-gray-400 cursor-pointer hover:text-gray-600" />
-        <span className="text-sm text-gray-700 font-medium">Bash批量测试</span>
+        <span className="text-sm text-gray-700 font-medium">查询下SH20260716 对应的出入库记录</span>
         <span className="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">● Connector+flow</span>
       </div>
 
