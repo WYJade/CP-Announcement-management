@@ -45,41 +45,6 @@ export default function AgentWorkstation() {
 
   return (
     <div className="flex h-[calc(100vh-3.5rem)] -m-4 bg-white">
-      {/* Left Agents Nav */}
-      <div className="w-44 bg-gray-50 border-r border-gray-200 flex flex-col shrink-0 overflow-y-auto">
-        <div className="p-3">
-          <p className="text-[10px] font-semibold text-gray-400 uppercase mb-2">Agents</p>
-          <nav className="space-y-0.5">
-            {NAV_ITEMS.map(item => (
-              <button key={item.id} onClick={() => setActiveNav(item.id)}
-                className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
-                  activeNav === item.id ? 'bg-primary-100 text-primary-700' : 'text-gray-600 hover:bg-gray-100'
-                }`}>
-                <item.icon size={14} />
-                {item.label}
-              </button>
-            ))}
-          </nav>
-        </div>
-
-        {/* Recents */}
-        <div className="px-3 mt-2">
-          <button onClick={() => setRecentsExpanded(!recentsExpanded)} className="flex items-center gap-1 text-[10px] font-semibold text-gray-500 uppercase w-full px-3 py-1.5 rounded hover:bg-gray-100">
-            <Clock size={10} /> Recents
-            <ChevronDown size={10} className={`ml-auto transition-transform ${recentsExpanded ? '' : '-rotate-90'}`} />
-          </button>
-          {recentsExpanded && (
-            <div className="mt-1 space-y-0.5">
-              {RECENTS.map((item, i) => (
-                <button key={i} className="w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-[11px] text-gray-600 hover:bg-gray-100 truncate">
-                  <FileText size={11} className="text-gray-400 shrink-0" />
-                  {item}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
 
       {/* Main Content Area */}
       <div className="flex-1 overflow-y-auto bg-white">

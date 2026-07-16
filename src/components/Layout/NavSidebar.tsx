@@ -175,6 +175,8 @@ const menuItems: MenuItem[] = [
       { id: 'agent-workstation', label: 'Agent Workstation', path: '/agents?nav=workstation' },
       { id: 'agent-customize', label: 'Customize', path: '/agents?nav=customize' },
       { id: 'agent-marketplace', label: 'Marketplace', path: '/agents?nav=marketplace' },
+      { id: 'agent-recents-header', label: '── RECENTS ──' },
+      { id: 'agent-recents-bash', label: 'Bash批量测试', path: '/agents?nav=chat' },
     ],
   },
   {
@@ -288,6 +290,11 @@ function NavSidebar() {
               {item.expandable && expandedItems.includes(item.id) && item.children && (
                 <div className="ml-8 mt-0.5 space-y-0.5">
                   {item.children.map((child) => (
+                    child.id.includes('recents-header') ? (
+                      <p key={child.id} className="text-[9px] font-semibold text-gray-400 uppercase px-3 pt-2 pb-0.5 flex items-center gap-1">
+                        <Clock size={9} /> RECENTS
+                      </p>
+                    ) : (
                     <button
                       key={child.id}
                       onClick={() => child.path && navigate(child.path)}
@@ -299,6 +306,7 @@ function NavSidebar() {
                     >
                       {child.label}
                     </button>
+                    )
                   ))}
                 </div>
               )}
