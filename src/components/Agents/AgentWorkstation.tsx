@@ -16,7 +16,16 @@ const NAV_ITEMS = [
   { id: 'marketplace', label: 'Marketplace', icon: Store },
 ]
 
-const RECENTS = ['Bash批量测试']
+// ─── Chat Modules Data ────────────────────────────────────────────────────────
+
+const CHAT_MODULES = [
+  { id: 'sales', label: 'Sales Orders', count: 10, refs: ['ORD-8821', 'ORD-8820', 'ORD-8819', 'ORD-8818', 'ORD-8817', 'ORD-8816', 'ORD-8815', 'ORD-8814', 'ORD-8813', 'ORD-8812'] },
+  { id: 'inbound', label: 'Inbound', count: 8, refs: ['RN-38199', 'RN-38198', 'RN-38197', 'RN-38196', 'RN-38195', 'ASN-20260601', 'ASN-20260602', 'ASN-20260603'] },
+  { id: 'inventory', label: 'Inventory', count: 8, refs: ['SKU-A100', 'SKU-B200', 'SKU-C350', 'SKU-D410', 'SKU-E520', 'FW-DENIM-001', 'FW-2024-BLK', 'TCORE-CABLE'] },
+  { id: 'outbound', label: 'Outbound', count: 8, refs: ['SHP-10021', 'SHP-10022', 'SHP-10023', 'SHP-10024', 'SHP-10025', 'LOAD-4401', 'LOAD-4402', 'LOAD-4403'] },
+  { id: 'shipment', label: 'Shipment', count: 8, refs: ['SSHAS2608072', 'SSHAS2608135', 'SSHAS2608099', 'SSHAS2608130', 'SSHAS2608200', 'SSHAS2608250', 'SSHAS2608260', 'SSHAS2608270'] },
+  { id: 'invoice', label: 'Invoice', count: 6, refs: ['INV-19043770', 'INV-19043771', 'INV-19043772', 'INV-19043773', 'INV-19043774', 'INV-19043775'] },
+]
 
 // ─── Marketplace Agents Data ─────────────────────────────────────────────────
 
@@ -68,9 +77,37 @@ export default function AgentWorkstation() {
 
 function ChatView() {
   const [input, setInput] = useState('')
+  const [showModuleSelect, setShowModuleSelect] = useState(false)
+  const [selectedModule, setSelectedModule] = useState<string | null>(null)
+
+  const handleInputChange = (val: string) => {
+    setInput(val)
+    if (val.endsWith('@')) {
+      setShowModuleSelect(true)
+      setSelectedModule(null)
+    } else if (!val.includes('@')) {
+      setShowModuleSelect(false)
+      setSelectedModule(null)
+    }
+  }
+
+  const handleSelectModule = (moduleId: string) => {
+    setSelectedModule(moduleId)
+  }
+
+  const handleSelectRef = (ref: string) => {
+    const mod = CHAT_MODULES.find(m => m.id === selectedModule)
+    setInput(input.replace(/@$/, '') + `@${mod?.label}/${ref} `)
+    setShowModuleSelect(false)
+    setSelectedModule(null)
+  }
+
+  const handleBack = () => {
+    setSelectedModule(null)
+  }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full relative">
       {/* Top bar */}
       <div className="flex items-center gap-3 px-5 py-3 border-b border-gray-100">
         <Plus size={16} className="text-gray-400 cursor-pointer hover:text-gray-600" />
@@ -101,11 +138,48 @@ function ChatView() {
         </div>
       </div>
 
+      {/* Module/Reference Selection Dropdown */}
+      {showModuleSelect && (
+        <div className="absolute bottom-24 left-8 right-8 bg-white border border-primary-200 rounded-xl shadow-lg overflow-hidden z-50">
+          {!selectedModule ? (
+            <>
+              <div className="px-4 py-2.5 border-b border-gray-100">
+                <p className="text-[10px] font-semibold text-gray-400 uppercase">SELECT MODULE</p>
+              </div>
+              <div className="max-h-64 overflow-y-auto">
+                {CHAT_MODULES.map(mod => (
+                  <button key={mod.id} onClick={() => handleSelectModule(mod.id)}
+                    className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 text-left border-b border-gray-50 transition-colors">
+                    <span className="text-sm font-medium text-gray-800">{mod.label}</span>
+                    <span className="text-xs text-gray-400">{mod.count} items</span>
+                  </button>
+                ))}
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="px-4 py-2.5 border-b border-gray-100 flex items-center justify-between">
+                <p className="text-[10px] font-semibold text-gray-400 uppercase">{CHAT_MODULES.find(m => m.id === selectedModule)?.label} — SELECT REFERENCE</p>
+                <button onClick={handleBack} className="text-xs text-gray-500 hover:text-gray-700">Back</button>
+              </div>
+              <div className="max-h-64 overflow-y-auto">
+                {CHAT_MODULES.find(m => m.id === selectedModule)?.refs.map(ref => (
+                  <button key={ref} onClick={() => handleSelectRef(ref)}
+                    className="w-full text-left px-4 py-2.5 hover:bg-primary-50 text-sm text-gray-700 border-b border-gray-50 transition-colors">
+                    {ref}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
       {/* Input */}
       <div className="px-8 pb-6">
-        <div className="border border-gray-200 rounded-xl px-4 py-3 flex items-center gap-3">
+        <div className="border border-gray-200 rounded-xl px-4 py-3 flex items-center gap-3 focus-within:border-primary-300">
           <Paperclip size={16} className="text-gray-400 cursor-pointer" />
-          <input type="text" value={input} onChange={e => setInput(e.target.value)}
+          <input type="text" value={input} onChange={e => handleInputChange(e.target.value)}
             placeholder="Ask any OMS question — data / knowledge / policy... Type @ to reference orders/products/shipments"
             className="flex-1 text-sm outline-none text-gray-700 placeholder-gray-400" />
           <Mic size={16} className="text-gray-400 cursor-pointer" />
@@ -113,7 +187,7 @@ function ChatView() {
             <Send size={14} className="text-white" />
           </button>
         </div>
-        <p className="text-[10px] text-gray-400 text-center mt-2">Enter to send · @ reference orders/prod./shipments · Need workflows? <strong>Go to Agent Workstation</strong></p>
+        <p className="text-[10px] text-gray-400 text-center mt-2">Type @ to select: Sales Orders · Inbound · Inventory · Outbound · Shipment · Invoice</p>
       </div>
     </div>
   )
