@@ -287,183 +287,31 @@ export default function AgentWorkstation() {
   return (
     <div className="flex h-[calc(100vh-3.5rem)] -m-4 bg-white">
 
-      {/* Middle panel - My Agents list (hidden in chat mode and marketplace) */}
-      {activeNav !== 'chat' && activeNav !== 'marketplace' && activeNav !== 'customize' && (
-      <div className="w-64 bg-white border-r border-gray-200 flex flex-col shrink-0 overflow-y-auto">
-        <div className="p-3 border-b border-gray-100">
-          <h3 className="text-sm font-bold text-gray-900 mb-2">My Agents</h3>
-          <div className="relative">
-            <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
-            <input type="text" placeholder="Search agents..." className="w-full pl-7 pr-2 py-1.5 text-xs border border-gray-200 rounded-lg" />
-          </div>
-        </div>
-
-        {/* Need Input section */}
-        <div className="p-3">
-          <p className="text-[10px] font-semibold text-gray-400 uppercase mb-2 flex items-center gap-1">
-            <AlertTriangle size={10} /> NEED INPUT
-            <span className="ml-auto bg-red-100 text-red-600 text-[10px] font-bold px-1.5 rounded-full">{NEED_INPUT_TASKS.length}</span>
-          </p>
-          <div className="space-y-1.5">
-            {NEED_INPUT_TASKS.slice(0, 4).map(task => (
-              <button key={task.id} onClick={() => setSelectedTask(task)}
-                className={`w-full text-left px-2.5 py-2 rounded-lg border transition-colors ${
-                  selectedTask?.id === task.id ? 'bg-primary-50 border-primary-200' : 'border-transparent hover:bg-gray-50'
-                }`}>
-                <div className="flex items-center gap-1.5 mb-0.5">
-                  <span className={`w-1.5 h-1.5 rounded-full ${task.tagColor}`} />
-                  <span className="text-[11px] font-medium text-gray-800 truncate">{task.agent}</span>
-                  <span className={`text-[9px] font-bold px-1 rounded ${task.tagColor} text-white`}>{task.agentTag}</span>
-                </div>
-                <p className="text-[10px] text-gray-400 truncate">{task.description.slice(0, 40)}...</p>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Working section */}
-        <div className="p-3 border-t border-gray-100">
-          <p className="text-[10px] font-semibold text-gray-400 uppercase mb-2 flex items-center gap-1">
-            <Clock size={10} /> WORKING
-            <span className="ml-auto text-[10px] text-gray-400">{WORKING_TASKS.length}</span>
-          </p>
-          {WORKING_TASKS.map(t => (
-            <div key={t.id} className="px-2.5 py-2 rounded-lg hover:bg-gray-50">
-              <p className="text-[11px] font-medium text-gray-700">{t.title}</p>
-              <p className="text-[10px] text-gray-400 mt-0.5">{t.progress}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* My Agents */}
-        <div className="p-3 border-t border-gray-100">
-          <p className="text-[10px] font-semibold text-gray-400 uppercase mb-2 flex items-center gap-1">
-            <Star size={10} /> MY AGENTS
-            <span className="ml-auto text-[10px] text-gray-400">{MY_AGENTS.length}</span>
-          </p>
-          <div className="space-y-1">
-            {MY_AGENTS.map(agent => (
-              <div key={agent.id} className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-gray-50 cursor-pointer">
-                <div className={`w-5 h-5 rounded ${agent.tagColor} flex items-center justify-center`}>
-                  <Bot size={10} className="text-white" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[11px] font-medium text-gray-700 truncate">{agent.name}</p>
-                  <p className="text-[9px] text-gray-400">{agent.lastUsed || 'Unused'}</p>
-                </div>
-                {agent.tag && <span className={`text-[9px] font-bold px-1 rounded ${agent.tagColor} text-white`}>{agent.tag}</span>}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-      )}
-
       {/* Main content */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto bg-white">
         {/* Chat View */}
-        {activeNav === 'chat' && <ChatPanel />}
+        {activeNav === 'chat' && (
+          <div className="w-full h-full bg-white">
+            <iframe
+              src="https://oms-ba.item.pub/ai-native/chat/index.html?hideNav=true&theme=light"
+              className="w-full h-full border-0 bg-white"
+              title="Chat"
+              style={{ minHeight: 'calc(100vh - 48px)' }}
+            />
+          </div>
+        )}
 
         {/* Agent Workstation View */}
         {activeNav === 'workstation' && (
-        <div className="p-6">
-        <div>
-          <div className="flex items-center gap-3 mb-6">
-            <Zap size={20} className="text-primary-600" />
-            <div>
-              <h1 className="text-xl font-bold text-gray-900">Agent Workstation</h1>
-              <p className="text-xs text-gray-500">Operations workbench · {MY_AGENTS.length} enabled agents · {NEED_INPUT_TASKS.length} active conversations</p>
-            </div>
+          <div className="w-full h-full bg-white">
+            <iframe
+              src="https://oms-ba.item.pub/ai-native/workstation/index.html?hideNav=true&theme=light"
+              className="w-full h-full border-0 bg-white"
+              title="Agent Workstation"
+              style={{ minHeight: 'calc(100vh - 48px)' }}
+            />
           </div>
-
-          {/* Need Input section */}
-          <div className="mb-8">
-            <h2 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-              <AlertTriangle size={14} className="text-amber-500" />
-              Need Input · awaiting your decision
-              <span className="bg-red-100 text-red-600 text-xs font-bold px-2 py-0.5 rounded-full">{NEED_INPUT_TASKS.length}</span>
-            </h2>
-            <div className="space-y-3">
-              {NEED_INPUT_TASKS.map(task => (
-                <div key={task.id}
-                  onClick={() => setSelectedTask(task)}
-                  className={`bg-white border rounded-xl p-4 cursor-pointer transition-all hover:shadow-md ${
-                    selectedTask?.id === task.id ? 'border-primary-300 ring-1 ring-primary-100' : 'border-gray-200'
-                  }`}>
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1.5">
-                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${task.tagColor} text-white`}>{task.agentTag}</span>
-                        <span className="text-sm font-semibold text-gray-900">{task.title}</span>
-                        <span className={`text-xs font-medium ${task.priorityColor}`}>{task.priority}</span>
-                        <span className="text-xs text-gray-400 ml-auto">{task.timeAgo}</span>
-                      </div>
-                      <p className="text-sm text-gray-600 leading-relaxed">{task.description}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 mt-3">
-                    {task.actions.map((action, i) => (
-                      <button key={i}
-                        onClick={(e) => { e.stopPropagation(); }}
-                        className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
-                          action.variant === 'primary' ? 'bg-primary-600 text-white hover:bg-primary-700' :
-                          action.variant === 'warning' ? 'bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100' :
-                          'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                        }`}>
-                        {action.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Working section */}
-          <div className="mb-8">
-            <h2 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-              <Clock size={14} className="text-blue-500" />
-              Working · your long-running tasks
-            </h2>
-            {WORKING_TASKS.map(task => (
-              <div key={task.id} className="bg-white border border-gray-200 rounded-xl p-4">
-                <div className="flex items-center gap-3">
-                  <span className="w-4 h-4 border-2 border-primary-300 border-t-primary-600 rounded-full animate-spin" />
-                  <div>
-                    <p className="text-sm font-medium text-gray-800">{task.title}</p>
-                    <p className="text-xs text-gray-500 mt-0.5">{task.progress}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* My Agents section */}
-          <div>
-            <h2 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-              <Star size={14} className="text-amber-500" />
-              My Agents
-            </h2>
-            <div className="grid grid-cols-3 gap-3">
-              {MY_AGENTS.filter(a => a.status === 'active').map(agent => (
-                <div key={agent.id} className="bg-white border border-gray-200 rounded-xl p-4 hover:border-primary-200 hover:shadow-sm cursor-pointer transition-all">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className={`w-8 h-8 rounded-lg ${agent.tagColor} flex items-center justify-center`}>
-                      <Bot size={14} className="text-white" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-800">{agent.name}</p>
-                      {agent.tag && <span className={`text-[9px] font-bold px-1 rounded ${agent.tagColor} text-white`}>{agent.tag}</span>}
-                    </div>
-                  </div>
-                  <p className="text-xs text-gray-400">{agent.lastUsed || 'Ready to use'}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-      )}
+        )}
 
         {/* Marketplace View */}
         {activeNav === 'marketplace' && (
