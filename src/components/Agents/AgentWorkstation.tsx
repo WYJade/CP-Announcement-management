@@ -293,7 +293,7 @@ export default function AgentWorkstation() {
         {activeNav === 'chat' && (
           <div className="w-full h-full bg-white">
             <iframe
-              src="https://oms-ba.item.pub/ai-native/chat/index.html?hideNav=true&theme=light"
+              src="https://oms-ba.item.pub/ai-native/chat/index.html?theme=light"
               className="w-full h-full border-0 bg-white"
               title="Chat"
               style={{ minHeight: 'calc(100vh - 48px)' }}
@@ -305,7 +305,7 @@ export default function AgentWorkstation() {
         {activeNav === 'workstation' && (
           <div className="w-full h-full bg-white">
             <iframe
-              src="https://oms-ba.item.pub/ai-native/workstation/index.html?hideNav=true&theme=light"
+              src="https://oms-ba.item.pub/ai-native/workstation/index.html?theme=light"
               className="w-full h-full border-0 bg-white"
               title="Agent Workstation"
               style={{ minHeight: 'calc(100vh - 48px)' }}
@@ -317,7 +317,7 @@ export default function AgentWorkstation() {
         {activeNav === 'marketplace' && (
           <div className="w-full h-full bg-white">
             <iframe
-              src="https://oms-ba.item.pub/ai-native/marketplace/index.html?hideNav=true&theme=light"
+              src="https://oms-ba.item.pub/ai-native/marketplace/index.html?theme=light"
               className="w-full h-full border-0 bg-white"
               title="Marketplace"
               style={{ minHeight: 'calc(100vh - 48px)' }}
@@ -329,7 +329,7 @@ export default function AgentWorkstation() {
         {activeNav === 'customize' && (
           <div className="w-full h-full bg-white">
             <iframe
-              src="https://oms-ba.item.pub/ai-native/customize/index.html?hideNav=true&theme=light"
+              src="https://oms-ba.item.pub/ai-native/customize/index.html?theme=light"
               className="w-full h-full border-0 bg-white"
               title="Customize"
               style={{ minHeight: 'calc(100vh - 48px)' }}
