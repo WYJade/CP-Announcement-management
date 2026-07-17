@@ -165,20 +165,6 @@ const menuItems: MenuItem[] = [
       { id: 'claim', label: 'Claim' },
     ],
   },
-  {
-    id: 'agents',
-    label: 'Agents',
-    icon: <Bot size={16} />,
-    expandable: true,
-    children: [
-      { id: 'agent-chat', label: 'Chat', path: '/agents?nav=chat' },
-      { id: 'agent-workstation', label: 'Agent Workstation', path: '/agents?nav=workstation' },
-      { id: 'agent-customize', label: 'Customize', path: '/agents?nav=customize' },
-      { id: 'agent-marketplace', label: 'Marketplace', path: '/agents?nav=marketplace' },
-      { id: 'agent-recents-header', label: '── RECENTS ──' },
-      { id: 'agent-recents-bash', label: '查询下SH20260716 对应的出入库记录', path: '/agents?nav=chat' },
-    ],
-  },
 ]
 
 const favoritesItems: MenuItem[] = [
@@ -233,6 +219,20 @@ const hiddenItems: MenuItem[] = [
     expandable: true,
     children: [
       { id: 'backup-tracking', label: 'End-to-End Tracking', path: '/backup/tracking' },
+    ],
+  },
+  {
+    id: 'ai-agents',
+    label: 'AI Agents',
+    icon: <Bot size={16} />,
+    expandable: true,
+    children: [
+      { id: 'agent-chat', label: 'Chat', path: '/agents?nav=chat' },
+      { id: 'agent-workstation', label: 'Agent Workstation', path: '/agents?nav=workstation' },
+      { id: 'agent-customize', label: 'Customize', path: '/agents?nav=customize' },
+      { id: 'agent-marketplace', label: 'Marketplace', path: '/agents?nav=marketplace' },
+      { id: 'agent-recents-header', label: '── RECENTS ──' },
+      { id: 'agent-recents-bash', label: '查询下SH20260716 对应的出入库记录', path: '/agents?nav=chat' },
     ],
   },
   {
@@ -356,6 +356,18 @@ function NavSidebar() {
           <p className="text-[10px] font-semibold text-gray-400 uppercase px-3 mb-1">Favorites</p>
           <nav className="space-y-0.5">
             {renderMenuSection(favoritesItems)}
+          </nav>
+        </div>
+
+        {/* Agents Section - standalone link */}
+        <div className="border-t border-gray-100 pt-3 mb-4">
+          <p className="text-[10px] font-semibold text-gray-400 uppercase px-3 mb-1">Agents</p>
+          <nav className="space-y-0.5">
+            <a href="https://ai-native.item.pub/" target="_blank" rel="noopener noreferrer"
+              className="flex items-center w-full px-3 py-2 text-sm rounded-md hover:bg-gray-100 transition-colors text-gray-700">
+              <span className="mr-3 text-gray-500"><Bot size={16} /></span>
+              <span className="flex-1 text-left font-medium">Agents</span>
+            </a>
           </nav>
         </div>
 
