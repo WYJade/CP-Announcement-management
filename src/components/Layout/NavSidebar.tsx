@@ -351,14 +351,6 @@ function NavSidebar() {
           {renderMenuSection(menuItems)}
         </nav>
 
-        {/* Favorites Section */}
-        <div className="border-t border-gray-100 pt-3 mb-4">
-          <p className="text-[10px] font-semibold text-gray-400 uppercase px-3 mb-1">Favorites</p>
-          <nav className="space-y-0.5">
-            {renderMenuSection(favoritesItems)}
-          </nav>
-        </div>
-
         {/* Agents Section - standalone link */}
         <div className="border-t border-gray-100 pt-3 mb-4">
           <p className="text-[10px] font-semibold text-gray-400 uppercase px-3 mb-1">Agents</p>
@@ -368,6 +360,14 @@ function NavSidebar() {
               <span className="mr-3 text-gray-500"><Bot size={16} /></span>
               <span className="flex-1 text-left font-medium">Agents</span>
             </a>
+          </nav>
+        </div>
+
+        {/* Favorites Section */}
+        <div className="border-t border-gray-100 pt-3 mb-4">
+          <p className="text-[10px] font-semibold text-gray-400 uppercase px-3 mb-1">Favorites</p>
+          <nav className="space-y-0.5">
+            {renderMenuSection(favoritesItems)}
           </nav>
         </div>
 
