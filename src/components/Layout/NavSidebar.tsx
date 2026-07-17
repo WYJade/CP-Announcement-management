@@ -179,16 +179,45 @@ const menuItems: MenuItem[] = [
       { id: 'agent-recents-bash', label: '查询下SH20260716 对应的出入库记录', path: '/agents?nav=chat' },
     ],
   },
+]
+
+const favoritesItems: MenuItem[] = [
   {
-    id: 'warehouse-map',
-    label: 'Warehouse Map',
-    icon: <Map size={16} />,
+    id: 'favorites',
+    label: 'Favorites',
+    icon: <Heart size={16} />,
     expandable: true,
+    children: [
+      { id: 'fav-chat', label: 'Chat', path: '/agents?nav=chat' },
+      { id: 'fav-scrap-report', label: 'Scrap Report' },
+      { id: 'fav-service-claim', label: 'Service Claim Report' },
+      { id: 'fav-freight-quote', label: 'Freight Quote', path: '/outbound/freight-quote' },
+      { id: 'fav-small-parcel', label: 'Small Parcel Tracking S...' },
+      { id: 'fav-order-carrier', label: 'Order Carrier Update' },
+    ],
   },
+]
+
+const systemItems: MenuItem[] = [
   {
     id: 'system',
     label: 'System Management',
     icon: <Settings size={16} />,
+    expandable: true,
+    children: [
+      { id: 'sys-user', label: 'User Management' },
+      { id: 'sys-role', label: 'Role Management' },
+      { id: 'sys-address', label: 'Address Book' },
+      { id: 'sys-settings', label: 'Settings' },
+    ],
+  },
+]
+
+const hiddenItems: MenuItem[] = [
+  {
+    id: 'warehouse-map',
+    label: 'Warehouse Map',
+    icon: <Map size={16} />,
     expandable: true,
   },
   {
@@ -220,6 +249,8 @@ const menuItems: MenuItem[] = [
     ],
   },
 ]
+  },
+]
 
 function NavSidebar() {
   const [expandedItems, setExpandedItems] = useState<string[]>(['dashboards', 'support'])
@@ -239,6 +270,66 @@ function NavSidebar() {
     return location.pathname === child.path || (child.path === '/dashboard/otif' && location.pathname === '/')
   }
 
+  const renderMenuSection = (items: MenuItem[]) => items.map((item) => {
+    const isCollaboration = item.id === 'support'
+    const isCollabActive = location.pathname.startsWith('/support')
+
+    return (
+      <div key={item.id}>
+        <button
+          onClick={() => item.expandable ? toggleExpand(item.id) : item.id === 'support' && navigate('/support')}
+          className={`flex items-center w-full px-3 py-2 text-sm rounded-md hover:bg-gray-100 transition-colors group ${
+            isCollaboration && isCollabActive
+              ? 'bg-primary-50 text-primary-700 font-semibold'
+              : 'text-gray-700'
+          }`}
+        >
+          <span className={`mr-3 ${isCollaboration && isCollabActive ? 'text-primary-600' : 'text-gray-500'}`}>
+            {item.icon}
+          </span>
+          <span className="flex-1 text-left font-medium">{item.label}</span>
+          {isCollaboration && supportUnread > 0 && (
+            <span className="flex items-center justify-center bg-red-500 text-white text-[10px] font-bold rounded-full w-4 h-4 mr-1">
+              {supportUnread > 9 ? '9+' : supportUnread}
+            </span>
+          )}
+          {item.expandable && (
+            <span className="text-gray-400">
+              {expandedItems.includes(item.id) ? (
+                <ChevronDown size={14} />
+              ) : (
+                <ChevronRight size={14} />
+              )}
+            </span>
+          )}
+        </button>
+        {item.expandable && expandedItems.includes(item.id) && item.children && (
+          <div className="ml-8 mt-0.5 space-y-0.5">
+            {item.children.map((child) => (
+              child.id.includes('recents-header') ? (
+                <p key={child.id} className="text-[9px] font-semibold text-gray-400 uppercase px-3 pt-2 pb-0.5 flex items-center gap-1">
+                  <Clock size={9} /> RECENTS
+                </p>
+              ) : (
+              <button
+                key={child.id}
+                onClick={() => child.path && navigate(child.path)}
+                className={`block w-full text-left px-3 py-1.5 text-sm rounded-md transition-colors ${
+                  isChildActive(child)
+                    ? 'bg-primary-50 text-primary-700 font-medium'
+                    : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                {child.label}
+              </button>
+              )
+            ))}
+          </div>
+        )}
+      </div>
+    )
+  })
+
   return (
     <div className="w-56 bg-white border-r border-gray-200 h-screen fixed left-0 top-0 z-40 overflow-y-auto">
       <div className="py-4 px-3">
@@ -253,66 +344,35 @@ function NavSidebar() {
           </div>
           <span className="text-sm font-bold text-gray-800">Client Portal</span>
         </div>
-        <nav className="space-y-0.5">
-          {menuItems.map((item) => {
-            const isCollaboration = item.id === 'support'
-            const isCollabActive = location.pathname.startsWith('/support')
 
-            return (
-            <div key={item.id}>
-              <button
-                onClick={() => item.expandable ? toggleExpand(item.id) : item.id === 'support' && navigate('/support')}
-                className={`flex items-center w-full px-3 py-2 text-sm rounded-md hover:bg-gray-100 transition-colors group ${
-                  isCollaboration && isCollabActive
-                    ? 'bg-primary-50 text-primary-700 font-semibold'
-                    : 'text-gray-700'
-                }`}
-              >
-                <span className={`mr-3 ${isCollaboration && isCollabActive ? 'text-primary-600' : 'text-gray-500'}`}>
-                  {item.icon}
-                </span>
-                <span className="flex-1 text-left font-medium">{item.label}</span>
-                {isCollaboration && supportUnread > 0 && (
-                  <span className="flex items-center justify-center bg-red-500 text-white text-[10px] font-bold rounded-full w-4 h-4 mr-1">
-                    {supportUnread > 9 ? '9+' : supportUnread}
-                  </span>
-                )}
-                {item.expandable && (
-                  <span className="text-gray-400">
-                    {expandedItems.includes(item.id) ? (
-                      <ChevronDown size={14} />
-                    ) : (
-                      <ChevronRight size={14} />
-                    )}
-                  </span>
-                )}
-              </button>
-              {item.expandable && expandedItems.includes(item.id) && item.children && (
-                <div className="ml-8 mt-0.5 space-y-0.5">
-                  {item.children.map((child) => (
-                    child.id.includes('recents-header') ? (
-                      <p key={child.id} className="text-[9px] font-semibold text-gray-400 uppercase px-3 pt-2 pb-0.5 flex items-center gap-1">
-                        <Clock size={9} /> RECENTS
-                      </p>
-                    ) : (
-                    <button
-                      key={child.id}
-                      onClick={() => child.path && navigate(child.path)}
-                      className={`block w-full text-left px-3 py-1.5 text-sm rounded-md transition-colors ${
-                        isChildActive(child)
-                          ? 'bg-primary-50 text-primary-700 font-medium'
-                          : 'text-gray-600 hover:bg-gray-100'
-                      }`}
-                    >
-                      {child.label}
-                    </button>
-                    )
-                  ))}
-                </div>
-              )}
-            </div>
-          )})}
+        {/* Workspace Section */}
+        <p className="text-[10px] font-semibold text-gray-400 uppercase px-3 mb-1">Workspace</p>
+        <nav className="space-y-0.5 mb-4">
+          {renderMenuSection(menuItems)}
         </nav>
+
+        {/* Favorites Section */}
+        <div className="border-t border-gray-100 pt-3 mb-4">
+          <p className="text-[10px] font-semibold text-gray-400 uppercase px-3 mb-1">Favorites</p>
+          <nav className="space-y-0.5">
+            {renderMenuSection(favoritesItems)}
+          </nav>
+        </div>
+
+        {/* System Section */}
+        <div className="border-t border-gray-100 pt-3">
+          <p className="text-[10px] font-semibold text-gray-400 uppercase px-3 mb-1">System</p>
+          <nav className="space-y-0.5">
+            {renderMenuSection(systemItems)}
+          </nav>
+        </div>
+
+        {/* Hidden/legacy items */}
+        <div className="border-t border-gray-100 pt-3 mt-4">
+          <nav className="space-y-0.5">
+            {renderMenuSection(hiddenItems)}
+          </nav>
+        </div>
       </div>
     </div>
   )
