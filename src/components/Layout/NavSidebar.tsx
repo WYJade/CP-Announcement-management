@@ -166,29 +166,6 @@ const menuItems: MenuItem[] = [
       { id: 'claim', label: 'Claim' },
     ],
   },
-  {
-    id: 'backup',
-    label: 'Backup',
-    icon: <Archive size={16} />,
-    expandable: true,
-    children: [
-      { id: 'backup-tracking', label: 'End-to-End Tracking', path: '/backup/tracking' },
-    ],
-  },
-  {
-    id: 'ai-agents',
-    label: 'AI Agents',
-    icon: <Bot size={16} />,
-    expandable: true,
-    children: [
-      { id: 'agent-chat', label: 'Chat', path: '/agents?nav=chat' },
-      { id: 'agent-workstation', label: 'Agent Workstation', path: '/agents?nav=workstation' },
-      { id: 'agent-customize', label: 'Customize', path: '/agents?nav=customize' },
-      { id: 'agent-marketplace', label: 'Marketplace', path: '/agents?nav=marketplace' },
-      { id: 'agent-recents-header', label: '── RECENTS ──' },
-      { id: 'agent-recents-bash', label: '查询下SH20260716 对应的出入库记录', path: '/agents?nav=chat' },
-    ],
-  },
 ]
 
 const favoritesItems: MenuItem[] = [
@@ -345,14 +322,14 @@ function NavSidebar() {
         </div>
 
         {/* Workspace Section */}
-        <p className="text-[10px] font-semibold text-gray-400 uppercase px-3 mb-1">Workspace</p>
+        <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1">Workspace</p>
         <nav className="space-y-0.5 mb-4">
           {renderMenuSection(menuItems)}
         </nav>
 
         {/* Agents Section - standalone external link, no arrow, no expand */}
         <div className="border-t border-gray-100 pt-3 mb-4">
-          <p className="text-[10px] font-semibold text-gray-400 uppercase px-3 mb-1">Agents</p>
+          <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1">Agents</p>
           <nav className="space-y-0.5">
             <a
               href="https://ai-native.item.pub/"
@@ -368,22 +345,22 @@ function NavSidebar() {
 
         {/* Favorites Section */}
         <div className="border-t border-gray-100 pt-3 mb-4">
-          <p className="text-[10px] font-semibold text-gray-400 uppercase px-3 mb-1">Favorites</p>
+          <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1">Favorites</p>
           <nav className="space-y-0.5">
             {renderMenuSection(favoritesItems)}
           </nav>
         </div>
 
         {/* System Section */}
-        <div className="border-t border-gray-100 pt-3">
-          <p className="text-[10px] font-semibold text-gray-400 uppercase px-3 mb-1">System</p>
+        <div className="border-t border-gray-100 pt-3 mb-4">
+          <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1">System</p>
           <nav className="space-y-0.5">
             {renderMenuSection(systemItems)}
           </nav>
         </div>
 
         {/* Hidden/legacy items */}
-        <div className="border-t border-gray-100 pt-3 mt-4 hidden">
+        <div className="hidden">
           <nav className="space-y-0.5">
             {renderMenuSection(hiddenItems)}
           </nav>
