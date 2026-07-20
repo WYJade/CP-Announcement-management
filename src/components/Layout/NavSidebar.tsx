@@ -329,7 +329,7 @@ function NavSidebar() {
 
         {/* Agents Section - standalone external link, no arrow, no expand */}
         <div className="border-t border-gray-100 pt-3 mb-4">
-          <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1">Agents</p>
+          <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1">AI Agents</p>
           <nav className="space-y-0.5">
             <a
               href="https://ai-native.item.pub/"
