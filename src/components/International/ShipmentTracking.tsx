@@ -74,6 +74,23 @@ function statusColor(status: string) {
   return 'bg-gray-100 text-gray-600'
 }
 
+// Status change description mapping
+function getStatusDescription(status: string): string {
+  const descriptions: Record<string, string> = {
+    'Booked': 'Booking confirmed, awaiting pickup',
+    'In Transit': 'Vessel departed, shipment in transit',
+    'Arrived': 'Arrived at port of destination',
+    'Customs Released': 'Customs clearance completed',
+    'Available': 'Container available for pickup',
+    'Dispatched': 'Dispatched for delivery',
+    'OFD': 'Out for final delivery',
+    'Delivered': 'Successfully delivered to warehouse',
+    'Receiving': 'Warehouse receiving in progress',
+    'Received': 'Received and checked into warehouse',
+  }
+  return descriptions[status] || 'Status updated'
+}
+
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export default function ShipmentTracking() {
@@ -189,10 +206,10 @@ export default function ShipmentTracking() {
           <div className="space-y-1.5">
             {SHIPMENT_DATA.slice(0, showAllUpdates ? 6 : 3).map(s => (
               <div key={s.id + '-update'} className="flex items-center gap-2 text-[11px] text-gray-600 py-1 border-b border-gray-50 last:border-0">
-                <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${s.status === 'In Transit' ? 'bg-blue-500' : s.status === 'Customs Released' ? 'bg-teal-500' : s.status === 'Received' ? 'bg-green-500' : s.status === 'Dispatched' ? 'bg-violet-500' : 'bg-gray-400'}`} />
+                <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${s.status === 'In Transit' ? 'bg-blue-500' : s.status === 'Customs Released' ? 'bg-teal-500' : s.status === 'Received' ? 'bg-green-500' : s.status === 'Dispatched' ? 'bg-violet-500' : s.status === 'Booked' ? 'bg-gray-400' : s.status === 'Available' ? 'bg-cyan-500' : s.status === 'OFD' ? 'bg-amber-500' : s.status === 'Delivered' ? 'bg-emerald-500' : s.status === 'Receiving' ? 'bg-lime-500' : s.status === 'Arrived' ? 'bg-indigo-500' : 'bg-gray-400'}`} />
                 <span className="font-medium text-primary-600 shrink-0">{s.shipmentNo}</span>
-                <span className="text-gray-400 truncate">{s.currentMilestone}</span>
-                <span className="ml-auto text-[10px] text-gray-400 whitespace-nowrap">{s.lastUpdated.split(' ').slice(0, 3).join(' ')}</span>
+                <span className="text-gray-500 truncate">{getStatusDescription(s.status)}</span>
+                <span className="ml-auto text-[10px] text-gray-400 whitespace-nowrap">{s.lastUpdated}</span>
               </div>
             ))}
           </div>
