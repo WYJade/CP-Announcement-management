@@ -85,6 +85,7 @@ export default function ShipmentTracking() {
   const [showRecentPanel, setShowRecentPanel] = useState(false)
   const [recentSearches] = useState(['SSHAS2608072', 'WHSU8555505', 'SSGNS2607829', '039GX40070'])
   const [alertFilter, setAlertFilter] = useState<string | null>(null)
+  const [showAllUpdates, setShowAllUpdates] = useState(false)
   const { showDialog, showListTour, handleDialogClose, handleListTourComplete } = useOnboardingGuide()
 
   // Compute alert counts dynamically from data
@@ -180,23 +181,46 @@ export default function ShipmentTracking() {
         </div>
       )}
 
-      {/* Alert Cards - between Recent and Status tabs */}
-      <div data-tour="alert-cards" className="grid grid-cols-4 gap-3 mb-4">
-        <div onClick={() => setAlertFilter(alertFilter === 'customs' ? null : 'customs')} className={`cursor-pointer rounded-lg p-3 transition-all ${alertFilter === 'customs' ? 'bg-amber-100 border-2 border-amber-300 ring-1 ring-amber-200' : 'bg-amber-50 border border-amber-100 hover:border-amber-200'}`}>
-          <div className="flex items-center gap-1.5 text-xs font-semibold text-amber-700 mb-1"><FileCheck size={12} /> {alertCounts.customs} Customs Hold</div>
-          <p className="text-[10px] text-amber-600">Awaiting clearance</p>
+      {/* Split Panel: Left = Recent Activity, Right = Alert Cards */}
+      <div data-tour="alert-cards" className="flex gap-3 mb-4">
+        {/* Left: Latest Document Updates */}
+        <div className="flex-1 bg-white border border-gray-200 rounded-lg p-3 overflow-hidden">
+          <p className="text-xs font-semibold text-gray-700 mb-2">Latest Updates</p>
+          <div className="space-y-1.5">
+            {SHIPMENT_DATA.slice(0, showAllUpdates ? 6 : 3).map(s => (
+              <div key={s.id + '-update'} className="flex items-center gap-2 text-[11px] text-gray-600 py-1 border-b border-gray-50 last:border-0">
+                <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${s.status === 'In Transit' ? 'bg-blue-500' : s.status === 'Customs Released' ? 'bg-teal-500' : s.status === 'Received' ? 'bg-green-500' : s.status === 'Dispatched' ? 'bg-violet-500' : 'bg-gray-400'}`} />
+                <span className="font-medium text-primary-600 shrink-0">{s.shipmentNo}</span>
+                <span className="text-gray-400 truncate">{s.currentMilestone}</span>
+                <span className="ml-auto text-[10px] text-gray-400 whitespace-nowrap">{s.lastUpdated.split(' ').slice(0, 3).join(' ')}</span>
+              </div>
+            ))}
+          </div>
+          {SHIPMENT_DATA.length > 3 && (
+            <button onClick={() => setShowAllUpdates(!showAllUpdates)} className="text-[10px] text-primary-600 hover:underline mt-2 font-medium">
+              {showAllUpdates ? 'Show less' : `Show more (${SHIPMENT_DATA.length - 3} more)`}
+            </button>
+          )}
         </div>
-        <div onClick={() => setAlertFilter(alertFilter === 'approaching-lfd' ? null : 'approaching-lfd')} className={`cursor-pointer rounded-lg p-3 transition-all ${alertFilter === 'approaching-lfd' ? 'bg-orange-100 border-2 border-orange-300 ring-1 ring-orange-200' : 'bg-orange-50 border border-orange-100 hover:border-orange-200'}`}>
-          <div className="flex items-center gap-1.5 text-xs font-semibold text-orange-700 mb-1"><Clock size={12} /> {alertCounts['approaching-lfd']} Approaching LFD</div>
-          <p className="text-[10px] text-orange-600">Containers nearing deadline</p>
-        </div>
-        <div onClick={() => setAlertFilter(alertFilter === 'lfd' ? null : 'lfd')} className={`cursor-pointer rounded-lg p-3 transition-all ${alertFilter === 'lfd' ? 'bg-red-100 border-2 border-red-300 ring-1 ring-red-200' : 'bg-red-50 border border-red-100 hover:border-red-200'}`}>
-          <div className="flex items-center gap-1.5 text-xs font-semibold text-red-700 mb-1"><AlertTriangle size={12} /> {alertCounts.lfd} LFD Exceeded</div>
-          <p className="text-[10px] text-red-600">Containers past last free day</p>
-        </div>
-        <div onClick={() => setAlertFilter(alertFilter === 'wh-receiving' ? null : 'wh-receiving')} className={`cursor-pointer rounded-lg p-3 transition-all ${alertFilter === 'wh-receiving' ? 'bg-blue-100 border-2 border-blue-300 ring-1 ring-blue-200' : 'bg-blue-50 border border-blue-100 hover:border-blue-200'}`}>
-          <div className="flex items-center gap-1.5 text-xs font-semibold text-blue-700 mb-1"><Warehouse size={12} /> {alertCounts['wh-receiving']} Warehouse Receiving</div>
-          <p className="text-[10px] text-blue-600">Scheduled this week</p>
+
+        {/* Right: Risk & Alert Cards */}
+        <div className="grid grid-cols-2 gap-2 w-[340px] shrink-0">
+          <div onClick={() => setAlertFilter(alertFilter === 'customs' ? null : 'customs')} className={`cursor-pointer rounded-lg p-2.5 transition-all ${alertFilter === 'customs' ? 'bg-amber-100 border-2 border-amber-300 ring-1 ring-amber-200' : 'bg-amber-50 border border-amber-100 hover:border-amber-200'}`}>
+            <div className="flex items-center gap-1.5 text-[11px] font-semibold text-amber-700 mb-0.5"><FileCheck size={11} /> {alertCounts.customs} Customs Hold</div>
+            <p className="text-[9px] text-amber-600">Awaiting clearance</p>
+          </div>
+          <div onClick={() => setAlertFilter(alertFilter === 'approaching-lfd' ? null : 'approaching-lfd')} className={`cursor-pointer rounded-lg p-2.5 transition-all ${alertFilter === 'approaching-lfd' ? 'bg-orange-100 border-2 border-orange-300 ring-1 ring-orange-200' : 'bg-orange-50 border border-orange-100 hover:border-orange-200'}`}>
+            <div className="flex items-center gap-1.5 text-[11px] font-semibold text-orange-700 mb-0.5"><Clock size={11} /> {alertCounts['approaching-lfd']} Approaching LFD</div>
+            <p className="text-[9px] text-orange-600">Nearing deadline</p>
+          </div>
+          <div onClick={() => setAlertFilter(alertFilter === 'lfd' ? null : 'lfd')} className={`cursor-pointer rounded-lg p-2.5 transition-all ${alertFilter === 'lfd' ? 'bg-red-100 border-2 border-red-300 ring-1 ring-red-200' : 'bg-red-50 border border-red-100 hover:border-red-200'}`}>
+            <div className="flex items-center gap-1.5 text-[11px] font-semibold text-red-700 mb-0.5"><AlertTriangle size={11} /> {alertCounts.lfd} LFD Exceeded</div>
+            <p className="text-[9px] text-red-600">Past last free day</p>
+          </div>
+          <div onClick={() => setAlertFilter(alertFilter === 'wh-receiving' ? null : 'wh-receiving')} className={`cursor-pointer rounded-lg p-2.5 transition-all ${alertFilter === 'wh-receiving' ? 'bg-blue-100 border-2 border-blue-300 ring-1 ring-blue-200' : 'bg-blue-50 border border-blue-100 hover:border-blue-200'}`}>
+            <div className="flex items-center gap-1.5 text-[11px] font-semibold text-blue-700 mb-0.5"><Warehouse size={11} /> {alertCounts['wh-receiving']} WH Receiving</div>
+            <p className="text-[9px] text-blue-600">Scheduled this week</p>
+          </div>
         </div>
       </div>
       {alertFilter && <p className="text-[10px] text-gray-400 mb-2">Filtered by: <span className="font-medium text-gray-600">{alertFilter === 'lfd' ? 'LFD Exceeded' : alertFilter === 'customs' ? 'Customs Hold' : alertFilter === 'approaching-lfd' ? 'Approaching LFD' : 'Warehouse Receiving'}</span> &middot; <button onClick={() => setAlertFilter(null)} className="text-primary-600 hover:underline">Clear filter</button></p>}
