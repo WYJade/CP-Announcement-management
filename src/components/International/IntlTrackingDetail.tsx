@@ -202,17 +202,81 @@ export default function IntlTrackingDetail() {
                 <div className="mt-3"><p className="text-[9px] text-gray-400 uppercase">Weight</p><p className="text-base font-bold text-gray-900">{D.totalWeight}</p><p className="text-[9px] text-gray-400">40HC</p></div>
               </div>
 
-              {/* Live Map */}
+              {/* Shipment Route Map */}
               <div data-tour="live-map" className="border-t border-gray-200 pt-3">
-                <p className="text-[9px] text-gray-400 uppercase font-semibold mb-2">Live Map</p>
+                <p className="text-[9px] text-gray-400 uppercase font-semibold mb-2">Shipment Route Map</p>
                 <div className="bg-white border border-gray-200 rounded-lg overflow-hidden relative" style={{ height: '280px' }}>
-                  {/* Embedded real map - OpenStreetMap tile view centered on Pacific (Asia to US) */}
-                  <iframe
-                    src="https://www.openstreetmap.org/export/embed.html?bbox=90.0%2C5.0%2C-60.0%2C55.0&layer=mapnik"
-                    className="w-full h-full border-0"
-                    style={{ pointerEvents: 'auto' }}
-                    title="Shipment Route Map"
-                  />
+                  {/* SVG Route Map with location points */}
+                  <div className="w-full h-full bg-gradient-to-br from-blue-50 to-cyan-50 relative overflow-hidden">
+                    <svg viewBox="0 0 600 260" className="w-full h-full" preserveAspectRatio="xMidYMid meet">
+                      {/* Ocean background */}
+                      <rect x="0" y="0" width="600" height="260" fill="#EFF6FF" />
+                      {/* Simplified land masses */}
+                      {/* Asia (left) */}
+                      <path d="M 20 60 Q 50 40 80 55 Q 100 65 110 90 Q 115 110 105 130 Q 95 145 85 155 L 60 160 Q 40 150 30 130 Q 20 100 20 60 Z" fill="#E2E8F0" stroke="#CBD5E1" strokeWidth="0.5" />
+                      {/* North America (right) */}
+                      <path d="M 400 30 Q 440 25 480 35 Q 520 45 550 60 Q 575 80 580 110 Q 580 140 570 160 Q 555 180 530 195 Q 500 205 470 210 Q 440 200 420 180 Q 405 160 400 130 Q 395 100 398 70 Q 400 50 400 30 Z" fill="#E2E8F0" stroke="#CBD5E1" strokeWidth="0.5" />
+
+                      {/* Route line - curved path across ocean */}
+                      <path d="M 85 110 C 160 80 280 65 370 95 Q 420 110 460 130 L 500 145 L 520 155" fill="none" stroke="#6366F1" strokeWidth="2" strokeDasharray="6 3" opacity="0.7" />
+                      {/* Drayage route on land */}
+                      <path d="M 460 130 L 500 145 L 520 155" fill="none" stroke="#8B5CF6" strokeWidth="2" opacity="0.8" />
+
+                      {/* Animated ship indicator on route */}
+                      <circle cx="370" cy="95" r="4" fill="#6366F1" opacity="0.3">
+                        <animate attributeName="opacity" values="0.3;0.8;0.3" dur="2s" repeatCount="indefinite" />
+                      </circle>
+
+                      {/* Route Points */}
+                      {/* Point 1: Haiphong, VN (Origin) */}
+                      <circle cx="85" cy="110" r="6" fill="#3B82F6" stroke="white" strokeWidth="2" />
+                      <circle cx="85" cy="110" r="3" fill="white" />
+                      {/* Label */}
+                      <rect x="55" y="120" width="75" height="30" rx="3" fill="white" stroke="#CBD5E1" strokeWidth="0.5" opacity="0.95" />
+                      <text x="92" y="132" textAnchor="middle" className="text-[8px]" fill="#1E40AF" fontWeight="600" fontSize="8">Haiphong, VN</text>
+                      <text x="92" y="143" textAnchor="middle" fill="#6B7280" fontSize="6.5">Origin · Booked</text>
+
+                      {/* Point 2: Savannah, GA (POD) */}
+                      <circle cx="460" cy="130" r="6" fill="#14B8A6" stroke="white" strokeWidth="2" />
+                      <circle cx="460" cy="130" r="3" fill="white" />
+                      {/* Label */}
+                      <rect x="420" y="100" width="85" height="30" rx="3" fill="white" stroke="#CBD5E1" strokeWidth="0.5" opacity="0.95" />
+                      <text x="462" y="112" textAnchor="middle" fill="#0F766E" fontWeight="600" fontSize="8">Savannah, GA</text>
+                      <text x="462" y="123" textAnchor="middle" fill="#6B7280" fontSize="6.5">POD · Customs Released</text>
+
+                      {/* Point 3: Garden City Terminal */}
+                      <circle cx="500" cy="145" r="5" fill="#8B5CF6" stroke="white" strokeWidth="2" />
+                      <circle cx="500" cy="145" r="2.5" fill="white" />
+                      {/* Label */}
+                      <rect x="505" y="133" width="90" height="30" rx="3" fill="white" stroke="#CBD5E1" strokeWidth="0.5" opacity="0.95" />
+                      <text x="550" y="145" textAnchor="middle" fill="#6D28D9" fontWeight="600" fontSize="7.5">Garden City Terminal</text>
+                      <text x="550" y="156" textAnchor="middle" fill="#6B7280" fontSize="6.5">Dispatched · OFD</text>
+
+                      {/* Point 4: UNIS Seabrook (Destination) */}
+                      <circle cx="520" cy="155" r="6" fill="#22C55E" stroke="white" strokeWidth="2" />
+                      <circle cx="520" cy="155" r="3" fill="white" />
+                      {/* Label */}
+                      <rect x="505" y="162" width="85" height="30" rx="3" fill="white" stroke="#CBD5E1" strokeWidth="0.5" opacity="0.95" />
+                      <text x="547" y="174" textAnchor="middle" fill="#166534" fontWeight="600" fontSize="7.5">UNIS Seabrook</text>
+                      <text x="547" y="185" textAnchor="middle" fill="#6B7280" fontSize="6.5">Destination · Pending</text>
+
+                      {/* Legend */}
+                      <rect x="10" y="225" width="190" height="30" rx="4" fill="white" opacity="0.9" stroke="#E5E7EB" strokeWidth="0.5" />
+                      <circle cx="22" cy="237" r="3" fill="#3B82F6" />
+                      <text x="28" y="240" fill="#374151" fontSize="7">Origin</text>
+                      <circle cx="65" cy="237" r="3" fill="#14B8A6" />
+                      <text x="71" y="240" fill="#374151" fontSize="7">Customs</text>
+                      <circle cx="115" cy="237" r="3" fill="#8B5CF6" />
+                      <text x="121" y="240" fill="#374151" fontSize="7">Drayage</text>
+                      <circle cx="165" cy="237" r="3" fill="#22C55E" />
+                      <text x="171" y="240" fill="#374151" fontSize="7">Dest</text>
+
+                      <circle cx="22" cy="248" r="2" fill="#6366F1" />
+                      <text x="28" y="251" fill="#6B7280" fontSize="6">--- Sea Route</text>
+                      <line x1="80" y1="248" x2="100" y2="248" stroke="#8B5CF6" strokeWidth="1.5" />
+                      <text x="104" y="251" fill="#6B7280" fontSize="6">Land Route</text>
+                    </svg>
+                  </div>
 
                   {/* Expand to fullscreen button + zoom controls */}
                   <div className="absolute top-2 right-2 flex flex-col bg-white border border-gray-300 rounded shadow-sm">
@@ -490,15 +554,73 @@ export default function IntlTrackingDetail() {
         <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4" onClick={() => setMapFullscreen(false)}>
           <div className="bg-white rounded-xl shadow-2xl w-full h-full max-w-[95vw] max-h-[95vh] overflow-hidden relative" onClick={e => e.stopPropagation()}>
             <div className="px-4 py-3 border-b flex items-center justify-between bg-white">
-              <h3 className="text-sm font-semibold text-gray-900">Live Map — Shipment Route</h3>
+              <h3 className="text-sm font-semibold text-gray-900">Shipment Route Map</h3>
               <button onClick={() => setMapFullscreen(false)} className="text-gray-400 hover:text-gray-600 text-sm font-medium">Close</button>
             </div>
-            <iframe
-              src="https://www.openstreetmap.org/export/embed.html?bbox=90.0%2C5.0%2C-60.0%2C55.0&layer=mapnik"
-              className="w-full border-0"
-              style={{ height: 'calc(100% - 48px)' }}
-              title="Shipment Route Map Fullscreen"
-            />
+            <div className="w-full bg-gradient-to-br from-blue-50 to-cyan-50" style={{ height: 'calc(100% - 48px)' }}>
+              <svg viewBox="0 0 900 400" className="w-full h-full" preserveAspectRatio="xMidYMid meet">
+                {/* Ocean background */}
+                <rect x="0" y="0" width="900" height="400" fill="#EFF6FF" />
+                {/* Asia */}
+                <path d="M 30 80 Q 70 50 120 75 Q 160 90 170 130 Q 175 165 160 195 Q 140 220 120 235 L 80 240 Q 50 225 35 195 Q 25 150 30 80 Z" fill="#E2E8F0" stroke="#CBD5E1" strokeWidth="0.8" />
+                {/* North America */}
+                <path d="M 580 40 Q 640 30 720 50 Q 780 70 830 95 Q 870 120 875 165 Q 875 210 855 245 Q 830 275 790 300 Q 740 320 690 325 Q 640 315 600 285 Q 575 255 570 210 Q 565 160 568 110 Q 572 70 580 40 Z" fill="#E2E8F0" stroke="#CBD5E1" strokeWidth="0.8" />
+
+                {/* Sea route */}
+                <path d="M 130 155 C 250 110 420 90 560 140 Q 630 165 690 195 L 750 220 L 780 235" fill="none" stroke="#6366F1" strokeWidth="2.5" strokeDasharray="8 4" opacity="0.7" />
+                {/* Land route */}
+                <path d="M 690 195 L 750 220 L 780 235" fill="none" stroke="#8B5CF6" strokeWidth="2.5" opacity="0.8" />
+
+                {/* Ship animation */}
+                <circle cx="420" cy="105" r="6" fill="#6366F1" opacity="0.3">
+                  <animate attributeName="opacity" values="0.3;0.8;0.3" dur="2s" repeatCount="indefinite" />
+                </circle>
+                <text x="420" y="95" textAnchor="middle" fill="#4F46E5" fontSize="14">🚢</text>
+
+                {/* Point 1: Haiphong, VN */}
+                <circle cx="130" cy="155" r="9" fill="#3B82F6" stroke="white" strokeWidth="3" />
+                <circle cx="130" cy="155" r="4" fill="white" />
+                <rect x="80" y="170" width="110" height="42" rx="4" fill="white" stroke="#BFDBFE" strokeWidth="1" />
+                <text x="135" y="185" textAnchor="middle" fill="#1E40AF" fontWeight="700" fontSize="11">Haiphong, VN</text>
+                <text x="135" y="200" textAnchor="middle" fill="#6B7280" fontSize="9">Origin · Booked Apr 15</text>
+
+                {/* Point 2: Savannah, GA */}
+                <circle cx="690" cy="195" r="9" fill="#14B8A6" stroke="white" strokeWidth="3" />
+                <circle cx="690" cy="195" r="4" fill="white" />
+                <rect x="630" y="145" width="125" height="42" rx="4" fill="white" stroke="#99F6E4" strokeWidth="1" />
+                <text x="692" y="160" textAnchor="middle" fill="#0F766E" fontWeight="700" fontSize="11">Savannah, GA</text>
+                <text x="692" y="175" textAnchor="middle" fill="#6B7280" fontSize="9">POD · Customs Released Jun 10</text>
+
+                {/* Point 3: Garden City Terminal */}
+                <circle cx="750" cy="220" r="8" fill="#8B5CF6" stroke="white" strokeWidth="3" />
+                <circle cx="750" cy="220" r="3.5" fill="white" />
+                <rect x="762" y="205" width="130" height="42" rx="4" fill="white" stroke="#DDD6FE" strokeWidth="1" />
+                <text x="827" y="220" textAnchor="middle" fill="#6D28D9" fontWeight="700" fontSize="10">Garden City Terminal</text>
+                <text x="827" y="235" textAnchor="middle" fill="#6B7280" fontSize="9">Dispatched Jun 15 07:30</text>
+
+                {/* Point 4: UNIS Seabrook */}
+                <circle cx="780" cy="235" r="9" fill="#22C55E" stroke="white" strokeWidth="3" />
+                <circle cx="780" cy="235" r="4" fill="white" />
+                <rect x="725" y="250" width="120" height="42" rx="4" fill="white" stroke="#BBF7D0" strokeWidth="1" />
+                <text x="785" y="265" textAnchor="middle" fill="#166534" fontWeight="700" fontSize="10">UNIS Seabrook</text>
+                <text x="785" y="280" textAnchor="middle" fill="#6B7280" fontSize="9">Destination · ETA Jun 19</text>
+
+                {/* Legend */}
+                <rect x="15" y="350" width="280" height="40" rx="5" fill="white" opacity="0.95" stroke="#E5E7EB" strokeWidth="0.8" />
+                <circle cx="30" cy="367" r="4" fill="#3B82F6" />
+                <text x="38" y="370" fill="#374151" fontSize="10">Origin</text>
+                <circle cx="90" cy="367" r="4" fill="#14B8A6" />
+                <text x="98" y="370" fill="#374151" fontSize="10">Customs/POD</text>
+                <circle cx="175" cy="367" r="4" fill="#8B5CF6" />
+                <text x="183" y="370" fill="#374151" fontSize="10">Drayage</text>
+                <circle cx="240" cy="367" r="4" fill="#22C55E" />
+                <text x="248" y="370" fill="#374151" fontSize="10">Destination</text>
+                <line x1="30" y1="382" x2="55" y2="382" stroke="#6366F1" strokeWidth="2" strokeDasharray="4 2" />
+                <text x="60" y="385" fill="#6B7280" fontSize="9">Sea Route</text>
+                <line x1="120" y1="382" x2="145" y2="382" stroke="#8B5CF6" strokeWidth="2" />
+                <text x="150" y="385" fill="#6B7280" fontSize="9">Land Route</text>
+              </svg>
+            </div>
           </div>
         </div>
       )}
