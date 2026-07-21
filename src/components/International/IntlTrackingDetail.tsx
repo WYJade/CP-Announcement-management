@@ -366,7 +366,7 @@ export default function IntlTrackingDetail() {
                       <div className="flex-1 pb-1">
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="text-sm font-bold text-gray-900">{phase.phase}</span>
-                          {phase.id && <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${colors.lightBg} ${colors.text}`}>{phase.id}</span>}
+                          {phase.id && (phase.completed || phase.active) && <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${colors.lightBg} ${colors.text}`}>{phase.id}</span>}
                           {(phase.completed || phase.active) && (
                             <span className={`text-[9px] px-2 py-0.5 rounded-full font-semibold border ${phase.completed ? 'bg-green-50 text-green-600 border-green-200' : `${colors.lightBg} ${colors.text} ${colors.border}`}`}>
                               {phase.completed ? 'Completed' : 'In Progress'}
@@ -401,7 +401,7 @@ export default function IntlTrackingDetail() {
                               )}
                             </div>
                             <span className="flex items-center gap-0.5 text-[10px] text-gray-400 shrink-0 whitespace-nowrap">
-                              <Clock size={9} />{node.date}
+                              {(phase.completed || phase.active) && <><Clock size={9} />{node.date}</>}
                             </span>
                           </div>
                         </div>
