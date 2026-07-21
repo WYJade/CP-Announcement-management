@@ -232,33 +232,37 @@ export default function IntlTrackingDetail() {
                       <circle cx="85" cy="110" r="6" fill="#3B82F6" stroke="white" strokeWidth="2" />
                       <circle cx="85" cy="110" r="3" fill="white" />
                       {/* Label */}
-                      <rect x="55" y="120" width="75" height="30" rx="3" fill="white" stroke="#CBD5E1" strokeWidth="0.5" opacity="0.95" />
-                      <text x="92" y="132" textAnchor="middle" className="text-[8px]" fill="#1E40AF" fontWeight="600" fontSize="8">Haiphong, VN</text>
-                      <text x="92" y="143" textAnchor="middle" fill="#6B7280" fontSize="6.5">Origin · Booked</text>
+                      <rect x="45" y="118" width="95" height="36" rx="3" fill="white" stroke="#CBD5E1" strokeWidth="0.5" opacity="0.95" />
+                      <text x="92" y="130" textAnchor="middle" fill="#1E40AF" fontWeight="600" fontSize="8">Haiphong, VN</text>
+                      <text x="92" y="139" textAnchor="middle" fill="#6B7280" fontSize="6">Origin · Booked</text>
+                      <text x="92" y="148" textAnchor="middle" fill="#9CA3AF" fontSize="5.5">2026-04-15 10:30</text>
 
                       {/* Point 2: Savannah, GA (POD) */}
                       <circle cx="460" cy="130" r="6" fill="#14B8A6" stroke="white" strokeWidth="2" />
                       <circle cx="460" cy="130" r="3" fill="white" />
                       {/* Label */}
-                      <rect x="420" y="100" width="85" height="30" rx="3" fill="white" stroke="#CBD5E1" strokeWidth="0.5" opacity="0.95" />
-                      <text x="462" y="112" textAnchor="middle" fill="#0F766E" fontWeight="600" fontSize="8">Savannah, GA</text>
-                      <text x="462" y="123" textAnchor="middle" fill="#6B7280" fontSize="6.5">POD · Customs Released</text>
+                      <rect x="415" y="95" width="95" height="36" rx="3" fill="white" stroke="#CBD5E1" strokeWidth="0.5" opacity="0.95" />
+                      <text x="462" y="107" textAnchor="middle" fill="#0F766E" fontWeight="600" fontSize="8">Savannah, GA</text>
+                      <text x="462" y="116" textAnchor="middle" fill="#6B7280" fontSize="6">Customs Released</text>
+                      <text x="462" y="125" textAnchor="middle" fill="#9CA3AF" fontSize="5.5">2026-06-10 16:45</text>
 
                       {/* Point 3: Garden City Terminal */}
                       <circle cx="500" cy="145" r="5" fill="#8B5CF6" stroke="white" strokeWidth="2" />
                       <circle cx="500" cy="145" r="2.5" fill="white" />
                       {/* Label */}
-                      <rect x="505" y="133" width="90" height="30" rx="3" fill="white" stroke="#CBD5E1" strokeWidth="0.5" opacity="0.95" />
-                      <text x="550" y="145" textAnchor="middle" fill="#6D28D9" fontWeight="600" fontSize="7.5">Garden City Terminal</text>
-                      <text x="550" y="156" textAnchor="middle" fill="#6B7280" fontSize="6.5">Dispatched · OFD</text>
+                      <rect x="510" y="131" width="90" height="36" rx="3" fill="white" stroke="#CBD5E1" strokeWidth="0.5" opacity="0.95" />
+                      <text x="555" y="143" textAnchor="middle" fill="#6D28D9" fontWeight="600" fontSize="7.5">Garden City Terminal</text>
+                      <text x="555" y="152" textAnchor="middle" fill="#6B7280" fontSize="6">Dispatched</text>
+                      <text x="555" y="161" textAnchor="middle" fill="#9CA3AF" fontSize="5.5">2026-06-15 07:30</text>
 
                       {/* Point 4: UNIS Seabrook (Destination) */}
                       <circle cx="520" cy="155" r="6" fill="#22C55E" stroke="white" strokeWidth="2" />
                       <circle cx="520" cy="155" r="3" fill="white" />
                       {/* Label */}
-                      <rect x="505" y="162" width="85" height="30" rx="3" fill="white" stroke="#CBD5E1" strokeWidth="0.5" opacity="0.95" />
-                      <text x="547" y="174" textAnchor="middle" fill="#166534" fontWeight="600" fontSize="7.5">UNIS Seabrook</text>
-                      <text x="547" y="185" textAnchor="middle" fill="#6B7280" fontSize="6.5">Destination · Pending</text>
+                      <rect x="500" y="164" width="95" height="36" rx="3" fill="white" stroke="#CBD5E1" strokeWidth="0.5" opacity="0.95" />
+                      <text x="547" y="176" textAnchor="middle" fill="#166534" fontWeight="600" fontSize="7.5">UNIS Seabrook</text>
+                      <text x="547" y="185" textAnchor="middle" fill="#6B7280" fontSize="6">Destination · Receiving</text>
+                      <text x="547" y="194" textAnchor="middle" fill="#9CA3AF" fontSize="5.5">ETA 2026-06-21 09:00</text>
 
                       {/* Legend */}
                       <rect x="10" y="225" width="190" height="30" rx="4" fill="white" opacity="0.9" stroke="#E5E7EB" strokeWidth="0.5" />
@@ -582,30 +586,34 @@ export default function IntlTrackingDetail() {
                 {/* Point 1: Haiphong, VN */}
                 <circle cx="130" cy="155" r="9" fill="#3B82F6" stroke="white" strokeWidth="3" />
                 <circle cx="130" cy="155" r="4" fill="white" />
-                <rect x="80" y="170" width="110" height="42" rx="4" fill="white" stroke="#BFDBFE" strokeWidth="1" />
-                <text x="135" y="185" textAnchor="middle" fill="#1E40AF" fontWeight="700" fontSize="11">Haiphong, VN</text>
-                <text x="135" y="200" textAnchor="middle" fill="#6B7280" fontSize="9">Origin · Booked Apr 15</text>
+                <rect x="70" y="170" width="125" height="50" rx="4" fill="white" stroke="#BFDBFE" strokeWidth="1" />
+                <text x="132" y="186" textAnchor="middle" fill="#1E40AF" fontWeight="700" fontSize="11">Haiphong, VN</text>
+                <text x="132" y="200" textAnchor="middle" fill="#6B7280" fontSize="9">Origin · Booked</text>
+                <text x="132" y="213" textAnchor="middle" fill="#9CA3AF" fontSize="8">2026-04-15 10:30</text>
 
                 {/* Point 2: Savannah, GA */}
                 <circle cx="690" cy="195" r="9" fill="#14B8A6" stroke="white" strokeWidth="3" />
                 <circle cx="690" cy="195" r="4" fill="white" />
-                <rect x="630" y="145" width="125" height="42" rx="4" fill="white" stroke="#99F6E4" strokeWidth="1" />
-                <text x="692" y="160" textAnchor="middle" fill="#0F766E" fontWeight="700" fontSize="11">Savannah, GA</text>
-                <text x="692" y="175" textAnchor="middle" fill="#6B7280" fontSize="9">POD · Customs Released Jun 10</text>
+                <rect x="625" y="140" width="135" height="50" rx="4" fill="white" stroke="#99F6E4" strokeWidth="1" />
+                <text x="692" y="156" textAnchor="middle" fill="#0F766E" fontWeight="700" fontSize="11">Savannah, GA</text>
+                <text x="692" y="170" textAnchor="middle" fill="#6B7280" fontSize="9">Customs Released</text>
+                <text x="692" y="183" textAnchor="middle" fill="#9CA3AF" fontSize="8">2026-06-10 16:45</text>
 
                 {/* Point 3: Garden City Terminal */}
                 <circle cx="750" cy="220" r="8" fill="#8B5CF6" stroke="white" strokeWidth="3" />
                 <circle cx="750" cy="220" r="3.5" fill="white" />
-                <rect x="762" y="205" width="130" height="42" rx="4" fill="white" stroke="#DDD6FE" strokeWidth="1" />
-                <text x="827" y="220" textAnchor="middle" fill="#6D28D9" fontWeight="700" fontSize="10">Garden City Terminal</text>
-                <text x="827" y="235" textAnchor="middle" fill="#6B7280" fontSize="9">Dispatched Jun 15 07:30</text>
+                <rect x="767" y="200" width="130" height="50" rx="4" fill="white" stroke="#DDD6FE" strokeWidth="1" />
+                <text x="832" y="216" textAnchor="middle" fill="#6D28D9" fontWeight="700" fontSize="10">Garden City Terminal</text>
+                <text x="832" y="230" textAnchor="middle" fill="#6B7280" fontSize="9">Dispatched</text>
+                <text x="832" y="243" textAnchor="middle" fill="#9CA3AF" fontSize="8">2026-06-15 07:30</text>
 
                 {/* Point 4: UNIS Seabrook */}
                 <circle cx="780" cy="235" r="9" fill="#22C55E" stroke="white" strokeWidth="3" />
                 <circle cx="780" cy="235" r="4" fill="white" />
-                <rect x="725" y="250" width="120" height="42" rx="4" fill="white" stroke="#BBF7D0" strokeWidth="1" />
-                <text x="785" y="265" textAnchor="middle" fill="#166534" fontWeight="700" fontSize="10">UNIS Seabrook</text>
-                <text x="785" y="280" textAnchor="middle" fill="#6B7280" fontSize="9">Destination · ETA Jun 19</text>
+                <rect x="720" y="250" width="130" height="50" rx="4" fill="white" stroke="#BBF7D0" strokeWidth="1" />
+                <text x="785" y="266" textAnchor="middle" fill="#166534" fontWeight="700" fontSize="10">UNIS Seabrook</text>
+                <text x="785" y="280" textAnchor="middle" fill="#6B7280" fontSize="9">Destination · Receiving</text>
+                <text x="785" y="293" textAnchor="middle" fill="#9CA3AF" fontSize="8">ETA 2026-06-21 09:00</text>
 
                 {/* Legend */}
                 <rect x="15" y="350" width="280" height="40" rx="5" fill="white" opacity="0.95" stroke="#E5E7EB" strokeWidth="0.8" />
