@@ -363,9 +363,11 @@ export default function IntlTrackingDetail() {
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="text-sm font-bold text-gray-900">{phase.phase}</span>
                           {phase.id && <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${colors.lightBg} ${colors.text}`}>{phase.id}</span>}
-                          <span className={`text-[9px] px-2 py-0.5 rounded-full font-semibold border ${phase.completed ? 'bg-green-50 text-green-600 border-green-200' : phase.active ? `${colors.lightBg} ${colors.text} ${colors.border}` : 'bg-gray-50 text-gray-400 border-gray-200'}`}>
-                            {phase.completed ? 'Completed' : phase.active ? 'In Progress' : 'Pending'}
-                          </span>
+                          {(phase.completed || phase.active) && (
+                            <span className={`text-[9px] px-2 py-0.5 rounded-full font-semibold border ${phase.completed ? 'bg-green-50 text-green-600 border-green-200' : `${colors.lightBg} ${colors.text} ${colors.border}`}`}>
+                              {phase.completed ? 'Completed' : 'In Progress'}
+                            </span>
+                          )}
                         </div>
                       </div>
                     </div>
