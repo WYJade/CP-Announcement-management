@@ -29,13 +29,14 @@ const D = {
 }
 
 // ─── Phase & Status Color System ─────────────────────────────────────────────
-type PhaseKey = 'ocean' | 'customs' | 'drayage' | 'warehouse'
+type PhaseKey = 'ocean' | 'customs' | 'drayage' | 'appointment' | 'warehouse'
 
 const PHASE_COLORS: Record<PhaseKey, { bg: string; border: string; text: string; lightBg: string; dot: string; line: string; badge: string }> = {
-  ocean:     { bg: 'bg-blue-500',   border: 'border-blue-400',   text: 'text-blue-700',   lightBg: 'bg-blue-50',   dot: 'bg-blue-400',   line: 'bg-blue-200', badge: 'bg-blue-100 text-blue-700 border-blue-200' },
-  customs:   { bg: 'bg-teal-500',   border: 'border-teal-400',   text: 'text-teal-700',   lightBg: 'bg-teal-50',   dot: 'bg-teal-400',   line: 'bg-teal-200', badge: 'bg-teal-100 text-teal-700 border-teal-200' },
-  drayage:   { bg: 'bg-violet-500', border: 'border-violet-400', text: 'text-violet-700', lightBg: 'bg-violet-50', dot: 'bg-violet-400', line: 'bg-violet-200', badge: 'bg-violet-100 text-violet-700 border-violet-200' },
-  warehouse: { bg: 'bg-green-500',  border: 'border-green-400',  text: 'text-green-700',  lightBg: 'bg-green-50',  dot: 'bg-green-400',  line: 'bg-green-200', badge: 'bg-green-100 text-green-700 border-green-200' },
+  ocean:       { bg: 'bg-blue-500',   border: 'border-blue-400',   text: 'text-blue-700',   lightBg: 'bg-blue-50',   dot: 'bg-blue-400',   line: 'bg-blue-200',   badge: 'bg-blue-100 text-blue-700 border-blue-200' },
+  customs:     { bg: 'bg-teal-500',   border: 'border-teal-400',   text: 'text-teal-700',   lightBg: 'bg-teal-50',   dot: 'bg-teal-400',   line: 'bg-teal-200',   badge: 'bg-teal-100 text-teal-700 border-teal-200' },
+  drayage:     { bg: 'bg-violet-500', border: 'border-violet-400', text: 'text-violet-700', lightBg: 'bg-violet-50', dot: 'bg-violet-400', line: 'bg-violet-200', badge: 'bg-violet-100 text-violet-700 border-violet-200' },
+  appointment: { bg: 'bg-orange-500', border: 'border-orange-400', text: 'text-orange-700', lightBg: 'bg-orange-50', dot: 'bg-orange-400', line: 'bg-orange-200', badge: 'bg-orange-100 text-orange-700 border-orange-200' },
+  warehouse:   { bg: 'bg-green-500',  border: 'border-green-400',  text: 'text-green-700',  lightBg: 'bg-green-50',  dot: 'bg-green-400',  line: 'bg-green-200',  badge: 'bg-green-100 text-green-700 border-green-200' },
 }
 
 interface StatusNode {
@@ -53,6 +54,7 @@ interface PhaseNode {
   completed: boolean
   active: boolean
   statuses: StatusNode[]
+  apptInfo?: string
 }
 
 // Timeline data - all dates include hour:minute
@@ -90,7 +92,18 @@ const TIMELINE_PHASES: PhaseNode[] = [
       { status: 'Dispatched', date: 'Jun 15, 2026 07:30', location: 'Garden City Terminal', completed: true, active: false },
       { status: 'OFD', date: 'Jun 19, 2026 06:00 (ETA)', location: 'Enroute to UNIS Seabrook', completed: false, active: true },
       { status: 'Delivered', date: 'TBD', location: 'UNIS Seabrook', completed: false, active: false },
-      { status: 'Returned', date: 'TBD', location: 'SSL Empty Return', completed: false, active: false },
+    ]
+  },
+  {
+    phase: 'Warehouse Appointment',
+    phaseKey: 'appointment',
+    id: 'APPT-6007808',
+    completed: false,
+    active: false,
+    apptInfo: 'APPT# APPT-6007808 | Scheduled: Jun 19, 10:00',
+    statuses: [
+      { status: 'Vehicle Arrived', date: 'TBD', location: 'UNIS Seabrook', completed: false, active: false },
+      { status: 'Unloading', date: 'TBD', location: 'UNIS Seabrook', completed: false, active: false },
     ]
   },
   {
@@ -323,10 +336,10 @@ export default function IntlTrackingDetail() {
               </div>
               <div className="flex items-center gap-3">
                 <span className="text-[10px] text-gray-400 font-semibold uppercase">Phase:</span>
-                {(['ocean', 'customs', 'drayage', 'warehouse'] as PhaseKey[]).map(k => (
+                {(['ocean', 'customs', 'drayage', 'appointment', 'warehouse'] as PhaseKey[]).map(k => (
                   <span key={k} className="flex items-center gap-1 text-[10px]">
                     <span className={`w-2 h-2 rounded-full ${PHASE_COLORS[k].bg}`} />
-                    <span className="text-gray-600">{k === 'ocean' ? 'Ocean' : k === 'customs' ? 'Customs' : k === 'drayage' ? 'Drayage' : 'Warehouse'}</span>
+                    <span className="text-gray-600">{k === 'ocean' ? 'Ocean' : k === 'customs' ? 'Customs' : k === 'drayage' ? 'Drayage' : k === 'appointment' ? 'Appt' : 'Warehouse'}</span>
                   </span>
                 ))}
               </div>
@@ -342,7 +355,7 @@ export default function IntlTrackingDetail() {
                 <div className="h-full bg-gradient-to-r from-blue-500 via-violet-500 to-green-500 rounded-full transition-all" style={{ width: `${D.progress}%` }} />
               </div>
               <div className="flex justify-between mt-2 text-[9px] text-gray-400 uppercase">
-                <span>Ocean</span><span>Customs</span><span>Drayage</span><span>Warehouse</span>
+                <span>Ocean</span><span>Customs</span><span>Drayage</span><span>Appt</span><span>Warehouse</span>
               </div>
             </div>
 
@@ -366,7 +379,10 @@ export default function IntlTrackingDetail() {
                       <div className="flex-1 pb-1">
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="text-sm font-bold text-gray-900">{phase.phase}</span>
-                          {phase.id && (phase.completed || phase.active) && <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${colors.lightBg} ${colors.text}`}>{phase.id}</span>}
+                          {phase.id && (phase.completed || phase.active) && !phase.apptInfo && <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${colors.lightBg} ${colors.text}`}>{phase.id}</span>}
+                          {phase.apptInfo && (
+                            <span className="text-[10px] font-mono text-orange-600 font-semibold">{phase.apptInfo}</span>
+                          )}
                           {(phase.completed || phase.active) && (
                             <span className={`text-[9px] px-2 py-0.5 rounded-full font-semibold border ${phase.completed ? 'bg-green-50 text-green-600 border-green-200' : `${colors.lightBg} ${colors.text} ${colors.border}`}`}>
                               {phase.completed ? 'Completed' : 'In Progress'}
@@ -377,7 +393,7 @@ export default function IntlTrackingDetail() {
                     </div>
 
                     {/* Status nodes */}
-                    <div className="ml-[18px] pl-[20px] border-l-2" style={{ borderColor: phase.completed ? (phase.phaseKey === 'ocean' ? '#93c5fd' : phase.phaseKey === 'customs' ? '#5eead4' : phase.phaseKey === 'drayage' ? '#c4b5fd' : '#86efac') : phase.active ? '#c4b5fd' : '#e5e7eb' }}>
+                    <div className="ml-[18px] pl-[20px] border-l-2" style={{ borderColor: phase.completed ? (phase.phaseKey === 'ocean' ? '#93c5fd' : phase.phaseKey === 'customs' ? '#5eead4' : phase.phaseKey === 'drayage' ? '#c4b5fd' : phase.phaseKey === 'appointment' ? '#fed7aa' : '#86efac') : phase.active ? (phase.phaseKey === 'drayage' ? '#c4b5fd' : phase.phaseKey === 'appointment' ? '#fed7aa' : '#86efac') : '#e5e7eb' }}>
                       {phase.statuses.map((node, ni) => (
                         <div key={ni} className="flex items-start py-2.5">
                           {/* Status dot */}
@@ -385,7 +401,7 @@ export default function IntlTrackingDetail() {
                             <div className={`w-3.5 h-3.5 rounded-full border-2 shrink-0 ${
                               node.completed ? `${colors.dot} border-transparent` : node.active ? `${colors.dot} border-transparent` : 'bg-white border-gray-300'
                             }`}>
-                              {node.active && <div className="absolute inset-0 rounded-full animate-ping opacity-20" style={{ backgroundColor: phase.phaseKey === 'ocean' ? '#60a5fa' : phase.phaseKey === 'customs' ? '#2dd4bf' : phase.phaseKey === 'drayage' ? '#a78bfa' : '#4ade80' }} />}
+                              {node.active && <div className="absolute inset-0 rounded-full animate-ping opacity-20" style={{ backgroundColor: phase.phaseKey === 'ocean' ? '#60a5fa' : phase.phaseKey === 'customs' ? '#2dd4bf' : phase.phaseKey === 'drayage' ? '#a78bfa' : phase.phaseKey === 'appointment' ? '#fb923c' : '#4ade80' }} />}
                             </div>
                           </div>
                           {/* Status content */}
@@ -394,7 +410,13 @@ export default function IntlTrackingDetail() {
                               <span className={`text-[11px] font-semibold px-2 py-0.5 rounded border whitespace-nowrap ${
                                 node.completed ? colors.badge : node.active ? colors.badge : 'bg-gray-50 text-gray-500 border-gray-200'
                               }`}>{node.status}</span>
-                              {node.location && (
+                              {node.status === 'Vehicle Arrived' && (
+                                <span className="text-[10px] text-gray-400">车辆已入场</span>
+                              )}
+                              {node.status === 'Unloading' && (
+                                <span className="text-[10px] text-gray-400">月台签到，开始卸货</span>
+                              )}
+                              {node.location && node.status !== 'Vehicle Arrived' && node.status !== 'Unloading' && (
                                 <span className="flex items-center gap-0.5 text-[10px] text-gray-400 truncate">
                                   <MapPin size={9} className="shrink-0" /><span className="truncate">{node.location}</span>
                                 </span>
