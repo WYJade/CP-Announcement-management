@@ -43,6 +43,8 @@ const SHIPMENT_DATA: ShipmentRecord[] = [
   { id: 'SSHAS2608320', shipmentNo: 'SSHAS2608320', hbl: 'SSHAS2608320', status: 'Delivered', containers: ['MRSU546732'], currentMilestone: 'Delivered to Warehouse', origin: 'Shenzhen, CN', destination: 'Savannah, US', eta: 'Jun 07, 2026', customer: 'VITA COCO', receivedTime: '-', lastUpdated: 'Jun 15, 2026 07:00', alerts: ['wh-receiving'] },
   { id: 'SSHAS2608330', shipmentNo: 'SSHAS2608330', hbl: 'SSHAS2608330', status: 'Available', containers: ['MAGU5754435'], currentMilestone: 'Container Available', origin: 'Qingdao, CN', destination: 'Long Beach, US', eta: 'Jun 09, 2026', customer: 'ORGAIN LLC', receivedTime: '-', lastUpdated: 'Jun 14, 2026 16:00', alerts: ['approaching-lfd'] },
   { id: 'SSHAS2608340', shipmentNo: 'SSHAS2608340', hbl: 'SSHAS2608340', status: 'Dispatched', containers: ['NYKU3736566'], currentMilestone: 'Dispatched to Warehouse', origin: 'Shanghai, CN', destination: 'Los Angeles, US', eta: 'Jun 10, 2026', customer: 'ADOORN LLC', receivedTime: '-', lastUpdated: 'Jun 15, 2026 10:00', alerts: ['approaching-lfd', 'wh-receiving'] },
+  { id: 'SSHAS2608350', shipmentNo: 'SSHAS2608350', hbl: 'SSHAS2608350', status: 'Vehicle Arrived', containers: ['TCKU1234567'], currentMilestone: 'Vehicle arrived, pre check-in complete', origin: 'Ningbo, CN', destination: 'Savannah, US', eta: 'Jun 16, 2026', customer: 'PLEASS GLOBAL', receivedTime: '-', lastUpdated: 'Jun 19, 2026 09:15', alerts: ['wh-receiving'] },
+  { id: 'SSHAS2608360', shipmentNo: 'SSHAS2608360', hbl: 'SSHAS2608360', status: 'Unloading', containers: ['MSCU9876543'], currentMilestone: 'Checked in at dock, unloading in progress', origin: 'Shanghai, CN', destination: 'Long Beach, US', eta: 'Jun 18, 2026', customer: 'VITA COCO', receivedTime: '-', lastUpdated: 'Jun 19, 2026 10:30', alerts: ['wh-receiving'] },
 ]
 
 const STATUS_TABS = [
@@ -55,6 +57,8 @@ const STATUS_TABS = [
   { key: 'Dispatched', label: 'Dispatched' },
   { key: 'OFD', label: 'OFD' },
   { key: 'Delivered', label: 'Delivered' },
+  { key: 'Vehicle Arrived', label: 'Vehicle Arrived' },
+  { key: 'Unloading', label: 'Unloading' },
   { key: 'Receiving', label: 'Receiving' },
   { key: 'Received', label: 'Received' },
 ]
@@ -68,6 +72,8 @@ function statusColor(status: string) {
   if (status === 'Dispatched') return 'bg-violet-100 text-violet-700'
   if (status === 'OFD') return 'bg-amber-100 text-amber-700'
   if (status === 'Delivered') return 'bg-emerald-100 text-emerald-700'
+  if (status === 'Vehicle Arrived') return 'bg-orange-100 text-orange-700'
+  if (status === 'Unloading') return 'bg-yellow-100 text-yellow-700'
   if (status === 'Receiving') return 'bg-lime-100 text-lime-700'
   if (status === 'Received') return 'bg-green-100 text-green-700'
   if (status === 'Completed') return 'bg-gray-100 text-gray-600'
@@ -85,6 +91,8 @@ function getStatusDescription(status: string): string {
     'Dispatched': 'Dispatched for delivery',
     'OFD': 'Out for final delivery',
     'Delivered': 'Successfully delivered to warehouse',
+    'Vehicle Arrived': 'Vehicle arrived at warehouse, pre check-in complete',
+    'Unloading': 'Checked in at dock, unloading in progress',
     'Receiving': 'Warehouse receiving in progress',
     'Received': 'Received and checked into warehouse',
   }
@@ -252,7 +260,7 @@ export default function ShipmentTracking() {
               className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border transition-all ${
                 activeTab === tab.key ? 'bg-gray-900 border-gray-900 text-white' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
               }`}>
-              {tab.key !== 'all' && <span className={`w-2 h-2 rounded-full ${statusColor(tab.key).split(' ')[0].replace('bg-', 'bg-')}`} style={{ backgroundColor: tab.key === 'Booked' ? '#6b7280' : tab.key === 'In Transit' ? '#3b82f6' : tab.key === 'Arrived' ? '#6366f1' : tab.key === 'Customs Released' ? '#14b8a6' : tab.key === 'Available' ? '#06b6d4' : tab.key === 'Dispatched' ? '#8b5cf6' : tab.key === 'OFD' ? '#f59e0b' : tab.key === 'Delivered' ? '#10b981' : tab.key === 'Receiving' ? '#84cc16' : '#22c55e' }} />}
+              {tab.key !== 'all' && <span className={`w-2 h-2 rounded-full ${statusColor(tab.key).split(' ')[0].replace('bg-', 'bg-')}`} style={{ backgroundColor: tab.key === 'Booked' ? '#6b7280' : tab.key === 'In Transit' ? '#3b82f6' : tab.key === 'Arrived' ? '#6366f1' : tab.key === 'Customs Released' ? '#14b8a6' : tab.key === 'Available' ? '#06b6d4' : tab.key === 'Dispatched' ? '#8b5cf6' : tab.key === 'OFD' ? '#f59e0b' : tab.key === 'Delivered' ? '#10b981' : tab.key === 'Vehicle Arrived' ? '#f97316' : tab.key === 'Unloading' ? '#eab308' : tab.key === 'Receiving' ? '#84cc16' : '#22c55e' }} />}
               {tab.label} <span className="text-[10px] opacity-70">{count}</span>
             </button>
           )
