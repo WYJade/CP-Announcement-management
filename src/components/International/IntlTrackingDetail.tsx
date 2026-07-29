@@ -410,12 +410,6 @@ export default function IntlTrackingDetail() {
                               <span className={`text-[11px] font-semibold px-2 py-0.5 rounded border whitespace-nowrap ${
                                 node.completed ? colors.badge : node.active ? colors.badge : 'bg-gray-50 text-gray-500 border-gray-200'
                               }`}>{node.status}</span>
-                              {node.status === 'Vehicle Arrived' && (
-                                <span className="text-[10px] text-gray-400">车辆已入场</span>
-                              )}
-                              {node.status === 'Unloading' && (
-                                <span className="text-[10px] text-gray-400">月台签到，开始卸货</span>
-                              )}
                               {node.location && (
                                 <span className="flex items-center gap-0.5 text-[10px] text-gray-400 truncate">
                                   <MapPin size={9} className="shrink-0" /><span className="truncate">{node.location}</span>
