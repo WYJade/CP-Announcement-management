@@ -416,7 +416,7 @@ export default function IntlTrackingDetail() {
                               {node.status === 'Unloading' && (
                                 <span className="text-[10px] text-gray-400">月台签到，开始卸货</span>
                               )}
-                              {node.location && node.status !== 'Vehicle Arrived' && node.status !== 'Unloading' && (
+                              {node.location && (
                                 <span className="flex items-center gap-0.5 text-[10px] text-gray-400 truncate">
                                   <MapPin size={9} className="shrink-0" /><span className="truncate">{node.location}</span>
                                 </span>
