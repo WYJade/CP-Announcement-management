@@ -7,6 +7,7 @@ import {
   MessageSquare,
   HelpCircle,
   Bot,
+  BarChart2,
 } from 'lucide-react'
 import { useI18n } from '../../context/I18nContext'
 
@@ -31,6 +32,14 @@ function Header() {
           <Bot size={15} className="text-violet-500 group-hover:text-violet-700 transition-colors" />
           <span className="text-xs font-medium text-violet-500 group-hover:text-violet-700 transition-colors">AI Agents</span>
         </a>
+        {/* Insights entry — right of AI Agents */}
+        <button
+          className="flex items-center gap-1 px-2 py-1 rounded-md hover:bg-gray-100 transition-colors group"
+          title="Insights"
+        >
+          <BarChart2 size={15} className="text-emerald-500 group-hover:text-emerald-700 transition-colors" />
+          <span className="text-xs font-medium text-emerald-500 group-hover:text-emerald-700 transition-colors">Insights</span>
+        </button>
       </div>
 
       {/* Right section */}
