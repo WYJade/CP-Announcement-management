@@ -234,7 +234,7 @@ const SEARCH_INDEX: SearchEntry[] = [
   // Inventory
   { label: 'Inventory Activity', parent: 'Inventory', path: '/inventory/activity', keywords: ['inventory', 'activity', 'stock'] },
   // Outbound
-  { label: 'Outbound Inquiry', parent: 'Outbound', path: '/outbound/inquiry', keywords: ['outbound', 'inquiry', 'shipment'] },
+  { label: 'Outbound Inquiry', parent: 'Outbound', path: '/outbound/inquiry', keywords: ['outbound', 'inquiry'] },
   { label: 'Freight Quote', parent: 'Outbound', path: '/outbound/freight-quote', keywords: ['freight', 'quote', 'outbound'] },
   // Supply Chain
   { label: 'Shipments', parent: 'Supply Chain Mgmt', path: '/shipping/shipments', keywords: ['shipments', 'supply chain'] },
