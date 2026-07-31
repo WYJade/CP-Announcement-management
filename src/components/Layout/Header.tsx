@@ -83,16 +83,19 @@ function Header() {
 
           {helpOpen && (
             <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50 overflow-hidden">
-              <button
-                onClick={() => { setHelpOpen(false) }}
+              <a
+                href="https://help.item.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setHelpOpen(false)}
                 className="w-full flex items-center gap-2.5 px-4 py-3 text-xs text-gray-700 hover:bg-gray-50 transition-colors border-b border-gray-100"
               >
                 <BookOpen size={13} className="text-indigo-400 shrink-0" />
                 <div className="text-left">
                   <p className="font-medium">Help Center</p>
-                  <p className="text-[10px] text-gray-400">Browse docs & guides</p>
+                  <p className="text-[10px] text-gray-400">Browse docs &amp; guides</p>
                 </div>
-              </button>
+              </a>
               <button
                 onClick={() => { navigate('/support/requests'); setHelpOpen(false) }}
                 className="w-full flex items-center gap-2.5 px-4 py-3 text-xs text-gray-700 hover:bg-gray-50 transition-colors"
