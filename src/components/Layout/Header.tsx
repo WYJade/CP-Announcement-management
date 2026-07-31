@@ -1,3 +1,4 @@
+import { useState, useRef, useEffect } from 'react'
 import {
   PanelLeft,
   Home,
@@ -8,20 +9,39 @@ import {
   HelpCircle,
   Bot,
   BarChart2,
+  ChevronDown,
+  Users2,
+  BookOpen,
 } from 'lucide-react'
 import { useI18n } from '../../context/I18nContext'
+import { useNavigate } from 'react-router-dom'
 
 function Header() {
   const { t } = useI18n()
+  const navigate = useNavigate()
+  const [helpOpen, setHelpOpen] = useState(false)
+  const helpRef = useRef<HTMLDivElement>(null)
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (helpRef.current && !helpRef.current.contains(e.target as Node)) {
+        setHelpOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
 
   return (
     <header className="h-14 bg-white border-b border-gray-200 fixed top-0 left-56 right-0 z-30 flex items-center px-4">
       {/* Left section */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3">
         <PanelLeft size={16} className="text-gray-500 cursor-pointer hover:text-gray-700" />
-        <Home size={16} className="text-gray-700 cursor-pointer hover:text-gray-900" />
+        <Home size={16} className="text-gray-700 cursor-pointer hover:text-gray-900" onClick={() => navigate('/')} />
         <Heart size={16} className="text-purple-400 cursor-pointer hover:text-purple-600" />
-        {/* AI Agents entry — right of favorites */}
+
+        {/* AI Agents entry */}
         <a
           href="https://ai-native.item.pub/"
           target="_blank"
@@ -32,8 +52,10 @@ function Header() {
           <Bot size={15} className="text-violet-500 group-hover:text-violet-700 transition-colors" />
           <span className="text-xs font-medium text-violet-500 group-hover:text-violet-700 transition-colors">AI Agents</span>
         </a>
-        {/* Insights entry — right of AI Agents */}
+
+        {/* Insights entry */}
         <button
+          onClick={() => navigate('/insights')}
           className="flex items-center gap-1 px-2 py-1 rounded-md hover:bg-gray-100 transition-colors group"
           title="Insights"
         >
@@ -44,14 +66,44 @@ function Header() {
 
       {/* Right section */}
       <div className="flex items-center gap-2 ml-auto">
-        {/* Help Center — left of phone */}
-        <button
-          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md hover:bg-gray-100 transition-colors group"
-          title="Help Center"
-        >
-          <HelpCircle size={15} className="text-indigo-400 group-hover:text-indigo-600 transition-colors" />
-          <span className="text-xs font-medium text-indigo-400 group-hover:text-indigo-600 transition-colors">Help Center</span>
-        </button>
+
+        {/* Help & Support dropdown */}
+        <div ref={helpRef} className="relative">
+          <button
+            onClick={() => setHelpOpen(v => !v)}
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md transition-colors group ${helpOpen ? 'bg-indigo-50 text-indigo-600' : 'hover:bg-gray-100 text-indigo-400 hover:text-indigo-600'}`}
+            title="Help & Support"
+          >
+            <HelpCircle size={15} className="transition-colors" />
+            <span className="text-xs font-medium transition-colors">Help &amp; Support</span>
+            <ChevronDown size={11} className={`transition-transform ${helpOpen ? 'rotate-180' : ''}`} />
+          </button>
+
+          {helpOpen && (
+            <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50 overflow-hidden">
+              <button
+                onClick={() => { setHelpOpen(false) }}
+                className="w-full flex items-center gap-2.5 px-4 py-3 text-xs text-gray-700 hover:bg-gray-50 transition-colors border-b border-gray-100"
+              >
+                <BookOpen size={13} className="text-indigo-400 shrink-0" />
+                <div className="text-left">
+                  <p className="font-medium">Help Center</p>
+                  <p className="text-[10px] text-gray-400">Browse docs & guides</p>
+                </div>
+              </button>
+              <button
+                onClick={() => { navigate('/support/requests'); setHelpOpen(false) }}
+                className="w-full flex items-center gap-2.5 px-4 py-3 text-xs text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                <Users2 size={13} className="text-indigo-400 shrink-0" />
+                <div className="text-left">
+                  <p className="font-medium">Service &amp; Support</p>
+                  <p className="text-[10px] text-gray-400">My requests & tickets</p>
+                </div>
+              </button>
+            </div>
+          )}
+        </div>
 
         <button className="p-1.5 rounded-md hover:bg-gray-100 transition-colors">
           <Phone size={16} className="text-gray-500" />

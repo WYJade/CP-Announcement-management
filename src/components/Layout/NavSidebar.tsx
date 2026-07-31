@@ -48,27 +48,6 @@ interface MenuItem {
 
 const menuItems: MenuItem[] = [
   {
-    id: 'dashboards',
-    label: 'Dashboards',
-    icon: <LayoutDashboard size={16} />,
-    expandable: true,
-    children: [
-      { id: 'otif', label: 'OTIF', path: '/dashboard/otif' },
-      { id: 'kpi', label: 'KPI', path: '/dashboard/kpi' },
-      { id: 'ticket-insights', label: 'Ticket Insights' },
-      { id: 'finance-agents', label: 'FinanceAgents', path: '/dashboard/finance-agents' },
-    ],
-  },
-  {
-    id: 'support',
-    label: 'Service & Support',
-    icon: <Users2 size={16} />,
-    expandable: true,
-    children: [
-      { id: 'support-requests', label: 'My Requests', path: '/support/requests' },
-    ],
-  },
-  {
     id: 'purchase',
     label: 'Purchase Management',
     icon: <ShoppingCart size={16} />,

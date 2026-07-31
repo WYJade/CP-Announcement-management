@@ -30,6 +30,7 @@ import IntlTrackingPortal from './components/International/IntlTrackingPortal'
 import ShipmentTracking from './components/International/ShipmentTracking'
 import AgentWorkstation from './components/Agents/AgentWorkstation'
 import UserProfile from './components/UserProfile/UserProfile'
+import InsightsPage from './components/Insights/InsightsPage'
 
 function App() {
   return (
@@ -94,6 +95,9 @@ function App() {
 
         {/* Agents / AI Native */}
         <Route path="agents" element={<AgentWorkstation />} />
+
+        {/* Insights */}
+        <Route path="insights" element={<InsightsPage />} />
 
         {/* User Profile */}
         <Route path="profile" element={<UserProfile />} />
