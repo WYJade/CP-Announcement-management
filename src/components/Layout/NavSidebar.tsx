@@ -355,6 +355,30 @@ function NavSidebar() {
   const { getUnreadCount } = useCollaboration()
   const supportUnread = getUnreadCount()
 
+  // Recently used pages — track navigation history
+  const [recentPages, setRecentPages] = useState<{ label: string; path: string }[]>([
+    { label: 'Shipment Tracking', path: '/international-new/tracking' },
+    { label: 'Inbound Inquiry', path: '/inbound/inquiry' },
+    { label: 'Invoice', path: '/finance/invoices' },
+    { label: 'Inventory Activity', path: '/inventory/activity' },
+  ])
+
+  // Path to label lookup
+  const pathLabelMap: Record<string, string> = SEARCH_INDEX.reduce((acc, e) => {
+    if (e.path && !acc[e.path]) acc[e.path] = e.label
+    return acc
+  }, {} as Record<string, string>)
+
+  useEffect(() => {
+    const path = location.pathname
+    const label = pathLabelMap[path]
+    if (!label || path === '/') return
+    setRecentPages(prev => {
+      const filtered = prev.filter(p => p.path !== path)
+      return [{ label, path }, ...filtered].slice(0, 5)
+    })
+  }, [location.pathname])
+
   const toggleExpand = (id: string) => {
     setExpandedItems((prev) =>
       prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
@@ -444,11 +468,36 @@ function NavSidebar() {
         {/* Global Search */}
         <GlobalSearch />
 
+        {/* Recently Used Section — above Workspace */}
+        {recentPages.length > 0 && (
+          <div className="mb-3">
+            <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1">Recently Used</p>
+            <nav className="space-y-0.5">
+              {recentPages.map(page => (
+                <button
+                  key={page.path}
+                  onClick={() => navigate(page.path)}
+                  className={`flex items-center w-full px-3 py-1.5 text-xs rounded-md transition-colors ${
+                    location.pathname === page.path
+                      ? 'bg-primary-50 text-primary-700 font-medium'
+                      : 'text-gray-600 hover:bg-gray-100'
+                  }`}
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-gray-300 mr-2.5 shrink-0" />
+                  <span className="truncate">{page.label}</span>
+                </button>
+              ))}
+            </nav>
+          </div>
+        )}
+
         {/* Workspace Section */}
+        <div className="border-t border-gray-100 pt-3">
         <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1">Workspace</p>
         <nav className="space-y-0.5 mb-4">
           {renderMenuSection(menuItems)}
         </nav>
+        </div>
 
         {/* Agents Section - standalone external link, no arrow, no expand */}
         <div className="border-t border-gray-100 pt-3 mb-4">
@@ -463,14 +512,6 @@ function NavSidebar() {
               <span className="mr-3 text-gray-500"><Bot size={16} /></span>
               <span className="flex-1 text-left font-medium">Agents</span>
             </a>
-          </nav>
-        </div>
-
-        {/* Favorites Section */}
-        <div className="border-t border-gray-100 pt-3 mb-4">
-          <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1">Favorites</p>
-          <nav className="space-y-0.5">
-            {renderMenuSection(favoritesItems)}
           </nav>
         </div>
 
