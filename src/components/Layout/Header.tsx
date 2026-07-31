@@ -3,8 +3,6 @@ import {
   PanelLeft,
   Home,
   Heart,
-  Phone,
-  Settings,
   MessageSquare,
   HelpCircle,
   Bot,
@@ -12,14 +10,18 @@ import {
   ChevronDown,
   Users2,
   BookOpen,
+  Moon,
+  Sun,
 } from 'lucide-react'
 import { useI18n } from '../../context/I18nContext'
 import { useNavigate } from 'react-router-dom'
+import LanguageSwitcher from './LanguageSwitcher'
 
 function Header() {
   const { t } = useI18n()
   const navigate = useNavigate()
   const [helpOpen, setHelpOpen] = useState(false)
+  const [darkMode, setDarkMode] = useState(false)
   const helpRef = useRef<HTMLDivElement>(null)
 
   // Close dropdown on outside click
@@ -105,12 +107,20 @@ function Header() {
           )}
         </div>
 
-        <button className="p-1.5 rounded-md hover:bg-gray-100 transition-colors">
-          <Phone size={16} className="text-gray-500" />
+        {/* Dark / Light mode toggle */}
+        <button
+          onClick={() => setDarkMode(v => !v)}
+          className="p-1.5 rounded-md hover:bg-gray-100 transition-colors"
+          title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+        >
+          {darkMode
+            ? <Sun size={16} className="text-amber-500" />
+            : <Moon size={16} className="text-gray-500 hover:text-gray-700" />
+          }
         </button>
-        <button className="p-1.5 rounded-md hover:bg-gray-100 transition-colors">
-          <Settings size={16} className="text-gray-500" />
-        </button>
+
+        {/* Language switcher */}
+        <LanguageSwitcher />
 
         {/* Assistant button — slow animated glow effect */}
         <button className="assistant-glow flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md border transition-colors">
