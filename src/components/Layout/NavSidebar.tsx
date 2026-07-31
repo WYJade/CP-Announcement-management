@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard,
@@ -27,6 +27,8 @@ import {
   Store,
   Heart,
   Clock,
+  Search,
+  ArrowRight,
 } from 'lucide-react'
 import { useCollaboration } from '../../context/CollaborationContext'
 
@@ -228,6 +230,145 @@ const hiddenItems: MenuItem[] = [
   },
 ]
 
+// ─── Global Search Index ─────────────────────────────────────────────────────
+interface SearchEntry {
+  label: string
+  parent: string
+  path: string
+  keywords: string[]
+}
+
+const SEARCH_INDEX: SearchEntry[] = [
+  // Dashboards
+  { label: 'OTIF Dashboard', parent: 'Dashboards', path: '/dashboard/otif', keywords: ['otif', 'on time in full', 'dashboard'] },
+  { label: 'KPI Dashboard', parent: 'Dashboards', path: '/dashboard/kpi', keywords: ['kpi', 'key performance', 'dashboard'] },
+  { label: 'Ticket Insights', parent: 'Dashboards', path: '/dashboard/otif', keywords: ['ticket', 'insights', 'dashboard'] },
+  { label: 'FinanceAgents', parent: 'Dashboards', path: '/dashboard/finance-agents', keywords: ['finance', 'agents', 'dashboard'] },
+  // Service & Support
+  { label: 'My Requests', parent: 'Service & Support', path: '/support/requests', keywords: ['requests', 'support', 'service', 'my requests'] },
+  // Sales Order
+  { label: 'Wholesale Orders', parent: 'Sales Order', path: '/sales/wholesale', keywords: ['wholesale', 'sales', 'order'] },
+  { label: 'Retail Orders', parent: 'Sales Order', path: '/sales/retail', keywords: ['retail', 'sales', 'order'] },
+  // Inbound
+  { label: 'Inbound Inquiry', parent: 'Inbound', path: '/inbound/inquiry', keywords: ['inbound', 'inquiry', 'receipt', 'receiving'] },
+  { label: 'Inbound Receipt Entry', parent: 'Inbound', path: '/inbound/inquiry', keywords: ['inbound', 'receipt', 'entry', 'receiving'] },
+  // Inventory
+  { label: 'Inventory Activity', parent: 'Inventory', path: '/inventory/activity', keywords: ['inventory', 'activity', 'stock'] },
+  // Outbound
+  { label: 'Outbound Inquiry', parent: 'Outbound', path: '/outbound/inquiry', keywords: ['outbound', 'inquiry', 'shipment'] },
+  { label: 'Freight Quote', parent: 'Outbound', path: '/outbound/freight-quote', keywords: ['freight', 'quote', 'outbound'] },
+  // Supply Chain
+  { label: 'Shipments', parent: 'Supply Chain Mgmt', path: '/shipping/shipments', keywords: ['shipments', 'supply chain'] },
+  { label: 'Tracking', parent: 'Supply Chain Mgmt', path: '/shipping/tracking', keywords: ['tracking', 'supply chain'] },
+  // International
+  { label: 'Shipment Tracking', parent: 'International', path: '/international-new/tracking', keywords: ['international', 'shipment', 'tracking', 'container'] },
+  // Finance
+  { label: 'Invoice', parent: 'Finance', path: '/finance/invoices', keywords: ['invoice', 'finance', 'billing', 'payment'] },
+  { label: 'Card and Balance', parent: 'Finance', path: '/finance/invoices', keywords: ['card', 'balance', 'finance'] },
+  { label: 'Cost Calculator', parent: 'Finance', path: '/finance/invoices', keywords: ['cost', 'calculator', 'finance'] },
+  { label: 'Claim', parent: 'Finance', path: '/finance/invoices', keywords: ['claim', 'finance'] },
+  // Backup
+  { label: 'End-to-End Tracking', parent: 'Backup', path: '/backup/tracking', keywords: ['end to end', 'tracking', 'backup'] },
+  // AI Agents
+  { label: 'Chat', parent: 'AI Agents', path: '/agents?nav=chat', keywords: ['chat', 'ai', 'agents', 'assistant'] },
+  { label: 'Agent Workstation', parent: 'AI Agents', path: '/agents?nav=workstation', keywords: ['workstation', 'agents', 'ai'] },
+  { label: 'Marketplace', parent: 'AI Agents', path: '/agents?nav=marketplace', keywords: ['marketplace', 'agents'] },
+  // System
+  { label: 'User Management', parent: 'System', path: '/', keywords: ['user', 'management', 'system', 'admin'] },
+  { label: 'Role Management', parent: 'System', path: '/', keywords: ['role', 'management', 'system', 'permission'] },
+  { label: 'Address Book', parent: 'System', path: '/', keywords: ['address', 'book', 'system'] },
+  { label: 'Settings', parent: 'System', path: '/', keywords: ['settings', 'system', 'config'] },
+]
+
+// ─── Global Search Component ──────────────────────────────────────────────────
+function GlobalSearch() {
+  const [query, setQuery] = useState('')
+  const [open, setOpen] = useState(false)
+  const [highlighted, setHighlighted] = useState(0)
+  const navigate = useNavigate()
+  const inputRef = useRef<HTMLInputElement>(null)
+  const dropdownRef = useRef<HTMLDivElement>(null)
+
+  const results = query.trim().length === 0 ? [] : SEARCH_INDEX.filter(e => {
+    const q = query.toLowerCase()
+    return (
+      e.label.toLowerCase().includes(q) ||
+      e.parent.toLowerCase().includes(q) ||
+      e.keywords.some(k => k.includes(q))
+    )
+  }).slice(0, 8)
+
+  useEffect(() => { setHighlighted(0) }, [query])
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node) &&
+          inputRef.current && !inputRef.current.contains(e.target as Node)) {
+        setOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowDown') { e.preventDefault(); setHighlighted(h => Math.min(h + 1, results.length - 1)) }
+    if (e.key === 'ArrowUp') { e.preventDefault(); setHighlighted(h => Math.max(h - 1, 0)) }
+    if (e.key === 'Enter' && results[highlighted]) { handleSelect(results[highlighted]) }
+    if (e.key === 'Escape') { setOpen(false); setQuery('') }
+  }
+
+  const handleSelect = (entry: SearchEntry) => {
+    navigate(entry.path)
+    setQuery('')
+    setOpen(false)
+  }
+
+  return (
+    <div className="relative px-3 mb-3">
+      <div className="relative">
+        <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+        <input
+          ref={inputRef}
+          type="text"
+          value={query}
+          onChange={e => { setQuery(e.target.value); setOpen(true) }}
+          onFocus={() => setOpen(true)}
+          onKeyDown={handleKeyDown}
+          placeholder="Search menu or function..."
+          className="w-full pl-7 pr-3 py-1.5 text-xs border border-gray-200 rounded-md bg-gray-50 focus:bg-white focus:border-primary-400 focus:outline-none focus:ring-1 focus:ring-primary-200 transition-all placeholder-gray-400"
+        />
+      </div>
+      {open && results.length > 0 && (
+        <div
+          ref={dropdownRef}
+          className="absolute left-3 right-3 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 overflow-hidden"
+        >
+          {results.map((entry, i) => (
+            <button
+              key={entry.label + entry.parent}
+              onMouseDown={() => handleSelect(entry)}
+              onMouseEnter={() => setHighlighted(i)}
+              className={`w-full flex items-center justify-between px-3 py-2 text-left transition-colors ${i === highlighted ? 'bg-primary-50' : 'hover:bg-gray-50'}`}
+            >
+              <div className="min-w-0">
+                <p className="text-xs font-medium text-gray-800 truncate">{entry.label}</p>
+                <p className="text-[10px] text-gray-400 truncate">{entry.parent}</p>
+              </div>
+              <ArrowRight size={10} className="text-gray-300 shrink-0 ml-2" />
+            </button>
+          ))}
+        </div>
+      )}
+      {open && query.trim().length > 0 && results.length === 0 && (
+        <div ref={dropdownRef} className="absolute left-3 right-3 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 px-3 py-3 text-xs text-gray-400 text-center">
+          No results for "{query}"
+        </div>
+      )}
+    </div>
+  )
+}
+
 function NavSidebar() {
   const [expandedItems, setExpandedItems] = useState<string[]>(['dashboards', 'support'])
   const location = useLocation()
@@ -320,6 +461,9 @@ function NavSidebar() {
           </div>
           <span className="text-sm font-bold text-gray-800">Client Portal</span>
         </div>
+
+        {/* Global Search */}
+        <GlobalSearch />
 
         {/* Workspace Section */}
         <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1">Workspace</p>
