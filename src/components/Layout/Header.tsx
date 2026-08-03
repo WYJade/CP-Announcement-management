@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from 'react'
 import {
   PanelLeft,
   Home,
-  Heart,
   MessageSquare,
   HelpCircle,
   Bot,
@@ -41,7 +40,6 @@ function Header() {
       <div className="flex items-center gap-3">
         <PanelLeft size={16} className="text-gray-500 cursor-pointer hover:text-gray-700" />
         <Home size={16} className="text-gray-700 cursor-pointer hover:text-gray-900" onClick={() => navigate('/')} />
-        <Heart size={16} className="text-purple-400 cursor-pointer hover:text-purple-600" />
 
         {/* AI Agents entry */}
         <a

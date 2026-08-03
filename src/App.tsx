@@ -31,12 +31,14 @@ import ShipmentTracking from './components/International/ShipmentTracking'
 import AgentWorkstation from './components/Agents/AgentWorkstation'
 import UserProfile from './components/UserProfile/UserProfile'
 import InsightsPage from './components/Insights/InsightsPage'
+import HomePage from './components/Home/HomePage'
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<Layout />}>
-        <Route index element={<OTIFDashboard />} />
+        <Route index element={<HomePage />} />
+        <Route path="home" element={<HomePage />} />
         <Route path="dashboard/otif" element={<OTIFDashboard />} />
         <Route path="dashboard/kpi" element={<KPIDashboard />} />
         <Route path="finance/invoices" element={<InvoiceList />} />
