@@ -5,18 +5,24 @@ import AnnouncementBanner from '../common/AnnouncementBanner'
 
 function Layout() {
   const location = useLocation()
-  const isAgentsPage = location.pathname === '/agents'
+  const isInsightsPage = location.pathname === '/insights'
 
   return (
     <div className="min-h-screen bg-gray-50">
       <NavSidebar />
       <Header />
-      <main className={`ml-56 mt-14 p-4 overflow-auto`}>
-        <AnnouncementBanner />
-        <div className="mt-3">
+      {isInsightsPage ? (
+        <main className="ml-56 mt-14 overflow-hidden h-[calc(100vh-56px)]">
           <Outlet />
-        </div>
-      </main>
+        </main>
+      ) : (
+        <main className="ml-56 mt-14 p-4 overflow-auto">
+          <AnnouncementBanner />
+          <div className="mt-3">
+            <Outlet />
+          </div>
+        </main>
+      )}
     </div>
   )
 }
