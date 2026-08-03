@@ -48,21 +48,19 @@ function Header() {
           href="https://ai-native.item.pub/"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-1 px-2 py-1 rounded-md hover:bg-gray-100 transition-colors group"
+          className="p-1.5 rounded-md hover:bg-gray-100 transition-colors group"
           title="AI Agents"
         >
-          <Bot size={15} className="text-violet-500 group-hover:text-violet-700 transition-colors" />
-          <span className="text-xs font-medium text-violet-500 group-hover:text-violet-700 transition-colors">AI Agents</span>
+          <Bot size={16} className="text-violet-500 group-hover:text-violet-700 transition-colors" />
         </a>
 
         {/* Insights entry */}
         <button
           onClick={() => navigate('/insights')}
-          className="flex items-center gap-1 px-2 py-1 rounded-md hover:bg-gray-100 transition-colors group"
+          className="p-1.5 rounded-md hover:bg-gray-100 transition-colors group"
           title="Insights"
         >
-          <BarChart2 size={15} className="text-emerald-500 group-hover:text-emerald-700 transition-colors" />
-          <span className="text-xs font-medium text-emerald-500 group-hover:text-emerald-700 transition-colors">Insights</span>
+          <BarChart2 size={16} className="text-emerald-500 group-hover:text-emerald-700 transition-colors" />
         </button>
       </div>
 
