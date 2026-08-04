@@ -466,7 +466,9 @@ function NavSidebar() {
         </div>
 
         {/* Global Search */}
-        <GlobalSearch />
+        <div data-tour="global-search">
+          <GlobalSearch />
+        </div>
 
         {/* Recently Used Section — above Workspace */}
         {recentPages.length > 0 && (

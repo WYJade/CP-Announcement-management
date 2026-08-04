@@ -48,6 +48,7 @@ function Header() {
           rel="noopener noreferrer"
           className="p-1.5 rounded-md hover:bg-gray-100 transition-colors group"
           title="AI Agents"
+          data-tour="header-ai-agents"
         >
           <Bot size={16} className="text-violet-500 group-hover:text-violet-700 transition-colors" />
         </a>
@@ -57,6 +58,7 @@ function Header() {
           onClick={() => navigate('/insights')}
           className="p-1.5 rounded-md hover:bg-gray-100 transition-colors group"
           title="Insights"
+          data-tour="header-insights"
         >
           <BarChart2 size={16} className="text-emerald-500 group-hover:text-emerald-700 transition-colors" />
         </button>
@@ -66,7 +68,7 @@ function Header() {
       <div className="flex items-center gap-2 ml-auto">
 
         {/* Help & Support dropdown */}
-        <div ref={helpRef} className="relative">
+        <div ref={helpRef} className="relative" data-tour="help-support">
           <button
             onClick={() => setHelpOpen(v => !v)}
             className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md transition-colors group ${helpOpen ? 'bg-indigo-50 text-indigo-600' : 'hover:bg-gray-100 text-indigo-400 hover:text-indigo-600'}`}

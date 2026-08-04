@@ -529,7 +529,7 @@ export default function HomePage() {
 
       {/* Middle Row */}
       <div className="grid grid-cols-5 gap-4">
-        <div className="col-span-3 bg-white border border-gray-200 rounded-xl p-4">
+        <div className="col-span-3 bg-white border border-gray-200 rounded-xl p-4" data-tour="network-map">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <MapPin size={14} className="text-indigo-500" />
@@ -543,7 +543,7 @@ export default function HomePage() {
           <NetworkMap onLocClick={openLocModal} />
         </div>
 
-        <div className="col-span-2 bg-white border border-gray-200 rounded-xl p-4">
+        <div className="col-span-2 bg-white border border-gray-200 rounded-xl p-4" data-tour="exceptions">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <AlertCircle size={14} className="text-red-500" />
@@ -570,7 +570,7 @@ export default function HomePage() {
 
       {/* Bottom Row */}
       <div className="grid grid-cols-5 gap-4">
-        <div className="col-span-3 bg-white border border-gray-200 rounded-xl p-4">
+        <div className="col-span-3 bg-white border border-gray-200 rounded-xl p-4" data-tour="my-tasks">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <CheckCircle2 size={14} className="text-violet-500" />
@@ -605,7 +605,9 @@ export default function HomePage() {
         </div>
 
         <div className="col-span-2 space-y-3">
-          <AIAgentPanel onAction={openAgentAction} />
+          <div data-tour="ai-agent">
+            <AIAgentPanel onAction={openAgentAction} />
+          </div>
           <div className="grid grid-cols-2 gap-2">
             {MODULES.map(m => (
               <button key={m.title} onClick={() => navigate(m.path)}

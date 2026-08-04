@@ -2,10 +2,12 @@ import { Outlet, useLocation } from 'react-router-dom'
 import NavSidebar from './NavSidebar'
 import Header from './Header'
 import AnnouncementBanner from '../common/AnnouncementBanner'
+import OnboardingTour from '../common/OnboardingTour'
 
 function Layout() {
   const location = useLocation()
   const isInsightsPage = location.pathname === '/insights'
+  const isHomePage = location.pathname === '/' || location.pathname === '/home'
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -23,6 +25,7 @@ function Layout() {
           </div>
         </main>
       )}
+      {isHomePage && <OnboardingTour />}
     </div>
   )
 }
