@@ -31,6 +31,7 @@ import {
   ArrowRight,
 } from 'lucide-react'
 import { useCollaboration } from '../../context/CollaborationContext'
+import { useFavorites } from '../../context/FavoritesContext'
 
 interface ChildItem {
   id: string
@@ -354,6 +355,7 @@ function NavSidebar() {
   const navigate = useNavigate()
   const { getUnreadCount } = useCollaboration()
   const supportUnread = getUnreadCount()
+  const { favorites } = useFavorites()
 
   // Recently used pages — track navigation history
   const [recentPages, setRecentPages] = useState<{ label: string; path: string }[]>([
@@ -470,23 +472,23 @@ function NavSidebar() {
           <GlobalSearch />
         </div>
 
-        {/* Recently Used Section — above Workspace */}
-        {recentPages.length > 0 && (
+        {/* Favorites Section — above Workspace */}
+        {favorites.length > 0 && (
           <div className="mb-3">
-            <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1">Recently Used</p>
+            <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1">Favorites</p>
             <nav className="space-y-0.5">
-              {recentPages.map(page => (
+              {favorites.map(fav => (
                 <button
-                  key={page.path}
-                  onClick={() => navigate(page.path)}
+                  key={fav.path}
+                  onClick={() => navigate(fav.path)}
                   className={`flex items-center w-full px-3 py-1.5 text-xs rounded-md transition-colors ${
-                    location.pathname === page.path
+                    location.pathname === fav.path
                       ? 'bg-primary-50 text-primary-700 font-medium'
                       : 'text-gray-600 hover:bg-gray-100'
                   }`}
                 >
-                  <span className="w-1.5 h-1.5 rounded-full bg-gray-300 mr-2.5 shrink-0" />
-                  <span className="truncate">{page.label}</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-rose-400 mr-2.5 shrink-0" />
+                  <span className="truncate">{fav.label}</span>
                 </button>
               ))}
             </nav>

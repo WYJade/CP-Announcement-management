@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from 'react'
 import {
   PanelLeft,
   Home,
-  MessageSquare,
   HelpCircle,
   Bot,
   BarChart2,
@@ -11,17 +10,38 @@ import {
   BookOpen,
   Moon,
   Sun,
+  Heart,
 } from 'lucide-react'
 import { useI18n } from '../../context/I18nContext'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import LanguageSwitcher from './LanguageSwitcher'
+import { useFavorites } from '../../context/FavoritesContext'
+
+// ─── Path → readable label ────────────────────────────────────────────────────
+function getPageLabel(pathname: string): string {
+  const map: Record<string, string> = {
+    '/': 'Home', '/home': 'Home', '/dashboard/otif': 'OTIF Dashboard', '/dashboard/kpi': 'KPI Dashboard',
+    '/insights': 'Insights', '/inbound/inquiry': 'Inbound Inquiry', '/inventory/activity': 'Inventory Activity',
+    '/outbound/inquiry': 'Outbound Inquiry', '/outbound/freight-quote': 'Freight Quote',
+    '/international-new/tracking': 'Shipment Tracking', '/finance/invoices': 'Invoice',
+    '/support/requests': 'My Requests', '/sales/wholesale': 'Wholesale Orders', '/sales/retail': 'Retail Orders',
+    '/shipping/shipments': 'Shipments', '/shipping/tracking': 'Tracking', '/agents': 'AI Agents',
+  }
+  return map[pathname] ?? pathname.split('/').pop()?.replace(/-/g,' ') ?? 'Page'
+}
 
 function Header() {
   const { t } = useI18n()
   const navigate = useNavigate()
+  const location = useLocation()
+  const { isFavorited, toggleFavorite } = useFavorites()
   const [helpOpen, setHelpOpen] = useState(false)
   const [darkMode, setDarkMode] = useState(false)
   const helpRef = useRef<HTMLDivElement>(null)
+
+  const currentPath = location.pathname
+  const currentLabel = getPageLabel(currentPath)
+  const favorited = isFavorited(currentPath)
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -40,6 +60,18 @@ function Header() {
       <div className="flex items-center gap-3">
         <PanelLeft size={16} className="text-gray-500 cursor-pointer hover:text-gray-700" />
         <Home size={16} className="text-gray-700 cursor-pointer hover:text-gray-900" onClick={() => navigate('/')} />
+
+        {/* Favorite current page */}
+        <button
+          onClick={() => toggleFavorite(currentPath, currentLabel)}
+          className="p-1.5 rounded-md hover:bg-gray-100 transition-colors"
+          title={favorited ? 'Remove from Favorites' : 'Add to Favorites'}
+        >
+          <Heart
+            size={16}
+            className={`transition-colors ${favorited ? 'text-rose-500 fill-rose-500' : 'text-gray-400 hover:text-rose-400'}`}
+          />
+        </button>
 
         {/* AI Agents entry */}
         <a
@@ -122,32 +154,7 @@ function Header() {
 
         {/* Language switcher */}
         <LanguageSwitcher />
-
-        {/* Assistant button — slow animated glow effect */}
-        <button className="assistant-glow flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md border transition-colors">
-          <MessageSquare size={14} />
-          {t('header.assistant')}
-        </button>
       </div>
-
-      <style>{`
-        @keyframes assistantGlow {
-          0%   { background-color: #eff6ff; border-color: #bfdbfe; color: #2563eb; box-shadow: 0 0 0px rgba(99,102,241,0); }
-          25%  { background-color: #eef2ff; border-color: #a5b4fc; color: #4338ca; box-shadow: 0 0 8px rgba(99,102,241,0.25); }
-          50%  { background-color: #f5f3ff; border-color: #c4b5fd; color: #7c3aed; box-shadow: 0 0 14px rgba(139,92,246,0.35); }
-          75%  { background-color: #eef2ff; border-color: #a5b4fc; color: #4338ca; box-shadow: 0 0 8px rgba(99,102,241,0.25); }
-          100% { background-color: #eff6ff; border-color: #bfdbfe; color: #2563eb; box-shadow: 0 0 0px rgba(99,102,241,0); }
-        }
-        .assistant-glow {
-          animation: assistantGlow 4s ease-in-out infinite;
-        }
-        .assistant-glow:hover {
-          animation: none;
-          background-color: #ede9fe;
-          border-color: #8b5cf6;
-          color: #6d28d9;
-        }
-      `}</style>
     </header>
   )
 }
