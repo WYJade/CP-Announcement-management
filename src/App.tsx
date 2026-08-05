@@ -16,6 +16,7 @@ import InboundInquiry from './components/Orders/InboundInquiry'
 import ReceiptDetail from './components/Inbound/ReceiptDetail'
 import Shipments from './components/Shipping/Shipments'
 import Tracking from './components/Shipping/Tracking'
+import ShipperShipmentManagement from './components/Shipping/ShipperShipmentManagement'
 import CustomsEntries from './components/International/CustomsEntries'
 import CustomsEntryDetail from './components/International/CustomsEntryDetail'
 import IntlShipments from './components/International/IntlShipments'
@@ -73,6 +74,7 @@ function App() {
         {/* Shipping */}
         <Route path="shipping/shipments" element={<Shipments />} />
         <Route path="shipping/tracking" element={<Tracking />} />
+        <Route path="shipping/shipper-shipments" element={<ShipperShipmentManagement />} />
 
         {/* International */}
         <Route path="international/customs" element={<CustomsEntries />} />

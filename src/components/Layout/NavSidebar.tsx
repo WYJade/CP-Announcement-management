@@ -124,6 +124,7 @@ const menuItems: MenuItem[] = [
     children: [
       { id: 'shipments-list', label: 'Shipments', path: '/shipping/shipments' },
       { id: 'tracking', label: 'Tracking', path: '/shipping/tracking' },
+      { id: 'shipper-shipments', label: 'Shipper Shipment-Management', path: '/shipping/shipper-shipments' },
     ],
   },
   {
