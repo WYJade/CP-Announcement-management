@@ -69,46 +69,58 @@ function CreateAccountModal({ defaultSubType, onClose, onSave }: {
 
   return (
     <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center px-4" onClick={onClose}>
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-md max-h-[90vh] flex flex-col" onClick={e => e.stopPropagation()}>
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-xl max-h-[90vh] flex flex-col" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between px-6 py-4 border-b">
           <h3 className="text-base font-semibold text-gray-900">Create Account</h3>
           <button onClick={onClose}><X size={16} className="text-gray-400 hover:text-gray-600" /></button>
         </div>
 
         <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4">
-          <Field label="Username" name="username" />
-          <Field label="Email" name="email" type="email" />
-          <Field label="First Name" name="firstName" />
-          <Field label="Last Name" name="lastName" />
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Contact Number</label>
-            <input value={form.contact} onChange={e => setForm(f => ({ ...f, contact: e.target.value }))}
-              placeholder="Enter contact number"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400/30 focus:border-primary-500" />
+          {/* Row 1: Username + Email */}
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Username" name="username" />
+            <Field label="Email" name="email" type="email" />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Password <span className="text-red-500">*</span></label>
-            <input type="password" value={form.password} onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
-              placeholder="Enter password"
-              className={`w-full border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400/30 focus:border-primary-500 ${errors.password ? 'border-red-300 bg-red-50' : 'border-gray-300'}`} />
-            {errors.password
-              ? <p className="text-xs text-red-500 mt-1">{errors.password}</p>
-              : <p className="text-xs text-gray-400 mt-1">Use 8+ chars with upper, lower, number, and symbol</p>}
+          {/* Row 2: First Name + Last Name */}
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="First Name" name="firstName" />
+            <Field label="Last Name" name="lastName" />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Confirm Password <span className="text-red-500">*</span></label>
-            <input type="password" value={form.confirmPassword} onChange={e => setForm(f => ({ ...f, confirmPassword: e.target.value }))}
-              placeholder="Confirm password"
-              className={`w-full border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400/30 focus:border-primary-500 ${errors.confirmPassword ? 'border-red-300 bg-red-50' : 'border-gray-300'}`} />
-            {errors.confirmPassword && <p className="text-xs text-red-500 mt-1">{errors.confirmPassword}</p>}
+          {/* Row 3: Contact + Status */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Contact Number</label>
+              <input value={form.contact} onChange={e => setForm(f => ({ ...f, contact: e.target.value }))}
+                placeholder="Enter contact number"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400/30 focus:border-primary-500" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Status</label>
+              <select value={form.status} onChange={e => setForm(f => ({ ...f, status: e.target.value }))}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400/30 focus:border-primary-500">
+                <option>Active</option>
+                <option>Inactive</option>
+              </select>
+            </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Status</label>
-            <select value={form.status} onChange={e => setForm(f => ({ ...f, status: e.target.value }))}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400/30 focus:border-primary-500">
-              <option>Active</option>
-              <option>Inactive</option>
-            </select>
+          {/* Row 4: Password + Confirm Password */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Password <span className="text-red-500">*</span></label>
+              <input type="password" value={form.password} onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
+                placeholder="Enter password"
+                className={`w-full border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400/30 focus:border-primary-500 ${errors.password ? 'border-red-300 bg-red-50' : 'border-gray-300'}`} />
+              {errors.password
+                ? <p className="text-xs text-red-500 mt-1">{errors.password}</p>
+                : <p className="text-xs text-gray-400 mt-1">8+ chars with upper, lower, number &amp; symbol</p>}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Confirm Password <span className="text-red-500">*</span></label>
+              <input type="password" value={form.confirmPassword} onChange={e => setForm(f => ({ ...f, confirmPassword: e.target.value }))}
+                placeholder="Confirm password"
+                className={`w-full border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400/30 focus:border-primary-500 ${errors.confirmPassword ? 'border-red-300 bg-red-50' : 'border-gray-300'}`} />
+              {errors.confirmPassword && <p className="text-xs text-red-500 mt-1">{errors.confirmPassword}</p>}
+            </div>
           </div>
         </div>
 

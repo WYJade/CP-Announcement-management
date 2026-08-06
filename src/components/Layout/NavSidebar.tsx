@@ -474,12 +474,12 @@ function NavSidebar() {
           <GlobalSearch />
         </div>
 
-        {/* Favorites Section — above Workspace */}
-        {favorites.length > 0 && (
-          <div className="mb-3">
-            <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1">Favorites</p>
-            <nav className="space-y-0.5">
-              {favorites.map(fav => (
+        {/* Favorites Section — above Workspace, always visible */}
+        <div className="mb-3">
+          <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1">Favorites</p>
+          <nav className="space-y-0.5">
+            {favorites.length > 0 ? (
+              favorites.map(fav => (
                 <button
                   key={fav.path}
                   onClick={() => navigate(fav.path)}
@@ -492,10 +492,14 @@ function NavSidebar() {
                   <span className="w-1.5 h-1.5 rounded-full bg-rose-400 mr-2.5 shrink-0" />
                   <span className="truncate">{fav.label}</span>
                 </button>
-              ))}
-            </nav>
-          </div>
-        )}
+              ))
+            ) : (
+              <p className="text-[10px] text-gray-400 px-3 py-1.5 italic">
+                Click ♡ in the header to add favorites
+              </p>
+            )}
+          </nav>
+        </div>
 
         {/* Workspace Section */}
         <div className="border-t border-gray-100 pt-3">
