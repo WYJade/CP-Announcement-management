@@ -35,37 +35,29 @@ function CreateAccountModal({ defaultSubType, onClose, onSave }: {
   onSave: (form: CreateForm, subType: '客户子账号' | '租户子账号') => void
 }) {
   const [form, setForm] = useState<CreateForm>({
-    username: '', email: '', firstName: '', lastName: '',
+    username: 'evelyn_role@teml.net', email: '', firstName: '', lastName: '',
     contact: '', password: '', confirmPassword: '', status: 'Active',
   })
+  const [customers, setCustomers] = useState('')
+  const [roles, setRoles] = useState('')
   const [errors, setErrors] = useState<Partial<Record<keyof CreateForm, string>>>({})
+  const [submitted, setSubmitted] = useState(false)
 
   const validate = () => {
     const e: Partial<Record<keyof CreateForm, string>> = {}
     if (!form.username.trim()) e.username = 'Required'
-    if (!form.email.trim()) e.email = 'Required'
-    if (!form.firstName.trim()) e.firstName = 'Required'
-    if (!form.lastName.trim()) e.lastName = 'Required'
-    if (!form.password) e.password = 'Required'
+    if (!form.email.trim()) e.email = 'Please enter email'
+    if (!form.firstName.trim()) e.firstName = 'Please enter first name'
+    if (!form.lastName.trim()) e.lastName = 'Please enter last name'
+    if (!form.password) e.password = 'Use 8+ chars with upper, lower, number, and symbol'
     else if (form.password.length < 8) e.password = 'Use 8+ chars with upper, lower, number, and symbol'
     if (form.confirmPassword !== form.password) e.confirmPassword = 'Passwords do not match'
     setErrors(e)
     return Object.keys(e).length === 0
   }
 
-  const Field = ({ label, name, type = 'text', placeholder }: { label: string; name: keyof CreateForm; type?: string; placeholder?: string }) => (
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1.5">{label} <span className="text-red-500">*</span></label>
-      <input
-        type={type}
-        value={form[name]}
-        onChange={e => setForm(f => ({ ...f, [name]: e.target.value }))}
-        placeholder={placeholder || `Enter ${label.toLowerCase().replace(' *','')}`}
-        className={`w-full border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400/30 focus:border-primary-500 transition-colors ${errors[name] ? 'border-red-300 bg-red-50' : 'border-gray-300'}`}
-      />
-      {errors[name] && <p className="text-xs text-red-500 mt-1">{errors[name]}</p>}
-    </div>
-  )
+  const inp = (name: keyof CreateForm) =>
+    `w-full border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400/30 focus:border-primary-500 transition-colors ${errors[name] ? 'border-red-400 bg-red-50' : 'border-gray-300'}`
 
   return (
     <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center px-4" onClick={onClose}>
@@ -78,15 +70,41 @@ function CreateAccountModal({ defaultSubType, onClose, onSave }: {
         <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4">
           {/* Row 1: Username + Email */}
           <div className="grid grid-cols-2 gap-4">
-            <Field label="Username" name="username" />
-            <Field label="Email" name="email" type="email" />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Username <span className="text-red-500">*</span></label>
+              <input value={form.username} onChange={e => setForm(f => ({ ...f, username: e.target.value }))}
+                placeholder="Enter username"
+                className={`${inp('username')} bg-gray-50`} />
+              {errors.username && <p className="text-xs text-red-500 mt-1">{errors.username}</p>}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Email <span className="text-red-500">*</span></label>
+              <input type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+                placeholder="Enter email"
+                className={inp('email')} />
+              {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
+            </div>
           </div>
+
           {/* Row 2: First Name + Last Name */}
           <div className="grid grid-cols-2 gap-4">
-            <Field label="First Name" name="firstName" />
-            <Field label="Last Name" name="lastName" />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">First Name <span className="text-red-500">*</span></label>
+              <input value={form.firstName} onChange={e => setForm(f => ({ ...f, firstName: e.target.value }))}
+                placeholder="Enter first name"
+                className={inp('firstName')} />
+              {errors.firstName && <p className="text-xs text-red-500 mt-1">{errors.firstName}</p>}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Last Name <span className="text-red-500">*</span></label>
+              <input value={form.lastName} onChange={e => setForm(f => ({ ...f, lastName: e.target.value }))}
+                placeholder="Enter last name"
+                className={inp('lastName')} />
+              {errors.lastName && <p className="text-xs text-red-500 mt-1">{errors.lastName}</p>}
+            </div>
           </div>
-          {/* Row 3: Contact + Status */}
+
+          {/* Row 3: Contact Number + Status */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Contact Number</label>
@@ -103,23 +121,51 @@ function CreateAccountModal({ defaultSubType, onClose, onSave }: {
               </select>
             </div>
           </div>
+
           {/* Row 4: Password + Confirm Password */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Password <span className="text-red-500">*</span></label>
               <input type="password" value={form.password} onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
                 placeholder="Enter password"
-                className={`w-full border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400/30 focus:border-primary-500 ${errors.password ? 'border-red-300 bg-red-50' : 'border-gray-300'}`} />
+                className={inp('password')} />
               {errors.password
                 ? <p className="text-xs text-red-500 mt-1">{errors.password}</p>
-                : <p className="text-xs text-gray-400 mt-1">8+ chars with upper, lower, number &amp; symbol</p>}
+                : <p className="text-xs text-gray-400 mt-1">Use 8+ chars with upper, lower, number, and symbol</p>}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Confirm Password <span className="text-red-500">*</span></label>
               <input type="password" value={form.confirmPassword} onChange={e => setForm(f => ({ ...f, confirmPassword: e.target.value }))}
                 placeholder="Confirm password"
-                className={`w-full border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400/30 focus:border-primary-500 ${errors.confirmPassword ? 'border-red-300 bg-red-50' : 'border-gray-300'}`} />
+                className={inp('confirmPassword')} />
               {errors.confirmPassword && <p className="text-xs text-red-500 mt-1">{errors.confirmPassword}</p>}
+            </div>
+          </div>
+
+          {/* Row 5: Customer & Facility + Roles */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Customer &amp; Facility</label>
+              <p className="text-xs text-gray-500 mb-1">Select Customers</p>
+              <select value={customers} onChange={e => setCustomers(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400/30 focus:border-primary-500 text-gray-400">
+                <option value="">Select customers</option>
+                <option value="c1">ADOORN LLC</option>
+                <option value="c2">THE ONLY BEAN LLC</option>
+                <option value="c3">VITA COCO</option>
+                <option value="c4">ORGAIN LLC</option>
+                <option value="c5">PLEASS GLOBAL</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Roles</label>
+              <select value={roles} onChange={e => setRoles(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400/30 focus:border-primary-500 text-gray-400">
+                <option value="">Select roles</option>
+                <option value="admin">Admin</option>
+                <option value="viewer">Viewer</option>
+                <option value="editor">Editor</option>
+              </select>
             </div>
           </div>
         </div>
