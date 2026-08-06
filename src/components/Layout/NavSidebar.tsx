@@ -177,6 +177,7 @@ const systemItems: MenuItem[] = [
     children: [
       { id: 'sys-user', label: 'User Management' },
       { id: 'sys-role', label: 'Role Management' },
+      { id: 'sys-accounts', label: 'Account Management', path: '/system/accounts' },
       { id: 'sys-address', label: 'Address Book' },
       { id: 'sys-settings', label: 'Settings' },
     ],

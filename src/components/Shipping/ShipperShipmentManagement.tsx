@@ -2,7 +2,7 @@ import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Search, Filter, Download, X, Plus, ChevronDown, ArrowLeft,
-  MapPin, Package, FileText, Activity, AlertCircle,
+  MapPin, AlertCircle, ChevronLeft, ChevronRight as ChevronRightIcon,
 } from 'lucide-react'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -38,6 +38,203 @@ const ALL_COLUMNS = [
 
 const FILTER_FIELDS = ['Pickup Date','Status','Scheduled','Service','Origin','Destination','Ready Date','Close Time']
 const FILTER_OPS = ['equal','not equal','contains','not contains','is empty','is not empty','greater than','less than']
+
+// ─── Date‑picker helpers ──────────────────────────────────────────────────────
+const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December']
+const DAY_NAMES = ['Su','Mo','Tu','We','Th','Fr','Sa']
+
+function DatePicker({ value, onChange }: { value: string; onChange:(v:string)=>void }) {
+  const today = new Date(); today.setHours(0,0,0,0)
+  const maxDate = new Date(today); maxDate.setDate(today.getDate()+30)
+
+  const [calOpen, setCalOpen] = useState(false)
+  const [viewYear, setViewYear] = useState(today.getFullYear())
+  const [viewMonth, setViewMonth] = useState(today.getMonth())
+
+  const prevMonth = () => { if (viewMonth===0){setViewMonth(11);setViewYear(y=>y-1)}else setViewMonth(m=>m-1) }
+  const nextMonth = () => { if (viewMonth===11){setViewMonth(0);setViewYear(y=>y+1)}else setViewMonth(m=>m+1) }
+
+  const firstDay = new Date(viewYear, viewMonth, 1).getDay()
+  const daysInMonth = new Date(viewYear, viewMonth+1, 0).getDate()
+  const cells: (number|null)[] = [...Array(firstDay).fill(null), ...Array.from({length:daysInMonth},(_,i)=>i+1)]
+
+  const isDisabled = (day:number) => {
+    const d = new Date(viewYear, viewMonth, day); d.setHours(0,0,0,0)
+    return d < today || d > maxDate
+  }
+
+  const isSelected = (day:number) => {
+    if (!value) return false
+    const parts = value.split('-')
+    return parseInt(parts[0])===viewYear && parseInt(parts[1])-1===viewMonth && parseInt(parts[2])===day
+  }
+
+  const select = (day:number) => {
+    if (isDisabled(day)) return
+    const m = String(viewMonth+1).padStart(2,'0')
+    const d = String(day).padStart(2,'0')
+    onChange(`${viewYear}-${m}-${d}`)
+    setCalOpen(false)
+  }
+
+  return (
+    <div className="relative">
+      <div className="flex items-center border border-gray-300 rounded-lg px-3 py-2 cursor-pointer hover:border-primary-400 focus-within:border-primary-500 bg-white"
+        onClick={()=>setCalOpen(v=>!v)}>
+        <span className="text-gray-400 mr-2 text-xs">📅</span>
+        <span className={`text-sm flex-1 ${value?'text-gray-800':'text-gray-400'}`}>{value||'Ready date'}</span>
+      </div>
+      {calOpen&&(
+        <div className="absolute top-full mt-1 left-0 bg-white border border-gray-200 rounded-xl shadow-xl z-[200] w-64 p-3">
+          {/* Navigation */}
+          <div className="flex items-center justify-between mb-3">
+            <button onClick={prevMonth} className="p-1 rounded hover:bg-gray-100"><ChevronLeft size={14}/></button>
+            <span className="text-sm font-semibold text-gray-800">{MONTH_NAMES[viewMonth]} {viewYear}</span>
+            <button onClick={nextMonth} className="p-1 rounded hover:bg-gray-100"><ChevronRightIcon size={14}/></button>
+          </div>
+          {/* Day headers */}
+          <div className="grid grid-cols-7 mb-1">
+            {DAY_NAMES.map(d=><div key={d} className="text-center text-[10px] font-semibold text-gray-400 py-1">{d}</div>)}
+          </div>
+          {/* Cells */}
+          <div className="grid grid-cols-7 gap-0.5">
+            {cells.map((day,i)=>(
+              <div key={i} className={`text-center py-1.5 text-xs rounded-md select-none ${
+                day===null?'':
+                isDisabled(day)?'text-gray-300 cursor-not-allowed':
+                isSelected(day)?'bg-primary-600 text-white font-semibold cursor-pointer':
+                'text-gray-700 hover:bg-primary-50 cursor-pointer'
+              }`}
+                onClick={()=>day&&!isDisabled(day)&&select(day)}>
+                {day||''}
+              </div>
+            ))}
+          </div>
+          <p className="text-[9px] text-gray-400 mt-2 text-center">Can only select dates within 30 days from today</p>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ─── Edit Order Modal ─────────────────────────────────────────────────────────
+function EditOrderModal({ shipment, onClose, onSave }: {
+  shipment: Shipment; onClose:()=>void; onSave:(id:string, readyDate:string, readyTime:string, closeTime:string, notes:string, noteReason:string)=>void
+}) {
+  const [readyDate, setReadyDate] = useState(shipment.readyDate||'')
+  const [readyTime, setReadyTime] = useState(shipment.readyTime||'00:00')
+  const [closeTime, setCloseTime] = useState(shipment.closeTime||'')
+  const [reason, setReason] = useState('')
+  const [notes, setNotes] = useState(shipment.reference||'')
+  const [noteReason, setNoteReason] = useState('')
+
+  const poData = shipment.po.filter(p=>p).map((p,i)=>({ no:i+1, po:p, pallets:'', stackable:'No', weight:'573.00' }))
+
+  return (
+    <div className="fixed inset-0 bg-black/40 z-50 flex items-start justify-center pt-10 px-4 overflow-y-auto" onClick={onClose}>
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-xl mb-10" onClick={e=>e.stopPropagation()}>
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b">
+          <h3 className="text-sm font-bold text-gray-900">Edit</h3>
+          <button onClick={onClose}><X size={15} className="text-gray-400 hover:text-gray-600"/></button>
+        </div>
+        <div className="px-6 py-5 space-y-5">
+          {/* Pickup Times */}
+          <div>
+            <p className="text-sm font-bold text-gray-900 mb-3">Pickup Times <span className="text-red-500">*</span></p>
+            <div className="grid grid-cols-3 gap-3">
+              <div>
+                <label className="text-xs text-gray-500 block mb-1">Ready date <span className="text-red-500">*</span></label>
+                <DatePicker value={readyDate} onChange={setReadyDate} />
+              </div>
+              <div>
+                <label className="text-xs text-gray-500 block mb-1">Ready Time <span className="text-red-500">*</span></label>
+                <select value={readyTime} onChange={e=>setReadyTime(e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary-400">
+                  {['00:00','06:00','07:00','08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00'].map(t=><option key={t}>{t}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="text-xs text-gray-500 block mb-1">Close Time <span className="text-red-500">*</span></label>
+                <select value={closeTime} onChange={e=>setCloseTime(e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary-400">
+                  <option value="">Close Time</option>
+                  {['12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00'].map(t=><option key={t}>{t}</option>)}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Reason */}
+          <div>
+            <label className="text-xs text-gray-500 block mb-1">Reason</label>
+            <select value={reason} onChange={e=>setReason(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary-400">
+              <option value="">Please select a reason</option>
+              <option>Product Not Ready</option>
+              <option>Warehouse Delay</option>
+              <option>Transportation Issue</option>
+              <option>Other</option>
+            </select>
+            <p className="text-[10px] text-primary-600 mt-1.5">
+              Please contact <a href="mailto:grocery.logistics@meyer.com" className="underline">grocery.logistics@meyer.com</a> for further clarification on why this shipment is being delayed.
+            </p>
+          </div>
+
+          {/* PO Information */}
+          <div>
+            <p className="text-sm font-bold text-gray-900 mb-3">PO Information</p>
+            <table className="w-full text-xs border border-gray-100 rounded-lg overflow-hidden">
+              <thead><tr className="bg-gray-50">
+                {['PO','Pallets','Stackable','Weight'].map(h=><th key={h} className="text-left py-2 px-3 font-medium text-gray-500">{h}</th>)}
+              </tr></thead>
+              <tbody>
+                {(poData.length?poData:[{no:1,po:shipment.po[0]||'',pallets:'',stackable:'No',weight:'573.00'},{no:2,po:shipment.po[1]||'',pallets:'',stackable:'No',weight:'573.00'}]).map(row=>(
+                  <tr key={row.no} className="border-t border-gray-100">
+                    <td className="py-2 px-3"><input defaultValue={row.po} className="w-full border border-gray-200 rounded px-2 py-1 text-xs focus:outline-none"/></td>
+                    <td className="py-2 px-3"><input defaultValue={row.pallets} className="w-full border border-gray-200 rounded px-2 py-1 text-xs focus:outline-none"/></td>
+                    <td className="py-2 px-3">
+                      <select defaultValue={row.stackable} className="w-full border border-gray-200 rounded px-2 py-1 text-xs focus:outline-none">
+                        <option>No</option><option>Yes</option>
+                      </select>
+                    </td>
+                    <td className="py-2 px-3"><input defaultValue={row.weight} className="w-full border border-gray-200 rounded px-2 py-1 text-xs focus:outline-none"/></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* PU Reference & Notes */}
+          <div>
+            <label className="text-xs text-gray-500 block mb-1">PU Reference# &amp; Notes</label>
+            <input value={notes} onChange={e=>setNotes(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary-400" placeholder="shipper notes" />
+          </div>
+
+          {/* Note */}
+          <div>
+            <p className="text-xs font-medium text-gray-700 mb-1">Note</p>
+            <label className="text-xs text-gray-500 block mb-1">Reason</label>
+            <select value={noteReason} onChange={e=>setNoteReason(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary-400">
+              <option value="">Please enter reason</option>
+              <option>Delay notification</option>
+              <option>Special handling required</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t">
+          <button onClick={onClose} className="px-5 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
+          <button onClick={()=>onSave(shipment.id, readyDate, readyTime, closeTime, notes, noteReason)}
+            className="px-5 py-2 text-sm text-white bg-primary-600 rounded-lg hover:bg-primary-700">Save</button>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 // ─── Customize Fields Modal ────────────────────────────────────────────────────
 function CustomizeModal({ visible, onToggle, onClose, onConfirm }: {
@@ -315,6 +512,7 @@ export default function ShipperShipmentManagement() {
   const [actionMenuId, setActionMenuId] = useState<string|null>(null)
   const [reportIssueShipment, setReportIssueShipment] = useState<Shipment|null>(null)
   const [dataChangeShipment, setDataChangeShipment] = useState<Shipment|null>(null)
+  const [editShipment, setEditShipment] = useState<Shipment|null>(null)
   const [detailId, setDetailId] = useState<string|null>(null)
   const [readyDates, setReadyDates] = useState<Record<string,string>>(() =>
     Object.fromEntries(SHIPMENTS.map(s=>[s.id, s.readyDate]))
@@ -411,7 +609,7 @@ export default function ShipperShipmentManagement() {
                     </button>
                     {actionMenuId===row.id&&(
                       <div className="absolute right-8 top-0 bg-white border border-gray-200 rounded-lg shadow-xl z-20 w-44 py-1" onClick={e=>e.stopPropagation()}>
-                        <button className="w-full text-left px-3 py-2 text-xs text-gray-600 hover:bg-gray-50 flex items-center gap-2">
+                        <button onClick={()=>{setEditShipment(row);setActionMenuId(null)}} className="w-full text-left px-3 py-2 text-xs text-gray-600 hover:bg-gray-50 flex items-center gap-2">
                           ✏️ Edit
                         </button>
                         <button onClick={()=>{setDetailId(row.id);setActionMenuId(null)}} className="w-full text-left px-3 py-2 text-xs text-gray-600 hover:bg-gray-50 flex items-center gap-2">
@@ -439,6 +637,7 @@ export default function ShipperShipmentManagement() {
       {/* Modals */}
       {showCustomize&&<CustomizeModal visible={visibleCols} onToggle={toggleCol} onClose={()=>setShowCustomize(false)} onConfirm={()=>setShowCustomize(false)} />}
       {showFilter&&<FilterModal onClose={()=>setShowFilter(false)} onApply={rules=>setActiveFilter(rules)} />}
+      {editShipment&&<EditOrderModal shipment={editShipment} onClose={()=>setEditShipment(null)} onSave={(id,rd,rt,ct,n,nr)=>{setReadyDates(prev=>({...prev,[id]:rd}));setEditShipment(null)}} />}
       {reportIssueShipment&&<ReportIssueModal shipment={reportIssueShipment} onClose={()=>setReportIssueShipment(null)} />}
       {dataChangeShipment&&<DataChangeModal shipment={dataChangeShipment} onClose={()=>setDataChangeShipment(null)} />}
     </div>

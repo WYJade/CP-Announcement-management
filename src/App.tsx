@@ -33,6 +33,7 @@ import AgentWorkstation from './components/Agents/AgentWorkstation'
 import UserProfile from './components/UserProfile/UserProfile'
 import InsightsPage from './components/Insights/InsightsPage'
 import HomePage from './components/Home/HomePage'
+import AccountManagement from './components/System/AccountManagement'
 
 function App() {
   return (
@@ -105,6 +106,9 @@ function App() {
 
         {/* User Profile */}
         <Route path="profile" element={<UserProfile />} />
+
+        {/* System */}
+        <Route path="system/accounts" element={<AccountManagement />} />
       </Route>
     </Routes>
   )
