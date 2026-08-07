@@ -275,16 +275,8 @@ export default function AccountManagement() {
 
   return (
     <div className="p-6">
-      {/* Page header */}
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Account Management</h1>
-        <button
-          onClick={() => setShowCreate(true)}
-          className="flex items-center gap-1.5 px-4 py-2.5 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors shadow-sm"
-        >
-          <Plus size={15} /> Create Account
-        </button>
-      </div>
+      {/* Page header — title only */}
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">Account Management</h1>
 
       {/* Tabs */}
       <div className="flex items-center gap-0 mb-5 border-b border-gray-200">
@@ -350,7 +342,15 @@ export default function AccountManagement() {
         </div>
       </div>
 
-      {/* Table */}
+      {/* Table — with Create Account button above it */}
+      <div className="flex items-center justify-end mb-3">
+        <button
+          onClick={() => setShowCreate(true)}
+          className="flex items-center gap-1.5 px-4 py-2.5 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors shadow-sm"
+        >
+          <Plus size={15} /> Create Account
+        </button>
+      </div>
       <AccountTable
         accounts={tabAccounts}
         searchUser={searchUser}
