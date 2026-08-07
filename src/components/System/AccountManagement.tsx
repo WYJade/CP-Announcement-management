@@ -295,7 +295,7 @@ export default function AccountManagement() {
         ))}
       </div>
 
-      {/* Search filters */}
+      {/* Search filters — with Create Account button on the right */}
       <div className="bg-white border border-gray-200 rounded-xl p-5 mb-5">
         <div className="grid grid-cols-3 gap-4 mb-4">
           <div>
@@ -329,28 +329,30 @@ export default function AccountManagement() {
             </select>
           </div>
         </div>
-        <div className="flex justify-end gap-2">
-          <button
-            onClick={() => { setSearchUser(''); setSearchEmail(''); setFilterStatus('') }}
-            className="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50"
-          >
-            Reset
-          </button>
-          <button className="px-4 py-2 text-sm text-white bg-primary-600 rounded-lg hover:bg-primary-700">
-            Search
-          </button>
+        <div className="flex items-center justify-between">
+          <div />
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => { setSearchUser(''); setSearchEmail(''); setFilterStatus('') }}
+              className="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50"
+            >
+              Reset
+            </button>
+            <button className="px-4 py-2 text-sm text-white bg-primary-600 rounded-lg hover:bg-primary-700">
+              Search
+            </button>
+            <div className="w-px h-6 bg-gray-200 mx-1" />
+            <button
+              onClick={() => setShowCreate(true)}
+              className="flex items-center gap-1.5 px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors shadow-sm"
+            >
+              <Plus size={14} /> Create Account
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Table — with Create Account button above it */}
-      <div className="flex items-center justify-end mb-3">
-        <button
-          onClick={() => setShowCreate(true)}
-          className="flex items-center gap-1.5 px-4 py-2.5 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors shadow-sm"
-        >
-          <Plus size={15} /> Create Account
-        </button>
-      </div>
+      {/* Table */}
       <AccountTable
         accounts={tabAccounts}
         searchUser={searchUser}
