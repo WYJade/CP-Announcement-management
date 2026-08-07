@@ -295,9 +295,9 @@ export default function AccountManagement() {
         ))}
       </div>
 
-      {/* Search filters — Create Account button at top right of filter area */}
-      <div className="bg-white border border-gray-200 rounded-xl p-5 mb-5">
-        <div className="flex items-center justify-end mb-3">
+      {/* Search filters with Create Account outside top-right */}
+      <div className="relative mb-5">
+        <div className="flex justify-end mb-2">
           <button
             onClick={() => setShowCreate(true)}
             className="flex items-center gap-1.5 px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors shadow-sm"
@@ -305,48 +305,35 @@ export default function AccountManagement() {
             <Plus size={14} /> Create Account
           </button>
         </div>
-        <div className="grid grid-cols-3 gap-4 mb-4">
-          <div>
-            <label className="block text-xs font-medium text-gray-500 mb-1.5">Username</label>
-            <input
-              value={searchUser}
-              onChange={e => setSearchUser(e.target.value)}
-              placeholder="Search by username..."
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary-400"
-            />
+        <div className="bg-white border border-gray-200 rounded-xl p-5">
+          <div className="grid grid-cols-3 gap-4 mb-4">
+            <div>
+              <label className="block text-xs font-medium text-gray-500 mb-1.5">Username</label>
+              <input value={searchUser} onChange={e => setSearchUser(e.target.value)}
+                placeholder="Search by username..."
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary-400" />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-500 mb-1.5">Email</label>
+              <input value={searchEmail} onChange={e => setSearchEmail(e.target.value)}
+                placeholder="Search by email..."
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary-400" />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-500 mb-1.5">Status</label>
+              <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary-400">
+                <option value="">Select status</option>
+                <option>Active</option>
+                <option>Inactive</option>
+              </select>
+            </div>
           </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-500 mb-1.5">Email</label>
-            <input
-              value={searchEmail}
-              onChange={e => setSearchEmail(e.target.value)}
-              placeholder="Search by email..."
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary-400"
-            />
+          <div className="flex items-center justify-end gap-2">
+            <button onClick={() => { setSearchUser(''); setSearchEmail(''); setFilterStatus('') }}
+              className="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50">Reset</button>
+            <button className="px-4 py-2 text-sm text-white bg-primary-600 rounded-lg hover:bg-primary-700">Search</button>
           </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-500 mb-1.5">Status</label>
-            <select
-              value={filterStatus}
-              onChange={e => setFilterStatus(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary-400"
-            >
-              <option value="">Select status</option>
-              <option>Active</option>
-              <option>Inactive</option>
-            </select>
-          </div>
-        </div>
-        <div className="flex items-center justify-end gap-2">
-          <button
-            onClick={() => { setSearchUser(''); setSearchEmail(''); setFilterStatus('') }}
-            className="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50"
-          >
-            Reset
-          </button>
-          <button className="px-4 py-2 text-sm text-white bg-primary-600 rounded-lg hover:bg-primary-700">
-            Search
-          </button>
         </div>
       </div>
 
