@@ -455,8 +455,9 @@ function NavSidebar() {
   })
 
   return (
-    <div className="w-56 bg-white border-r border-gray-200 h-screen fixed left-0 top-0 z-40 overflow-y-auto">
-      <div className="py-4 px-3">
+    <div className="w-56 bg-white border-r border-gray-200 h-screen fixed left-0 top-0 z-40 flex flex-col overflow-hidden">
+      {/* Scrollable content */}
+      <div className="flex-1 overflow-y-auto py-4 px-3">
         {/* Logo */}
         <div className="flex items-center gap-2 px-3 mb-4">
           <div className="w-7 h-7 bg-primary-600 rounded-lg flex items-center justify-center">
@@ -539,6 +540,64 @@ function NavSidebar() {
             {renderMenuSection(hiddenItems)}
           </nav>
         </div>
+      </div>
+
+      {/* ── Sticky AI Agents bottom entry ── */}
+      <div className="border-t border-gray-100 p-3 bg-white shrink-0">
+        <button
+          onClick={() => setExpandedItems(prev =>
+            prev.includes('ai-agents-bottom')
+              ? prev.filter(i => i !== 'ai-agents-bottom')
+              : [...prev, 'ai-agents-bottom']
+          )}
+          className="w-full flex items-center gap-3 px-3 py-3 rounded-xl bg-gradient-to-r from-violet-50 to-indigo-50 border border-violet-200 hover:from-violet-100 hover:to-indigo-100 transition-all group"
+        >
+          <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-sm shrink-0">
+            <Bot size={16} className="text-white" />
+          </div>
+          <div className="flex-1 text-left min-w-0">
+            <p className="text-xs font-bold text-violet-700 leading-tight">AI Agents</p>
+            <p className="text-[9px] text-violet-400">Your AI agent</p>
+          </div>
+          <span className={`text-violet-400 transition-transform shrink-0 ${expandedItems.includes('ai-agents-bottom') ? 'rotate-180' : ''}`}>
+            <ChevronDown size={13} />
+          </span>
+        </button>
+
+        {/* Expanded agents menu */}
+        {expandedItems.includes('ai-agents-bottom') && (
+          <div className="mt-1.5 space-y-0.5 border border-violet-100 rounded-lg bg-white overflow-hidden">
+            {[
+              { label: 'Chat', path: '/agents?nav=chat' },
+              { label: 'Agent Workstation', path: '/agents?nav=workstation' },
+              { label: 'Customize', path: '/agents?nav=customize' },
+              { label: 'Marketplace', path: '/agents?nav=marketplace' },
+            ].map(item => (
+              <button
+                key={item.path}
+                onClick={() => navigate(item.path)}
+                className={`w-full text-left px-4 py-2 text-sm transition-colors ${
+                  location.pathname + location.search === item.path
+                    ? 'bg-violet-50 text-violet-700 font-medium'
+                    : 'text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
+            <div className="px-4 pt-1.5 pb-0.5">
+              <p className="text-[9px] font-semibold text-gray-400 uppercase flex items-center gap-1">
+                <Clock size={9} /> RECENTS
+              </p>
+            </div>
+            <button
+              onClick={() => navigate('/agents?nav=chat')}
+              className="w-full text-left px-4 py-2 text-xs text-gray-500 hover:bg-gray-50 transition-colors truncate"
+            >
+              查询下SH20260716 对应的出入库记录
+            </button>
+          </div>
+        )}
       </div>
     </div>
   )
