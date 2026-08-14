@@ -11,11 +11,13 @@ import {
   Moon,
   Sun,
   Heart,
+  Building2,
 } from 'lucide-react'
 import { useI18n } from '../../context/I18nContext'
 import { useNavigate, useLocation } from 'react-router-dom'
 import LanguageSwitcher from './LanguageSwitcher'
 import { useFavorites } from '../../context/FavoritesContext'
+import { useRole, type Role } from '../../context/RoleContext'
 
 // ─── Path → readable label ────────────────────────────────────────────────────
 function getPageLabel(pathname: string): string {
@@ -35,20 +37,22 @@ function Header() {
   const navigate = useNavigate()
   const location = useLocation()
   const { isFavorited, toggleFavorite } = useFavorites()
+  const { role, setRole } = useRole()
   const [helpOpen, setHelpOpen] = useState(false)
+  const [roleOpen, setRoleOpen] = useState(false)
   const [darkMode, setDarkMode] = useState(false)
   const helpRef = useRef<HTMLDivElement>(null)
+  const roleRef = useRef<HTMLDivElement>(null)
 
   const currentPath = location.pathname
   const currentLabel = getPageLabel(currentPath)
   const favorited = isFavorited(currentPath)
 
-  // Close dropdown on outside click
+  // Close dropdowns on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (helpRef.current && !helpRef.current.contains(e.target as Node)) {
-        setHelpOpen(false)
-      }
+      if (helpRef.current && !helpRef.current.contains(e.target as Node)) setHelpOpen(false)
+      if (roleRef.current && !roleRef.current.contains(e.target as Node)) setRoleOpen(false)
     }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
@@ -154,6 +158,44 @@ function Header() {
 
         {/* Language switcher */}
         <LanguageSwitcher />
+
+        {/* Role switcher */}
+        <div ref={roleRef} className="relative">
+          <button
+            onClick={() => setRoleOpen(v => !v)}
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md transition-colors text-xs font-medium border ${
+              role === 'Customer' ? 'border-blue-200 bg-blue-50 text-blue-700' :
+              role === 'Carrier' ? 'border-violet-200 bg-violet-50 text-violet-700' :
+              'border-teal-200 bg-teal-50 text-teal-700'
+            }`}
+            title="Switch Role"
+          >
+            <Building2 size={13} />
+            {role}
+            <ChevronDown size={11} className={`transition-transform ${roleOpen ? 'rotate-180' : ''}`} />
+          </button>
+          {roleOpen && (
+            <div className="absolute right-0 top-full mt-1 w-44 bg-white border border-gray-200 rounded-lg shadow-lg z-50 overflow-hidden">
+              <p className="px-4 py-2 text-[10px] font-semibold text-gray-400 uppercase border-b border-gray-100">Switch Role</p>
+              {(['Customer', 'Carrier', 'Broker'] as Role[]).map(r => (
+                <button
+                  key={r}
+                  onClick={() => {
+                    setRole(r)
+                    setRoleOpen(false)
+                    if (r === 'Carrier' || r === 'Broker') navigate('/carrier/appointment')
+                    else navigate('/')
+                  }}
+                  className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors ${role === r ? 'text-primary-600 font-semibold bg-primary-50' : 'text-gray-700'}`}
+                >
+                  <span className={`w-2 h-2 rounded-full ${r === 'Customer' ? 'bg-blue-500' : r === 'Carrier' ? 'bg-violet-500' : 'bg-teal-500'}`} />
+                  {r}
+                  {role === r && <span className="ml-auto text-[10px] text-primary-500">Active</span>}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </header>
   )

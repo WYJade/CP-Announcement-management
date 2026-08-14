@@ -34,6 +34,7 @@ import UserProfile from './components/UserProfile/UserProfile'
 import InsightsPage from './components/Insights/InsightsPage'
 import HomePage from './components/Home/HomePage'
 import AccountManagement from './components/System/AccountManagement'
+import CarrierAppointment from './components/Carrier/CarrierAppointment'
 
 function App() {
   return (
@@ -109,6 +110,9 @@ function App() {
 
         {/* System */}
         <Route path="system/accounts" element={<AccountManagement />} />
+
+        {/* Carrier / Broker */}
+        <Route path="carrier/appointment" element={<CarrierAppointment />} />
       </Route>
     </Routes>
   )
