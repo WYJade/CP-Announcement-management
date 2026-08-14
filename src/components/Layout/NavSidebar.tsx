@@ -510,22 +510,6 @@ function NavSidebar() {
         </nav>
         </div>
 
-        {/* Agents Section - standalone external link, no arrow, no expand */}
-        <div className="border-t border-gray-100 pt-3 mb-4">
-          <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1">AI Agents</p>
-          <nav className="space-y-0.5">
-            <a
-              href="https://ai-native.item.pub/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center w-full px-3 py-2 text-sm rounded-md hover:bg-gray-100 transition-colors text-gray-700"
-            >
-              <span className="mr-3 text-gray-500"><Bot size={16} /></span>
-              <span className="flex-1 text-left font-medium">Agents</span>
-            </a>
-          </nav>
-        </div>
-
         {/* System Section */}
         <div className="border-t border-gray-100 pt-3 mb-4">
           <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1">System</p>
@@ -542,31 +526,31 @@ function NavSidebar() {
         </div>
       </div>
 
-      {/* ── Sticky AI Agents bottom entry ── */}
-      <div className="border-t border-gray-100 p-3 bg-white shrink-0">
+      {/* ── Sticky AI Agents bottom entry — full width ── */}
+      <div className="border-t border-gray-100 bg-white shrink-0">
         <button
           onClick={() => setExpandedItems(prev =>
             prev.includes('ai-agents-bottom')
               ? prev.filter(i => i !== 'ai-agents-bottom')
               : [...prev, 'ai-agents-bottom']
           )}
-          className="w-full flex items-center gap-3 px-3 py-3 rounded-xl bg-gradient-to-r from-violet-50 to-indigo-50 border border-violet-200 hover:from-violet-100 hover:to-indigo-100 transition-all group"
+          className="w-full flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 transition-all group"
         >
-          <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-sm shrink-0">
-            <Bot size={16} className="text-white" />
+          <div className="w-7 h-7 bg-white/20 rounded-lg flex items-center justify-center shrink-0">
+            <Bot size={15} className="text-white" />
           </div>
           <div className="flex-1 text-left min-w-0">
-            <p className="text-xs font-bold text-violet-700 leading-tight">AI Agents</p>
-            <p className="text-[9px] text-violet-400">Your AI agent</p>
+            <p className="text-xs font-bold text-white leading-tight">AI Agents</p>
+            <p className="text-[9px] text-white/70">Your AI agent</p>
           </div>
-          <span className={`text-violet-400 transition-transform shrink-0 ${expandedItems.includes('ai-agents-bottom') ? 'rotate-180' : ''}`}>
+          <span className={`text-white/70 transition-transform shrink-0 ${expandedItems.includes('ai-agents-bottom') ? 'rotate-180' : ''}`}>
             <ChevronDown size={13} />
           </span>
         </button>
 
         {/* Expanded agents menu */}
         {expandedItems.includes('ai-agents-bottom') && (
-          <div className="mt-1.5 space-y-0.5 border border-violet-100 rounded-lg bg-white overflow-hidden">
+          <div className="border-t border-violet-500/30 bg-violet-700 py-1">
             {[
               { label: 'Chat', path: '/agents?nav=chat' },
               { label: 'Agent Workstation', path: '/agents?nav=workstation' },
@@ -576,23 +560,19 @@ function NavSidebar() {
               <button
                 key={item.path}
                 onClick={() => navigate(item.path)}
-                className={`w-full text-left px-4 py-2 text-sm transition-colors ${
-                  location.pathname + location.search === item.path
-                    ? 'bg-violet-50 text-violet-700 font-medium'
-                    : 'text-gray-700 hover:bg-gray-50'
-                }`}
+                className="w-full text-left px-5 py-2 text-sm text-white/80 hover:text-white hover:bg-white/10 transition-colors"
               >
                 {item.label}
               </button>
             ))}
-            <div className="px-4 pt-1.5 pb-0.5">
-              <p className="text-[9px] font-semibold text-gray-400 uppercase flex items-center gap-1">
+            <div className="px-5 pt-1.5 pb-0.5">
+              <p className="text-[9px] font-semibold text-white/40 uppercase flex items-center gap-1">
                 <Clock size={9} /> RECENTS
               </p>
             </div>
             <button
               onClick={() => navigate('/agents?nav=chat')}
-              className="w-full text-left px-4 py-2 text-xs text-gray-500 hover:bg-gray-50 transition-colors truncate"
+              className="w-full text-left px-5 py-2 text-xs text-white/60 hover:text-white hover:bg-white/10 transition-colors truncate"
             >
               查询下SH20260716 对应的出入库记录
             </button>

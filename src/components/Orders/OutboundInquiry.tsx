@@ -228,19 +228,29 @@ function AttachmentModal({ order, onClose }: { order: OutboundOrder; onClose: ()
 // ─── Status badge ─────────────────────────────────────────────────────────────
 function StatusBadge({ status }: { status: string }) {
   const cls: Record<string, string> = {
-    'Shipped': 'bg-blue-100 text-blue-700',
-    'In Progress': 'bg-violet-100 text-violet-700',
-    'Staged': 'bg-amber-100 text-amber-700',
-    'Paid': 'bg-green-100 text-green-700',
-    'Billed': 'bg-teal-100 text-teal-700',
-    'Problem': 'bg-red-100 text-red-700',
-    'Plan': 'bg-gray-100 text-gray-700',
-    'Loading': 'bg-orange-100 text-orange-700',
-    'Partially Paid': 'bg-cyan-100 text-cyan-700',
-    'Paid Due': 'bg-rose-100 text-rose-700',
+    'Shipped':        'bg-blue-500 text-white',
+    'In Progress':    'bg-orange-400 text-white',
+    'Staged':         'bg-yellow-400 text-white',
+    'Committed':      'bg-violet-500 text-white',
+    'Commit Blocked': 'bg-gray-100 text-gray-600 border border-gray-300',
+    'Paid':           'bg-green-500 text-white',
+    'Billed':         'bg-teal-500 text-white',
+    'Problem':        'bg-red-500 text-white',
+    'Plan':           'bg-gray-400 text-white',
+    'Loading':        'bg-orange-500 text-white',
+    'Partially Paid': 'bg-cyan-400 text-white',
+    'Paid Due':       'bg-rose-500 text-white',
+    'Dispatched':     'bg-violet-500 text-white',
+    'Booked':         'bg-gray-200 text-gray-700',
+    'OFD':            'bg-amber-400 text-white',
+    'Delivered':      'bg-emerald-500 text-white',
+    'Receiving':      'bg-lime-500 text-white',
+    'Received':       'bg-green-500 text-white',
+    'Vehicle Arrived':'bg-orange-500 text-white',
+    'Unloading':      'bg-yellow-500 text-white',
   }
   return (
-    <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-semibold ${cls[status] ?? 'bg-gray-100 text-gray-500'}`}>
+    <span className={`inline-flex px-2.5 py-0.5 rounded-full text-[10px] font-semibold ${cls[status] ?? 'bg-gray-100 text-gray-500'}`}>
       {status}
     </span>
   )

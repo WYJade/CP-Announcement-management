@@ -17,7 +17,7 @@ function LayoutInner() {
 
   if (isCarrierRole) {
     return (
-      <div className="min-h-screen bg-[#1a1a2e]">
+      <div className="min-h-screen bg-gray-50">
         <CarrierSidebar role={role as 'Carrier' | 'Broker'} />
         <Header />
         <main className="ml-56 mt-14 overflow-auto min-h-screen">

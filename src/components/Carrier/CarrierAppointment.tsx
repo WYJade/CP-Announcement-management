@@ -1,4 +1,4 @@
-import { useState } from 'react'
+zimport { useState } from 'react'
 import { Plus, Search, RotateCcw, Download, ChevronRight } from 'lucide-react'
 
 interface Appointment {
@@ -21,10 +21,11 @@ const APPOINTMENTS: Appointment[] = [
 ]
 
 function statusBadge(status: string) {
-  if (status === 'CHECKED IN') return 'bg-green-900/40 text-green-300 border border-green-700'
-  if (status === 'WAITING FOR DRIVER') return 'bg-yellow-900/40 text-yellow-300 border border-yellow-700'
-  if (status === 'COMPLETED') return 'bg-blue-900/40 text-blue-300 border border-blue-700'
-  return 'bg-gray-700 text-gray-300'
+  if (status === 'CHECKED IN') return 'bg-green-100 text-green-800 border border-green-300'
+  if (status === 'WAITING FOR DRIVER') return 'bg-yellow-100 text-yellow-800 border border-yellow-300'
+  if (status === 'COMPLETED') return 'bg-blue-100 text-blue-700 border border-blue-300'
+  if (status === 'CANCELLED') return 'bg-red-100 text-red-700 border border-red-300'
+  return 'bg-gray-100 text-gray-600 border border-gray-200'
 }
 
 export default function CarrierAppointment() {
@@ -45,52 +46,52 @@ export default function CarrierAppointment() {
   })
 
   return (
-    <div className="p-6 min-h-screen bg-[#1a1a2e] text-white">
+    <div className="p-6 min-h-screen bg-gray-50">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-bold text-white">Appointment</h1>
+        <h1 className="text-xl font-bold text-gray-900">Appointment</h1>
         <button className="flex items-center gap-2 px-4 py-2 bg-violet-600 text-white text-sm font-medium rounded-lg hover:bg-violet-700 transition-colors">
           <Plus size={14} /> Add New
         </button>
       </div>
 
       {/* Search filters */}
-      <div className="bg-[#16213e] border border-gray-700 rounded-xl p-5 mb-5">
-        <p className="text-xs font-semibold text-gray-400 uppercase mb-4">Search By</p>
+      <div className="bg-white border border-gray-200 rounded-xl p-5 mb-5">
+        <p className="text-xs font-semibold text-gray-500 uppercase mb-4">Search By</p>
         <div className="grid grid-cols-4 gap-4 mb-4">
           <div>
-            <label className="block text-xs text-gray-400 mb-1.5">Yard</label>
+            <label className="block text-xs text-gray-500 mb-1.5">Yard</label>
             <select value={yard} onChange={e => setYard(e.target.value)}
-              className="w-full bg-[#0f3460] border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-violet-500">
+              className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:border-violet-400">
               <option>Fontana</option>
               <option>Savannah</option>
               <option>Long Beach</option>
             </select>
           </div>
           <div>
-            <label className="block text-xs text-gray-400 mb-1.5">APPT #</label>
+            <label className="block text-xs text-gray-500 mb-1.5">APPT #</label>
             <input value={apptNo} onChange={e => setApptNo(e.target.value)}
-              className="w-full bg-[#0f3460] border border-gray-600 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-violet-500" />
+              className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:border-violet-400" />
           </div>
           <div>
-            <label className="block text-xs text-gray-400 mb-1.5">Reference #</label>
+            <label className="block text-xs text-gray-500 mb-1.5">Reference #</label>
             <input value={refNo} onChange={e => setRefNo(e.target.value)}
-              className="w-full bg-[#0f3460] border border-gray-600 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-violet-500" />
+              className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:border-violet-400" />
           </div>
           <div>
-            <label className="block text-xs text-gray-400 mb-1.5">PO #</label>
+            <label className="block text-xs text-gray-500 mb-1.5">PO #</label>
             <input value={poNo} onChange={e => setPoNo(e.target.value)}
-              className="w-full bg-[#0f3460] border border-gray-600 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-violet-500" />
+              className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:border-violet-400" />
           </div>
           <div>
-            <label className="block text-xs text-gray-400 mb-1.5">LOAD #</label>
+            <label className="block text-xs text-gray-500 mb-1.5">LOAD #</label>
             <input value={loadNo} onChange={e => setLoadNo(e.target.value)}
-              className="w-full bg-[#0f3460] border border-gray-600 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-violet-500" />
+              className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:border-violet-400" />
           </div>
           <div>
-            <label className="block text-xs text-gray-400 mb-1.5">Carrier</label>
+            <label className="block text-xs text-gray-500 mb-1.5">Carrier</label>
             <select value={carrier} onChange={e => setCarrier(e.target.value)}
-              className="w-full bg-[#0f3460] border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-violet-500">
+              className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:border-violet-400">
               <option value="">Select Carrier</option>
               <option>FEDEX FREIGHT INC</option>
               <option>UPS FREIGHT</option>
@@ -98,9 +99,9 @@ export default function CarrierAppointment() {
             </select>
           </div>
           <div>
-            <label className="block text-xs text-gray-400 mb-1.5">Service Type</label>
+            <label className="block text-xs text-gray-500 mb-1.5">Service Type</label>
             <select value={serviceType} onChange={e => setServiceType(e.target.value)}
-              className="w-full bg-[#0f3460] border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-violet-500">
+              className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:border-violet-400">
               <option value="">Select</option>
               <option>LTL</option>
               <option>TL</option>
@@ -108,21 +109,21 @@ export default function CarrierAppointment() {
             </select>
           </div>
           <div>
-            <label className="block text-xs text-gray-400 mb-1.5">Appointment Time Range</label>
+            <label className="block text-xs text-gray-500 mb-1.5">Appointment Time Range</label>
             <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1 flex-1 bg-[#0f3460] border border-gray-600 rounded-lg px-3 py-2">
-                <span className="text-gray-500 text-xs">⏰</span>
-                <input placeholder="Start" className="flex-1 bg-transparent text-sm text-white placeholder-gray-500 focus:outline-none w-16" />
-                <span className="text-gray-500 text-xs mx-1">–</span>
-                <input placeholder="End" className="flex-1 bg-transparent text-sm text-white placeholder-gray-500 focus:outline-none w-16" />
+              <div className="flex items-center gap-1 flex-1 bg-white border border-gray-300 rounded-lg px-3 py-2">
+                <span className="text-gray-400 text-xs">⏰</span>
+                <input placeholder="Start" className="flex-1 bg-transparent text-sm text-gray-800 placeholder-gray-400 focus:outline-none w-16" />
+                <span className="text-gray-400 text-xs mx-1">–</span>
+                <input placeholder="End" className="flex-1 bg-transparent text-sm text-gray-800 placeholder-gray-400 focus:outline-none w-16" />
               </div>
             </div>
           </div>
         </div>
         <div>
-          <label className="block text-xs text-gray-400 mb-1.5">Appointment Status</label>
+          <label className="block text-xs text-gray-500 mb-1.5">Appointment Status</label>
           <select value={apptStatus} onChange={e => setApptStatus(e.target.value)}
-            className="w-48 bg-[#0f3460] border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-violet-500">
+            className="w-48 bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:border-violet-400">
             <option value="">Select</option>
             <option>CHECKED IN</option>
             <option>WAITING FOR DRIVER</option>
@@ -132,7 +133,7 @@ export default function CarrierAppointment() {
         </div>
         <div className="flex justify-end gap-3 mt-5">
           <button onClick={() => { setApptNo(''); setApptStatus(''); setCarrier(''); setServiceType('') }}
-            className="px-5 py-2 border border-gray-600 text-gray-300 text-sm rounded-lg hover:bg-gray-700 transition-colors flex items-center gap-1.5">
+            className="px-5 py-2 border border-gray-300 text-gray-600 text-sm rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-1.5">
             <RotateCcw size={13} /> Reset
           </button>
           <button className="px-5 py-2 bg-violet-600 text-white text-sm font-medium rounded-lg hover:bg-violet-700 transition-colors flex items-center gap-1.5">
@@ -149,56 +150,56 @@ export default function CarrierAppointment() {
       </div>
 
       {/* Table */}
-      <div className="bg-[#16213e] border border-gray-700 rounded-xl overflow-hidden">
+      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-gray-700">
+            <tr className="bg-gray-50 border-b border-gray-200">
               <th className="w-8 py-3 px-3"></th>
               {['APPT #','Carrier','Customer','APPT Time (America/Los_Angeles)','Status','Created Time','Last Update Time','ACTION'].map(h => (
-                <th key={h} className="text-left py-3 px-3 text-xs font-semibold text-gray-400">{h}</th>
+                <th key={h} className="text-left py-3 px-3 text-xs font-semibold text-gray-500">{h}</th>
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-700/50">
+          <tbody className="divide-y divide-gray-100">
             {filtered.map(row => (
               <>
-                <tr key={row.id} className="hover:bg-[#0f3460]/50 transition-colors">
+                <tr key={row.id} className="hover:bg-gray-50 transition-colors">
                   <td className="py-3 px-3">
                     <button onClick={() => setExpandedRow(expandedRow === row.id ? null : row.id)}
-                      className="text-gray-400 hover:text-white transition-colors">
+                      className="text-gray-400 hover:text-gray-600 transition-colors">
                       <ChevronRight size={14} className={`transition-transform ${expandedRow === row.id ? 'rotate-90' : ''}`} />
                     </button>
                   </td>
-                  <td className="py-3 px-3 text-violet-400 font-medium cursor-pointer hover:underline">{row.apptNo}</td>
-                  <td className="py-3 px-3 text-white font-medium">{row.carrier}</td>
-                  <td className="py-3 px-3 text-gray-300">{row.customer}</td>
-                  <td className="py-3 px-3 text-gray-300">{row.apptTime}</td>
+                  <td className="py-3 px-3 text-violet-600 font-medium cursor-pointer hover:underline">{row.apptNo}</td>
+                  <td className="py-3 px-3 text-gray-800 font-medium">{row.carrier}</td>
+                  <td className="py-3 px-3 text-gray-700">{row.customer}</td>
+                  <td className="py-3 px-3 text-gray-600">{row.apptTime}</td>
                   <td className="py-3 px-3">
                     <span className={`inline-flex px-2 py-0.5 rounded text-[10px] font-semibold ${statusBadge(row.status)}`}>
                       {row.status}
                     </span>
                   </td>
-                  <td className="py-3 px-3 text-gray-400 text-xs">{row.createdTime}</td>
-                  <td className="py-3 px-3 text-gray-400 text-xs">{row.lastUpdateTime}</td>
+                  <td className="py-3 px-3 text-gray-500 text-xs">{row.createdTime}</td>
+                  <td className="py-3 px-3 text-gray-500 text-xs">{row.lastUpdateTime}</td>
                   <td className="py-3 px-3">
                     <div className="flex items-center gap-2">
                       {row.status === 'CHECKED IN' ? (
-                        <button className="text-xs text-violet-400 hover:text-violet-300 font-medium">View Details</button>
+                        <button className="text-xs text-violet-600 hover:text-violet-800 font-medium">View Details</button>
                       ) : (
-                        <button className="text-xs text-violet-400 hover:text-violet-300 font-medium">Modify Driver</button>
+                        <button className="text-xs text-violet-600 hover:text-violet-800 font-medium">Modify Driver</button>
                       )}
-                      <span className="text-gray-600">|</span>
-                      <button className="text-xs text-violet-400 hover:text-violet-300 font-medium">Edit</button>
+                      <span className="text-gray-300">|</span>
+                      <button className="text-xs text-violet-600 hover:text-violet-800 font-medium">Edit</button>
                     </div>
                   </td>
                 </tr>
                 {expandedRow === row.id && (
-                  <tr key={row.id + '-expanded'} className="bg-[#0f3460]/30">
+                  <tr key={row.id + '-expanded'} className="bg-violet-50/40">
                     <td colSpan={9} className="px-8 py-4">
                       <div className="grid grid-cols-3 gap-4 text-xs">
-                        <div><p className="text-gray-500 mb-1">APPT #</p><p className="text-white font-medium">{row.apptNo}</p></div>
-                        <div><p className="text-gray-500 mb-1">Carrier</p><p className="text-white">{row.carrier}</p></div>
-                        <div><p className="text-gray-500 mb-1">Status</p>
+                        <div><p className="text-gray-400 mb-1">APPT #</p><p className="text-gray-800 font-medium">{row.apptNo}</p></div>
+                        <div><p className="text-gray-400 mb-1">Carrier</p><p className="text-gray-800">{row.carrier}</p></div>
+                        <div><p className="text-gray-400 mb-1">Status</p>
                           <span className={`inline-flex px-2 py-0.5 rounded text-[10px] font-semibold ${statusBadge(row.status)}`}>{row.status}</span>
                         </div>
                       </div>
@@ -208,7 +209,7 @@ export default function CarrierAppointment() {
               </>
             ))}
             {filtered.length === 0 && (
-              <tr><td colSpan={9} className="text-center py-12 text-gray-500">No appointments found</td></tr>
+              <tr><td colSpan={9} className="text-center py-12 text-gray-400">No appointments found</td></tr>
             )}
           </tbody>
         </table>
