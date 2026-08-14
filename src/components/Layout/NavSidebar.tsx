@@ -29,6 +29,7 @@ import {
   Clock,
   Search,
   ArrowRight,
+  BarChart2 as BarChart2Icon,
 } from 'lucide-react'
 import { useCollaboration } from '../../context/CollaborationContext'
 import { useFavorites } from '../../context/FavoritesContext'
@@ -48,11 +49,29 @@ interface MenuItem {
 }
 
 const menuItems: MenuItem[] = [
+  // ── Dashboard ──────────────────────────────────────────────────────────────
+  {
+    id: 'dashboards',
+    label: 'Dashboards',
+    icon: <LayoutDashboard size={16} />,
+    expandable: true,
+    children: [
+      { id: 'otif', label: 'OTIF', path: '/dashboard/otif' },
+      { id: 'kpi', label: 'KPI', path: '/dashboard/kpi' },
+      { id: 'ticket-insights', label: 'Ticket Insights' },
+    ],
+  },
+
+  // ── Order & Planning ───────────────────────────────────────────────────────
   {
     id: 'purchase',
     label: 'Purchase Management',
     icon: <ShoppingCart size={16} />,
     expandable: true,
+    children: [
+      { id: 'purchase-request', label: 'Purchase Request' },
+      { id: 'purchase-order', label: 'Purchase Order' },
+    ],
   },
   {
     id: 'sales',
@@ -62,6 +81,8 @@ const menuItems: MenuItem[] = [
     children: [
       { id: 'wholesale', label: 'Wholesale Orders', path: '/sales/wholesale' },
       { id: 'retail', label: 'Retail Orders', path: '/sales/retail' },
+      { id: 'sales-order', label: 'Sales Order' },
+      { id: 'order-routing', label: 'Order Routing' },
     ],
   },
   {
@@ -71,23 +92,78 @@ const menuItems: MenuItem[] = [
     expandable: false,
   },
   {
+    id: 'performance',
+    label: 'Performance & Compliance',
+    icon: <BarChart2Icon size={16} />,
+    expandable: true,
+    children: [
+      { id: 'otif-summary', label: 'OTIF Summary', path: '/dashboard/otif' },
+      { id: 'lead-time', label: 'Lead Time Analysis' },
+      { id: 'penalties', label: 'Penalties' },
+      { id: 'routing-report', label: 'Routing Report' },
+      { id: 'walmart-shipments', label: 'Walmart Shipments' },
+      { id: 'target-shipments', label: 'Target Shipments' },
+      { id: 'auto-order-entry', label: 'Automated Order Entry' },
+      { id: 'damaged-box', label: 'Damaged Box Detection' },
+      { id: 'root-cause', label: 'Root Cause Analysis' },
+    ],
+  },
+
+  // ── Inbound & Yard ─────────────────────────────────────────────────────────
+  {
     id: 'inbound',
     label: 'Inbound',
     icon: <PackageOpen size={16} />,
     expandable: true,
     children: [
       { id: 'inbound-inquiry', label: 'Inquiry', path: '/inbound/inquiry' },
+      { id: 'inbound-schedule', label: 'Schedule Summary' },
+      { id: 'inbound-received', label: 'Received Summary' },
+      { id: 'receipt-entry', label: 'Receipt Entry' },
+      { id: 'put-away', label: 'Put Away Report' },
+      { id: 'make-appointment', label: 'Make Appointment' },
+      { id: 'appointment-list', label: 'Appointment List' },
     ],
   },
+  {
+    id: 'yard',
+    label: 'Yard Management',
+    icon: <ParkingCircle size={16} />,
+    expandable: true,
+    children: [
+      { id: 'equip-history', label: 'Equipment History Report' },
+      { id: 'equip-report', label: 'Equipment Report' },
+      { id: 'yard-status', label: 'Yard Status Report' },
+      { id: 'yard-check', label: 'Yard Check Report' },
+      { id: 'location-status', label: 'Location Status' },
+      { id: 'equip-activity', label: 'Equipment Activity' },
+      { id: 'equip-sla', label: 'Equipment SLA Report' },
+      { id: 'dock-suggestion', label: 'Dock Suggestion Command' },
+      { id: 'appt-report', label: 'Appointment Report' },
+      { id: 'yard-traffic', label: 'Yard Traffic Report' },
+      { id: 'driver-disc', label: 'Driver Discrepancy Report' },
+    ],
+  },
+
+  // ── Inventory ──────────────────────────────────────────────────────────────
   {
     id: 'inventory',
     label: 'Inventory',
     icon: <Boxes size={16} />,
     expandable: true,
     children: [
+      { id: 'sn-lookup', label: 'SN Look Up' },
       { id: 'inventory-activity', label: 'Inventory Activity', path: '/inventory/activity' },
+      { id: 'inventory-adj', label: 'Inventory Adjustment' },
+      { id: 'inventory-status', label: 'Inventory Status' },
+      { id: 'item-master', label: 'Item Master' },
+      { id: 'current-onhand', label: 'Current Onhand Inventory' },
+      { id: 'aging-report', label: 'Historical Inventory Aging Report' },
+      { id: 'wh-projects', label: 'Warehouse Projects' },
     ],
   },
+
+  // ── Outbound ───────────────────────────────────────────────────────────────
   {
     id: 'outbound',
     label: 'Outbound',
@@ -95,36 +171,22 @@ const menuItems: MenuItem[] = [
     expandable: true,
     children: [
       { id: 'outbound-inquiry', label: 'Inquiry', path: '/outbound/inquiry' },
-      { id: 'freight-quote', label: 'Freight Quote', path: '/outbound/freight-quote' },
+      { id: 'outbound-schedule', label: 'Schedule Summary' },
+      { id: 'shipped-summary', label: 'Shipped Summary' },
+      { id: 'order-carrier', label: 'Order Carrier Update' },
+      { id: 'order-entry', label: 'Order Entry' },
+      { id: 'small-parcel', label: 'Small Parcel Tracking Status' },
     ],
   },
-  {
-    id: 'integrations',
-    label: 'Integrations',
-    icon: <Puzzle size={16} />,
-    expandable: true,
-  },
-  {
-    id: 'returns',
-    label: 'Returns',
-    icon: <RotateCcw size={16} />,
-    expandable: true,
-  },
-  {
-    id: 'yard',
-    label: 'Yard Management',
-    icon: <ParkingCircle size={16} />,
-    expandable: true,
-  },
+
+  // ── Shipping & Freight ─────────────────────────────────────────────────────
   {
     id: 'supply-chain',
-    label: 'Supply Chain Mgmt',
+    label: 'Shipping',
     icon: <Link2 size={16} />,
     expandable: true,
     children: [
-      { id: 'shipments-list', label: 'Shipments', path: '/shipping/shipments' },
       { id: 'tracking', label: 'Tracking', path: '/shipping/tracking' },
-      { id: 'shipper-shipments', label: 'Shipper Shipment-Management', path: '/shipping/shipper-shipments' },
     ],
   },
   {
@@ -137,6 +199,31 @@ const menuItems: MenuItem[] = [
     ],
   },
   {
+    id: 'freight-quote',
+    label: 'Freight Quote',
+    icon: <DollarSign size={16} />,
+    expandable: false,
+  },
+
+  // ── Returns ────────────────────────────────────────────────────────────────
+  {
+    id: 'returns',
+    label: 'Returns',
+    icon: <RotateCcw size={16} />,
+    expandable: true,
+    children: [
+      { id: 'rma', label: 'RMA' },
+      { id: 'traveler-id', label: 'Traveler ID' },
+      { id: 'return-report', label: 'Return Report' },
+      { id: 'restock', label: 'Restock Report' },
+      { id: 'adjustment', label: 'Adjustment Report' },
+      { id: 'scrap', label: 'Scrap Report' },
+      { id: 'service-claim', label: 'Service Claim Report' },
+    ],
+  },
+
+  // ── Finance ────────────────────────────────────────────────────────────────
+  {
     id: 'finance',
     label: 'Finance',
     icon: <DollarSign size={16} />,
@@ -147,6 +234,28 @@ const menuItems: MenuItem[] = [
       { id: 'history', label: 'History' },
       { id: 'cost-calculator', label: 'Cost Calculator' },
       { id: 'claim', label: 'Claim' },
+    ],
+  },
+
+  // ── Integration ────────────────────────────────────────────────────────────
+  {
+    id: 'integrations',
+    label: 'Integrations',
+    icon: <Puzzle size={16} />,
+    expandable: true,
+    children: [
+      { id: 'store-integrations', label: 'Store Integrations' },
+      { id: 'carrier-integrations', label: 'Carrier Integrations' },
+    ],
+  },
+  {
+    id: 'webmethods',
+    label: 'WebMethods',
+    icon: <Link2 size={16} />,
+    expandable: true,
+    children: [
+      { id: 'partners', label: 'Partners' },
+      { id: 'transactions', label: 'Transactions' },
     ],
   },
 ]
@@ -504,9 +613,41 @@ function NavSidebar() {
 
         {/* Workspace Section */}
         <div className="border-t border-gray-100 pt-3">
-        <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1">Workspace</p>
+        <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1">Dashboard</p>
+        <nav className="space-y-0.5 mb-3">
+          {renderMenuSection([menuItems[0]])}
+        </nav>
+        <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1 mt-2">Order &amp; Planning</p>
+        <nav className="space-y-0.5 mb-3">
+          {renderMenuSection(menuItems.slice(1,5))}
+        </nav>
+        <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1 mt-2">Inbound &amp; Yard</p>
+        <nav className="space-y-0.5 mb-3">
+          {renderMenuSection(menuItems.slice(5,7))}
+        </nav>
+        <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1 mt-2">Inventory</p>
+        <nav className="space-y-0.5 mb-3">
+          {renderMenuSection(menuItems.slice(7,8))}
+        </nav>
+        <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1 mt-2">Outbound</p>
+        <nav className="space-y-0.5 mb-3">
+          {renderMenuSection(menuItems.slice(8,9))}
+        </nav>
+        <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1 mt-2">Shipping &amp; Freight</p>
+        <nav className="space-y-0.5 mb-3">
+          {renderMenuSection(menuItems.slice(9,12))}
+        </nav>
+        <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1 mt-2">Returns</p>
+        <nav className="space-y-0.5 mb-3">
+          {renderMenuSection(menuItems.slice(12,13))}
+        </nav>
+        <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1 mt-2">Finance</p>
+        <nav className="space-y-0.5 mb-3">
+          {renderMenuSection(menuItems.slice(13,14))}
+        </nav>
+        <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1 mt-2">Integration</p>
         <nav className="space-y-0.5 mb-4">
-          {renderMenuSection(menuItems)}
+          {renderMenuSection(menuItems.slice(14))}
         </nav>
         </div>
 
@@ -526,7 +667,7 @@ function NavSidebar() {
         </div>
       </div>
 
-      {/* ── Sticky AI Agents bottom entry — full width ── */}
+      {/* ── Sticky AI Agents bottom entry — full width, light style ── */}
       <div className="border-t border-gray-100 bg-white shrink-0">
         <button
           onClick={() => setExpandedItems(prev =>
@@ -534,23 +675,22 @@ function NavSidebar() {
               ? prev.filter(i => i !== 'ai-agents-bottom')
               : [...prev, 'ai-agents-bottom']
           )}
-          className="w-full flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 transition-all group"
+          className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-violet-50 transition-all group"
         >
-          <div className="w-7 h-7 bg-white/20 rounded-lg flex items-center justify-center shrink-0">
-            <Bot size={15} className="text-white" />
+          <div className="w-6 h-6 bg-violet-100 rounded-lg flex items-center justify-center shrink-0">
+            <Bot size={13} className="text-violet-600" />
           </div>
           <div className="flex-1 text-left min-w-0">
-            <p className="text-xs font-bold text-white leading-tight">AI Agents</p>
-            <p className="text-[9px] text-white/70">Your AI agent</p>
+            <p className="text-xs font-semibold text-violet-700 leading-tight">AI Agents</p>
           </div>
-          <span className={`text-white/70 transition-transform shrink-0 ${expandedItems.includes('ai-agents-bottom') ? 'rotate-180' : ''}`}>
-            <ChevronDown size={13} />
+          <span className={`text-violet-400 transition-transform shrink-0 ${expandedItems.includes('ai-agents-bottom') ? 'rotate-180' : ''}`}>
+            <ChevronDown size={12} />
           </span>
         </button>
 
         {/* Expanded agents menu */}
         {expandedItems.includes('ai-agents-bottom') && (
-          <div className="border-t border-violet-500/30 bg-violet-700 py-1">
+          <div className="bg-gray-50 border-t border-gray-100 py-1">
             {[
               { label: 'Chat', path: '/agents?nav=chat' },
               { label: 'Agent Workstation', path: '/agents?nav=workstation' },
@@ -560,19 +700,23 @@ function NavSidebar() {
               <button
                 key={item.path}
                 onClick={() => navigate(item.path)}
-                className="w-full text-left px-5 py-2 text-sm text-white/80 hover:text-white hover:bg-white/10 transition-colors"
+                className={`w-full text-left px-8 py-1.5 text-xs transition-colors ${
+                  location.pathname + location.search === item.path
+                    ? 'text-violet-700 font-medium'
+                    : 'text-gray-600 hover:text-violet-700 hover:bg-violet-50'
+                }`}
               >
                 {item.label}
               </button>
             ))}
-            <div className="px-5 pt-1.5 pb-0.5">
-              <p className="text-[9px] font-semibold text-white/40 uppercase flex items-center gap-1">
+            <div className="px-8 pt-1.5 pb-0.5">
+              <p className="text-[9px] font-semibold text-gray-400 uppercase flex items-center gap-1">
                 <Clock size={9} /> RECENTS
               </p>
             </div>
             <button
               onClick={() => navigate('/agents?nav=chat')}
-              className="w-full text-left px-5 py-2 text-xs text-white/60 hover:text-white hover:bg-white/10 transition-colors truncate"
+              className="w-full text-left px-8 py-1.5 text-xs text-gray-500 hover:text-violet-700 hover:bg-violet-50 transition-colors truncate"
             >
               查询下SH20260716 对应的出入库记录
             </button>
