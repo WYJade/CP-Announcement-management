@@ -92,6 +92,12 @@ const menuItems: MenuItem[] = [
     expandable: false,
   },
   {
+    id: 'automated-order-entry',
+    label: 'Automated Order Entry',
+    icon: <ClipboardList size={16} />,
+    expandable: false,
+  },
+  {
     id: 'performance',
     label: 'Performance & Compliance',
     icon: <BarChart2Icon size={16} />,
@@ -619,41 +625,37 @@ function NavSidebar() {
         </nav>
         <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1 mt-2">Inbound &amp; Yard</p>
         <nav className="space-y-0.5 mb-3">
-          {renderMenuSection(menuItems.slice(5,7))}
+          {renderMenuSection(menuItems.slice(6,8))}
         </nav>
         <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1 mt-2">Inventory</p>
         <nav className="space-y-0.5 mb-3">
-          {renderMenuSection(menuItems.slice(7,8))}
+          {renderMenuSection(menuItems.slice(8,9))}
         </nav>
         <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1 mt-2">Outbound</p>
         <nav className="space-y-0.5 mb-3">
-          {renderMenuSection(menuItems.slice(8,9))}
+          {renderMenuSection(menuItems.slice(9,10))}
         </nav>
         <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1 mt-2">Shipping &amp; Freight</p>
         <nav className="space-y-0.5 mb-3">
-          {renderMenuSection(menuItems.slice(9,12))}
+          {renderMenuSection(menuItems.slice(10,13))}
         </nav>
         <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1 mt-2">Returns</p>
         <nav className="space-y-0.5 mb-3">
-          {renderMenuSection(menuItems.slice(12,13))}
+          {renderMenuSection(menuItems.slice(13,14))}
         </nav>
         <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1 mt-2">Finance</p>
         <nav className="space-y-0.5 mb-3">
-          {renderMenuSection(menuItems.slice(13,14))}
+          {renderMenuSection(menuItems.slice(14,15))}
         </nav>
         <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1 mt-2">Integration</p>
         <nav className="space-y-0.5 mb-3">
-          {renderMenuSection(menuItems.slice(14))}
+          {renderMenuSection(menuItems.slice(15))}
         </nav>
         </div>
 
-        {/* System Section */}
+        {/* System Section — Performance & Compliance moved to Insights */}
         <div className="border-t border-gray-100 pt-3 mb-4">
-          <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1">Performance &amp; Compliance</p>
-          <nav className="space-y-0.5 mb-3">
-            {renderMenuSection([menuItems[4]])}
-          </nav>
-          <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1 mt-2">System</p>
+          <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1">System</p>
           <nav className="space-y-0.5">
             {renderMenuSection(systemItems)}
           </nav>

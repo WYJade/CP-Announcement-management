@@ -77,27 +77,6 @@ function Header() {
           />
         </button>
 
-        {/* AI Agents entry */}
-        <a
-          href="https://ai-native.item.pub/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="p-1.5 rounded-md hover:bg-gray-100 transition-colors group"
-          title="AI Agents"
-          data-tour="header-ai-agents"
-        >
-          <Bot size={16} className="text-violet-500 group-hover:text-violet-700 transition-colors" />
-        </a>
-
-        {/* Insights entry */}
-        <button
-          onClick={() => navigate('/insights')}
-          className="p-1.5 rounded-md hover:bg-gray-100 transition-colors group"
-          title="Insights"
-          data-tour="header-insights"
-        >
-          <BarChart2 size={16} className="text-emerald-500 group-hover:text-emerald-700 transition-colors" />
-        </button>
       </div>
 
       {/* Right section */}

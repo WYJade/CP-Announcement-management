@@ -238,6 +238,25 @@ export default function InsightsPage() {
             ))}
           </div>
 
+          {/* Reports section — from Performance & Compliance */}
+          <div className="px-3 pt-2 pb-1">
+            <p className="text-[9px] font-semibold text-gray-400 uppercase mb-1.5 flex items-center gap-1"><BarChart2 size={9} /> Reports</p>
+            {[
+              { id: 'report-otif-summary', label: 'OTIF Summary' },
+              { id: 'report-lead-time', label: 'Lead Time Analysis' },
+              { id: 'report-penalties', label: 'Penalties' },
+              { id: 'report-routing', label: 'Routing Report' },
+              { id: 'report-root-cause', label: 'Root Cause Analysis' },
+            ].map(r => (
+              <button key={r.id}
+                onClick={() => { setActiveDashboard(r.id as any); setActiveSession(null) }}
+                className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-left group transition-colors ${activeDashboard === r.id ? 'bg-primary-50 text-primary-700 font-medium' : 'hover:bg-gray-50 text-gray-700'}`}>
+                <ChevronRight size={10} className="text-gray-400 shrink-0" />
+                <span className="text-[11px] truncate flex-1">{r.label}</span>
+              </button>
+            ))}
+          </div>
+
           {/* Saved Dashboards from chat */}
           {savedDashboards.length > 0 && (
             <div className="px-3 pt-1 pb-1">
@@ -286,25 +305,42 @@ export default function InsightsPage() {
 
       {/* ── Main Area ── */}
       <div className="flex-1 flex flex-col overflow-hidden bg-gray-50">
-        {/* Dashboard view when a dashboard nav item is selected */}
+        {/* Dashboard / Report view when a sidebar item is selected */}
         {activeDashboard && !activeSession ? (
           <div className="flex-1 overflow-y-auto p-4">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <BarChart2 size={16} className="text-primary-500" />
                 <h2 className="text-sm font-bold text-gray-900">
-                  {activeDashboard === 'kpi' ? 'KPI Dashboard' : activeDashboard === 'otif' ? 'OTIF Dashboard' : 'Ticket Insights'}
+                  {activeDashboard === 'kpi' ? 'KPI Dashboard' :
+                   activeDashboard === 'otif' ? 'OTIF Dashboard' :
+                   activeDashboard === 'ticket' ? 'Ticket Insights' :
+                   activeDashboard === 'report-otif-summary' ? 'OTIF Summary' :
+                   activeDashboard === 'report-lead-time' ? 'Lead Time Analysis' :
+                   activeDashboard === 'report-penalties' ? 'Penalties' :
+                   activeDashboard === 'report-routing' ? 'Routing Report' :
+                   activeDashboard === 'report-root-cause' ? 'Root Cause Analysis' : activeDashboard}
                 </h2>
               </div>
               <button onClick={() => setActiveDashboard(null)} className="text-xs text-gray-400 hover:text-gray-600">← Back to Insights</button>
             </div>
             {activeDashboard === 'kpi' && <KPIDashboard />}
             {activeDashboard === 'otif' && <OTIFDashboard />}
-            {activeDashboard === 'ticket' && (
+            {(activeDashboard === 'ticket' || activeDashboard.startsWith('report-')) && (
               <div className="bg-white border border-gray-200 rounded-xl p-12 text-center">
-                <Ticket size={40} className="text-gray-300 mx-auto mb-4" />
-                <p className="text-sm font-semibold text-gray-500">Ticket Insights</p>
-                <p className="text-xs text-gray-400 mt-1">Dashboard coming soon. Use the chat to explore ticket data.</p>
+                <BarChart2 size={40} className="text-gray-300 mx-auto mb-4" />
+                <p className="text-sm font-semibold text-gray-500">
+                  {activeDashboard === 'ticket' ? 'Ticket Insights' :
+                   activeDashboard === 'report-otif-summary' ? 'OTIF Summary Report' :
+                   activeDashboard === 'report-lead-time' ? 'Lead Time Analysis' :
+                   activeDashboard === 'report-penalties' ? 'Penalties Report' :
+                   activeDashboard === 'report-routing' ? 'Routing Report' : 'Root Cause Analysis'}
+                </p>
+                <p className="text-xs text-gray-400 mt-1">Report coming soon. Use the chat below to explore this data.</p>
+                <button onClick={() => { setActiveDashboard(null); const q = activeDashboard === 'report-otif-summary' ? 'Show OTIF summary' : activeDashboard === 'report-lead-time' ? 'Show lead time analysis' : activeDashboard === 'report-penalties' ? 'Show penalty data' : activeDashboard === 'report-routing' ? 'Show routing report' : 'Root cause analysis'; newSession(q) }}
+                  className="mt-4 px-4 py-2 text-xs text-primary-600 border border-primary-200 rounded-lg hover:bg-primary-50 transition-colors">
+                  Ask AI to generate this report
+                </button>
               </div>
             )}
           </div>
