@@ -28,22 +28,29 @@ function LayoutInner() {
     )
   }
 
+  // Insights — no sidebar, full width
+  if (isInsightsPage) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <main className="mt-14 overflow-hidden h-[calc(100vh-56px)]">
+          <Outlet />
+        </main>
+        <FloatingAssistant />
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <NavSidebar />
       <Header />
-      {isInsightsPage ? (
-        <main className="ml-56 mt-14 overflow-hidden h-[calc(100vh-56px)]">
+      <main className="ml-56 mt-14 p-4 overflow-auto">
+        <AnnouncementBanner />
+        <div className="mt-3">
           <Outlet />
-        </main>
-      ) : (
-        <main className="ml-56 mt-14 p-4 overflow-auto">
-          <AnnouncementBanner />
-          <div className="mt-3">
-            <Outlet />
-          </div>
-        </main>
-      )}
+        </div>
+      </main>
       {isHomePage && <OnboardingTour />}
       <FloatingAssistant />
     </div>
@@ -57,7 +64,6 @@ function Layout() {
         <LayoutInner />
       </FavoritesProvider>
     </RoleProvider>
-  )
-}
+  )}
 
 export default Layout

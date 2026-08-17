@@ -225,8 +225,8 @@ export default function InsightsPage() {
           <div className="px-3 pt-3 pb-1">
             <p className="text-[9px] font-semibold text-gray-400 uppercase mb-1.5 flex items-center gap-1"><LayoutDashboard size={9} /> Dashboards</p>
             {[
-              { id: 'kpi', label: 'KPI Dashboard' },
-              { id: 'otif', label: 'OTIF Dashboard' },
+              { id: 'kpi', label: 'KPI' },
+              { id: 'otif', label: 'OTIF' },
               { id: 'ticket', label: 'Ticket Insights' },
             ].map(d => (
               <button key={d.id}
@@ -256,20 +256,6 @@ export default function InsightsPage() {
               </button>
             ))}
           </div>
-
-          {/* Saved Dashboards from chat */}
-          {savedDashboards.length > 0 && (
-            <div className="px-3 pt-1 pb-1">
-              <p className="text-[9px] font-semibold text-gray-400 uppercase mb-1.5 mt-2">Saved</p>
-              {savedDashboards.map(d => (
-                <button key={d.id}
-                  className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-gray-50 text-left group">
-                  <BarChart2 size={11} className="text-emerald-500 shrink-0" />
-                  <span className="text-[11px] text-gray-700 truncate flex-1">{d.title}</span>
-                </button>
-              ))}
-            </div>
-          )}
 
           {/* Chat history */}
           <div className="px-3 pt-2">

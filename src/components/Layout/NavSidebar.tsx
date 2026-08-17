@@ -103,15 +103,9 @@ const menuItems: MenuItem[] = [
     icon: <BarChart2Icon size={16} />,
     expandable: true,
     children: [
-      { id: 'otif-summary', label: 'OTIF Summary', path: '/dashboard/otif' },
-      { id: 'lead-time', label: 'Lead Time Analysis' },
-      { id: 'penalties', label: 'Penalties' },
-      { id: 'routing-report', label: 'Routing Report' },
       { id: 'walmart-shipments', label: 'Walmart Shipments' },
       { id: 'target-shipments', label: 'Target Shipments' },
-      { id: 'auto-order-entry', label: 'Automated Order Entry' },
       { id: 'damaged-box', label: 'Damaged Box Detection' },
-      { id: 'root-cause', label: 'Root Cause Analysis' },
     ],
   },
 
@@ -621,7 +615,7 @@ function NavSidebar() {
         <div className="border-t border-gray-100 pt-3">
         <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1">Order &amp; Planning</p>
         <nav className="space-y-0.5 mb-3">
-          {renderMenuSection(menuItems.slice(1,5))}
+          {renderMenuSection(menuItems.slice(1,6))}
         </nav>
         <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1 mt-2">Inbound &amp; Yard</p>
         <nav className="space-y-0.5 mb-3">
