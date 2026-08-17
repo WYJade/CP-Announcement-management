@@ -617,37 +617,44 @@ function NavSidebar() {
         <nav className="space-y-0.5 mb-3">
           {renderMenuSection(menuItems.slice(1,6))}
         </nav>
-        <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1 mt-2">Inbound &amp; Yard</p>
+        <div className="border-t border-gray-100 mx-3 mb-2 mt-1" />
+        <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1">Inbound &amp; Yard</p>
         <nav className="space-y-0.5 mb-3">
           {renderMenuSection(menuItems.slice(6,8))}
         </nav>
-        <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1 mt-2">Inventory</p>
+        <div className="border-t border-gray-100 mx-3 mb-2 mt-1" />
+        <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1">Inventory</p>
         <nav className="space-y-0.5 mb-3">
           {renderMenuSection(menuItems.slice(8,9))}
         </nav>
-        <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1 mt-2">Outbound</p>
+        <div className="border-t border-gray-100 mx-3 mb-2 mt-1" />
+        <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1">Outbound</p>
         <nav className="space-y-0.5 mb-3">
           {renderMenuSection(menuItems.slice(9,10))}
         </nav>
-        <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1 mt-2">Shipping &amp; Freight</p>
+        <div className="border-t border-gray-100 mx-3 mb-2 mt-1" />
+        <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1">Shipping &amp; Freight</p>
         <nav className="space-y-0.5 mb-3">
           {renderMenuSection(menuItems.slice(10,13))}
         </nav>
-        <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1 mt-2">Returns</p>
+        <div className="border-t border-gray-100 mx-3 mb-2 mt-1" />
+        <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1">Returns</p>
         <nav className="space-y-0.5 mb-3">
           {renderMenuSection(menuItems.slice(13,14))}
         </nav>
-        <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1 mt-2">Finance</p>
+        <div className="border-t border-gray-100 mx-3 mb-2 mt-1" />
+        <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1">Finance</p>
         <nav className="space-y-0.5 mb-3">
           {renderMenuSection(menuItems.slice(14,15))}
         </nav>
-        <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1 mt-2">Integration</p>
+        <div className="border-t border-gray-100 mx-3 mb-2 mt-1" />
+        <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1">Integration</p>
         <nav className="space-y-0.5 mb-3">
           {renderMenuSection(menuItems.slice(15))}
         </nav>
         </div>
 
-        {/* System Section — Performance & Compliance moved to Insights */}
+        {/* System Section */}
         <div className="border-t border-gray-100 pt-3 mb-4">
           <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1">System</p>
           <nav className="space-y-0.5">

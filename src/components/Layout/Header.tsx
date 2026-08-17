@@ -77,6 +77,15 @@ function Header() {
           />
         </button>
 
+        {/* Insights entry */}
+        <button
+          onClick={() => navigate('/insights')}
+          className="p-1.5 rounded-md hover:bg-gray-100 transition-colors group"
+          title="Insights"
+        >
+          <BarChart2 size={16} className={`transition-colors ${location.pathname === '/insights' ? 'text-emerald-600' : 'text-emerald-400 group-hover:text-emerald-600'}`} />
+        </button>
+
       </div>
 
       {/* Right section */}
