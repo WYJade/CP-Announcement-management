@@ -667,57 +667,48 @@ function NavSidebar() {
         </div>
       </div>
 
-      {/* ── Sticky AI Agents bottom entry — full width, light style ── */}
-      <div className="border-t border-gray-100 bg-white shrink-0">
+      {/* ── Sticky AI Agents bottom entry ── */}
+      <div className="px-3 pb-3 pt-1.5 bg-white shrink-0 border-t border-gray-100">
         <button
           onClick={() => setExpandedItems(prev =>
             prev.includes('ai-agents-bottom')
               ? prev.filter(i => i !== 'ai-agents-bottom')
               : [...prev, 'ai-agents-bottom']
           )}
-          className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-violet-50 transition-all group"
+          className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-violet-50 border border-violet-200 hover:bg-violet-100 transition-all"
         >
-          <div className="w-6 h-6 bg-violet-100 rounded-lg flex items-center justify-center shrink-0">
-            <Bot size={13} className="text-violet-600" />
+          <div className="w-8 h-8 bg-violet-500 rounded-xl flex items-center justify-center shrink-0 shadow-sm">
+            <Bot size={16} className="text-white" />
           </div>
           <div className="flex-1 text-left min-w-0">
-            <p className="text-xs font-semibold text-violet-700 leading-tight">AI Agents</p>
+            <p className="text-xs font-bold text-violet-700 leading-snug">AI Agents</p>
+            <p className="text-[9px] text-violet-400 leading-tight">Your AI agent</p>
           </div>
-          <span className={`text-violet-400 transition-transform shrink-0 ${expandedItems.includes('ai-agents-bottom') ? 'rotate-180' : ''}`}>
-            <ChevronDown size={12} />
-          </span>
+          <ChevronDown size={13} className={`text-violet-400 transition-transform shrink-0 ${expandedItems.includes('ai-agents-bottom') ? 'rotate-180' : ''}`} />
         </button>
 
-        {/* Expanded agents menu */}
         {expandedItems.includes('ai-agents-bottom') && (
-          <div className="bg-gray-50 border-t border-gray-100 py-1">
+          <div className="mt-1 rounded-xl bg-violet-50 border border-violet-100 py-1 overflow-hidden">
             {[
               { label: 'Chat', path: '/agents?nav=chat' },
               { label: 'Agent Workstation', path: '/agents?nav=workstation' },
               { label: 'Customize', path: '/agents?nav=customize' },
               { label: 'Marketplace', path: '/agents?nav=marketplace' },
             ].map(item => (
-              <button
-                key={item.path}
-                onClick={() => navigate(item.path)}
-                className={`w-full text-left px-8 py-1.5 text-xs transition-colors ${
+              <button key={item.path} onClick={() => navigate(item.path)}
+                className={`w-full text-left px-4 py-1.5 text-xs transition-colors ${
                   location.pathname + location.search === item.path
-                    ? 'text-violet-700 font-medium'
-                    : 'text-gray-600 hover:text-violet-700 hover:bg-violet-50'
-                }`}
-              >
-                {item.label}
-              </button>
+                    ? 'text-violet-700 font-medium bg-violet-100'
+                    : 'text-gray-600 hover:text-violet-700 hover:bg-violet-100'
+                }`}>{item.label}</button>
             ))}
-            <div className="px-8 pt-1.5 pb-0.5">
+            <div className="px-4 pt-1.5 pb-0.5">
               <p className="text-[9px] font-semibold text-gray-400 uppercase flex items-center gap-1">
                 <Clock size={9} /> RECENTS
               </p>
             </div>
-            <button
-              onClick={() => navigate('/agents?nav=chat')}
-              className="w-full text-left px-8 py-1.5 text-xs text-gray-500 hover:text-violet-700 hover:bg-violet-50 transition-colors truncate"
-            >
+            <button onClick={() => navigate('/agents?nav=chat')}
+              className="w-full text-left px-4 py-1.5 text-xs text-gray-500 hover:text-violet-700 hover:bg-violet-100 transition-colors truncate">
               查询下SH20260716 对应的出入库记录
             </button>
           </div>
