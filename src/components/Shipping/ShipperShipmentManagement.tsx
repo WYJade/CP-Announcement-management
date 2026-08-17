@@ -260,7 +260,7 @@ function CustomizeModal({ visible, onToggle, onClose, onConfirm }: {
         </div>
         <div className="flex items-center justify-end gap-2 px-5 py-4 border-t">
           <button onClick={onClose} className="px-4 py-2 text-xs text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50">Cancel</button>
-          <button onClick={()=>{ALL_COLUMNS.forEach(c=>onToggle && true)}} className="px-4 py-2 text-xs text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50">Reset</button>
+          <button onClick={()=>{ALL_COLUMNS.forEach(c=>onToggle(c.key))}} className="px-4 py-2 text-xs text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50">Reset</button>
           <button onClick={onConfirm} className="px-4 py-2 text-xs text-white bg-primary-600 rounded-lg hover:bg-primary-700">Confirm</button>
         </div>
       </div>
