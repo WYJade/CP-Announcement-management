@@ -82,8 +82,10 @@ function MiniBarChart({ data }: { data: { label: string; value: number }[] }) {
 export default function InsightsPage() {
   const navigate = useNavigate()
   const [activeSession, setActiveSession] = useState<string | null>(null)
+  const [activeDashboard, setActiveDashboard] = useState<'kpi'|'otif'|'ticket'|null>(null)
   const [sessions, setSessions] = useState<ChatSession[]>(INITIAL_SESSIONS)
   const [dashboards, setDashboards] = useState<SavedDashboard[]>(INITIAL_DASHBOARDS)
+  const savedDashboards = dashboards
   const [input, setInput] = useState('')
   const [suggestTab, setSuggestTab] = useState(0)
   const [sidebarSearch, setSidebarSearch] = useState('')
@@ -219,17 +221,36 @@ export default function InsightsPage() {
         </div>
 
         <div className="flex-1 overflow-y-auto">
-          {/* Saved Dashboards */}
+          {/* Built-in Dashboards — KPI / OTIF / Ticket Insights */}
           <div className="px-3 pt-3 pb-1">
             <p className="text-[9px] font-semibold text-gray-400 uppercase mb-1.5 flex items-center gap-1"><LayoutDashboard size={9} /> Dashboards</p>
-            {dashboards.map(d => (
+            {[
+              { id: 'kpi', label: 'KPI Dashboard' },
+              { id: 'otif', label: 'OTIF Dashboard' },
+              { id: 'ticket', label: 'Ticket Insights' },
+            ].map(d => (
               <button key={d.id}
-                className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-gray-50 text-left group">
-                <BarChart2 size={11} className="text-emerald-500 shrink-0" />
-                <span className="text-[11px] text-gray-700 truncate flex-1">{d.title}</span>
+                onClick={() => { setActiveDashboard(d.id as 'kpi'|'otif'|'ticket'); setActiveSession(null) }}
+                className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-left group transition-colors ${activeDashboard === d.id ? 'bg-primary-50 text-primary-700 font-medium' : 'hover:bg-gray-50 text-gray-700'}`}>
+                <BarChart2 size={11} className={activeDashboard === d.id ? 'text-primary-500 shrink-0' : 'text-emerald-500 shrink-0'} />
+                <span className="text-[11px] truncate flex-1">{d.label}</span>
               </button>
             ))}
           </div>
+
+          {/* Saved Dashboards from chat */}
+          {savedDashboards.length > 0 && (
+            <div className="px-3 pt-1 pb-1">
+              <p className="text-[9px] font-semibold text-gray-400 uppercase mb-1.5 mt-2">Saved</p>
+              {savedDashboards.map(d => (
+                <button key={d.id}
+                  className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-gray-50 text-left group">
+                  <BarChart2 size={11} className="text-emerald-500 shrink-0" />
+                  <span className="text-[11px] text-gray-700 truncate flex-1">{d.title}</span>
+                </button>
+              ))}
+            </div>
+          )}
 
           {/* Chat history */}
           <div className="px-3 pt-2">
@@ -265,7 +286,29 @@ export default function InsightsPage() {
 
       {/* ── Main Area ── */}
       <div className="flex-1 flex flex-col overflow-hidden bg-gray-50">
-        {!activeSession ? (
+        {/* Dashboard view when a dashboard nav item is selected */}
+        {activeDashboard && !activeSession ? (
+          <div className="flex-1 overflow-y-auto p-4">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <BarChart2 size={16} className="text-primary-500" />
+                <h2 className="text-sm font-bold text-gray-900">
+                  {activeDashboard === 'kpi' ? 'KPI Dashboard' : activeDashboard === 'otif' ? 'OTIF Dashboard' : 'Ticket Insights'}
+                </h2>
+              </div>
+              <button onClick={() => setActiveDashboard(null)} className="text-xs text-gray-400 hover:text-gray-600">← Back to Insights</button>
+            </div>
+            {activeDashboard === 'kpi' && <KPIDashboard />}
+            {activeDashboard === 'otif' && <OTIFDashboard />}
+            {activeDashboard === 'ticket' && (
+              <div className="bg-white border border-gray-200 rounded-xl p-12 text-center">
+                <Ticket size={40} className="text-gray-300 mx-auto mb-4" />
+                <p className="text-sm font-semibold text-gray-500">Ticket Insights</p>
+                <p className="text-xs text-gray-400 mt-1">Dashboard coming soon. Use the chat to explore ticket data.</p>
+              </div>
+            )}
+          </div>
+        ) : !activeSession ? (
           /* ── Landing / Empty State ── */
           <div className="flex-1 flex flex-col items-center justify-center px-8 py-12 max-w-2xl mx-auto w-full">
             <div className="w-14 h-14 bg-gradient-to-br from-primary-500 to-violet-500 rounded-2xl flex items-center justify-center mb-5 shadow-lg">

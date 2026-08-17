@@ -613,11 +613,7 @@ function NavSidebar() {
 
         {/* Workspace Section */}
         <div className="border-t border-gray-100 pt-3">
-        <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1">Dashboard</p>
-        <nav className="space-y-0.5 mb-3">
-          {renderMenuSection([menuItems[0]])}
-        </nav>
-        <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1 mt-2">Order &amp; Planning</p>
+        <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1">Order &amp; Planning</p>
         <nav className="space-y-0.5 mb-3">
           {renderMenuSection(menuItems.slice(1,5))}
         </nav>
@@ -646,14 +642,18 @@ function NavSidebar() {
           {renderMenuSection(menuItems.slice(13,14))}
         </nav>
         <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1 mt-2">Integration</p>
-        <nav className="space-y-0.5 mb-4">
+        <nav className="space-y-0.5 mb-3">
           {renderMenuSection(menuItems.slice(14))}
         </nav>
         </div>
 
         {/* System Section */}
         <div className="border-t border-gray-100 pt-3 mb-4">
-          <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1">System</p>
+          <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1">Performance &amp; Compliance</p>
+          <nav className="space-y-0.5 mb-3">
+            {renderMenuSection([menuItems[4]])}
+          </nav>
+          <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1 mt-2">System</p>
           <nav className="space-y-0.5">
             {renderMenuSection(systemItems)}
           </nav>
