@@ -158,7 +158,18 @@ const menuItems: MenuItem[] = [
     ],
   },
 
-  // ── Yard Management (after Shipping, before Automation) ───────────────────
+  // ── Automation ─────────────────────────────────────────────────────────────
+  {
+    id: 'automation',
+    label: 'Automation',
+    icon: <Zap size={16} />,
+    expandable: true,
+    children: [
+      { id: 'automated-order-entry', label: 'Automated Order Entry' },
+    ],
+  },
+
+  // ── Yard Management (after Automation, before Returns) ────────────────────
   {
     id: 'yard',
     label: 'Yard Management',
@@ -176,17 +187,6 @@ const menuItems: MenuItem[] = [
       { id: 'appt-report', label: 'Appointment Report' },
       { id: 'yard-traffic', label: 'Yard Traffic Report' },
       { id: 'driver-disc', label: 'Driver Discrepancy Report' },
-    ],
-  },
-
-  // ── Automation ─────────────────────────────────────────────────────────────
-  {
-    id: 'automation',
-    label: 'Automation',
-    icon: <Zap size={16} />,
-    expandable: true,
-    children: [
-      { id: 'automated-order-entry', label: 'Automated Order Entry' },
     ],
   },
 
@@ -225,7 +225,7 @@ const menuItems: MenuItem[] = [
   // ── Retail Fulfillment (after Finance, before Integration)
   {
     id: 'performance',
-    label: 'Retail Fulfillment',
+    label: 'Retail Operations',
     icon: <TrendingUp size={16} />,
     expandable: true,
     children: [
