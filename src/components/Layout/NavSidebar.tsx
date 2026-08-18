@@ -30,6 +30,10 @@ import {
   Search,
   ArrowRight,
   BarChart2 as BarChart2Icon,
+  Ship,
+  TrendingUp,
+  RefreshCw,
+  Building,
 } from 'lucide-react'
 import { useCollaboration } from '../../context/CollaborationContext'
 import { useFavorites } from '../../context/FavoritesContext'
@@ -107,26 +111,6 @@ const menuItems: MenuItem[] = [
       { id: 'appointment-list', label: 'Appointment List', path: '/inbound/appointment-list' },
     ],
   },
-  {
-    id: 'yard',
-    label: 'Yard Management',
-    icon: <ParkingCircle size={16} />,
-    expandable: true,
-    children: [
-      { id: 'equip-history', label: 'Equipment History Report' },
-      { id: 'equip-report', label: 'Equipment Report' },
-      { id: 'yard-status', label: 'Yard Status Report' },
-      { id: 'yard-check', label: 'Yard Check Report' },
-      { id: 'location-status', label: 'Location Status' },
-      { id: 'equip-activity', label: 'Equipment Activity' },
-      { id: 'equip-sla', label: 'Equipment SLA Report' },
-      { id: 'dock-suggestion', label: 'Dock Suggestion Command' },
-      { id: 'appt-report', label: 'Appointment Report' },
-      { id: 'yard-traffic', label: 'Yard Traffic Report' },
-      { id: 'driver-disc', label: 'Driver Discrepancy Report' },
-    ],
-  },
-
   // ── Inventory ──────────────────────────────────────────────────────────────
   {
     id: 'inventory',
@@ -165,12 +149,33 @@ const menuItems: MenuItem[] = [
   {
     id: 'supply-chain',
     label: 'Shipping',
-    icon: <Link2 size={16} />,
+    icon: <Ship size={16} />,
     expandable: true,
     children: [
       { id: 'tracking', label: 'Domestic Tracking', path: '/shipping/tracking' },
       { id: 'shipment-tracking', label: 'International Tracking', path: '/international-new/tracking' },
       { id: 'freight-quote', label: 'Freight Quote', path: '/outbound/freight-quote' },
+    ],
+  },
+
+  // ── Yard Management (after Shipping, before Automation) ───────────────────
+  {
+    id: 'yard',
+    label: 'Yard Management',
+    icon: <Building size={16} />,
+    expandable: true,
+    children: [
+      { id: 'equip-history', label: 'Equipment History Report' },
+      { id: 'equip-report', label: 'Equipment Report' },
+      { id: 'yard-status', label: 'Yard Status Report' },
+      { id: 'yard-check', label: 'Yard Check Report' },
+      { id: 'location-status', label: 'Location Status' },
+      { id: 'equip-activity', label: 'Equipment Activity' },
+      { id: 'equip-sla', label: 'Equipment SLA Report' },
+      { id: 'dock-suggestion', label: 'Dock Suggestion Command' },
+      { id: 'appt-report', label: 'Appointment Report' },
+      { id: 'yard-traffic', label: 'Yard Traffic Report' },
+      { id: 'driver-disc', label: 'Driver Discrepancy Report' },
     ],
   },
 
@@ -217,16 +222,18 @@ const menuItems: MenuItem[] = [
     ],
   },
 
-  // ── Performance & Compliance (after Finance, before Integration)
+  // ── Retail Fulfillment (after Finance, before Integration)
   {
     id: 'performance',
-    label: 'Performance & Compliance',
-    icon: <BarChart2Icon size={16} />,
+    label: 'Retail Fulfillment',
+    icon: <TrendingUp size={16} />,
     expandable: true,
     children: [
       { id: 'walmart-shipments', label: 'Walmart Shipments' },
       { id: 'target-shipments', label: 'Target Shipments' },
       { id: 'damaged-box', label: 'Damaged Box Detection' },
+      { id: 'recovery-portal', label: 'Recovery Portal' },
+      { id: 'deductions', label: 'Deductions' },
     ],
   },
 
@@ -611,16 +618,16 @@ function NavSidebar() {
           {renderMenuSection(menuItems.slice(1,4))}
         </nav>
         <nav className="space-y-0.5 mb-3">
-          {renderMenuSection(menuItems.slice(4,6))}
+          {renderMenuSection(menuItems.slice(4,5))}
+        </nav>
+        <nav className="space-y-0.5 mb-3">
+          {renderMenuSection(menuItems.slice(5,6))}
         </nav>
         <nav className="space-y-0.5 mb-3">
           {renderMenuSection(menuItems.slice(6,7))}
         </nav>
         <nav className="space-y-0.5 mb-3">
-          {renderMenuSection(menuItems.slice(7,8))}
-        </nav>
-        <nav className="space-y-0.5 mb-3">
-          {renderMenuSection(menuItems.slice(8,11))}
+          {renderMenuSection(menuItems.slice(7,11))}
         </nav>
         <nav className="space-y-0.5 mb-3">
           {renderMenuSection(menuItems.slice(11,13))}
