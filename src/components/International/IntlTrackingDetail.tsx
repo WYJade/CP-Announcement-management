@@ -522,8 +522,8 @@ export default function IntlTrackingDetail() {
               <h3 className="text-sm font-bold text-gray-900">SKUs</h3>
             </div>
             <table className="w-full text-xs">
-              <thead><tr className="bg-gray-50 border-b">{['SKU', 'Product Name', 'Variant', 'Expected', 'Received', 'Diff', 'Damaged', 'Unit', 'Status'].map(h => (<th key={h} className="text-left py-2.5 px-3 font-semibold text-gray-500">{h}</th>))}</tr></thead>
-              <tbody>{D.items.map((item, i) => (<tr key={i} className="border-b border-gray-100"><td className="py-2.5 px-3 font-mono text-primary-600">{item.sku}</td><td className="py-2.5 px-3">{item.name}</td><td className="py-2.5 px-3">{item.variant}</td><td className="py-2.5 px-3 font-medium">{item.expected}</td><td className="py-2.5 px-3 text-green-600 font-medium">{item.received}</td><td className="py-2.5 px-3 text-orange-600">{item.diff}</td><td className="py-2.5 px-3 text-red-600">{item.damaged}</td><td className="py-2.5 px-3">{item.unit}</td><td className="py-2.5 px-3"><span className="text-green-600 font-medium">{item.status}</span></td></tr>))}</tbody>
+              <thead><tr className="bg-gray-50 border-b">{['SKU', 'Product Name', 'Expected', 'Received', 'Diff', 'Unit'].map(h => (<th key={h} className="text-left py-2.5 px-3 font-semibold text-gray-500">{h}</th>))}</tr></thead>
+              <tbody>{D.items.map((item, i) => (<tr key={i} className="border-b border-gray-100"><td className="py-2.5 px-3 font-mono text-primary-600">{item.sku}</td><td className="py-2.5 px-3">{item.name}</td><td className="py-2.5 px-3 font-medium">{item.expected}</td><td className="py-2.5 px-3 text-green-600 font-medium">{item.received}</td><td className="py-2.5 px-3 text-orange-600">{item.diff}</td><td className="py-2.5 px-3">{item.unit}</td></tr>))}</tbody>
             </table>
           </div>
         </div>
