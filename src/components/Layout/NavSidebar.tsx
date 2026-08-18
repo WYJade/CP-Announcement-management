@@ -122,7 +122,7 @@ const menuItems: MenuItem[] = [
       { id: 'receipt-entry', label: 'Receipt Entry' },
       { id: 'put-away', label: 'Put Away Report' },
       { id: 'make-appointment', label: 'Make Appointment' },
-      { id: 'appointment-list', label: 'Appointment List' },
+      { id: 'appointment-list', label: 'Appointment List', path: '/inbound/appointment-list' },
     ],
   },
   {

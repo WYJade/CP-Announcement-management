@@ -35,6 +35,7 @@ import InsightsPage from './components/Insights/InsightsPage'
 import HomePage from './components/Home/HomePage'
 import AccountManagement from './components/System/AccountManagement'
 import CarrierAppointment from './components/Carrier/CarrierAppointment'
+import AppointmentList from './components/Inbound/AppointmentList'
 
 function App() {
   return (
@@ -113,6 +114,9 @@ function App() {
 
         {/* Carrier / Broker */}
         <Route path="carrier/appointment" element={<CarrierAppointment />} />
+
+        {/* Inbound */}
+        <Route path="inbound/appointment-list" element={<AppointmentList />} />
       </Route>
     </Routes>
   )
