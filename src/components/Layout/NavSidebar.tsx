@@ -97,18 +97,6 @@ const menuItems: MenuItem[] = [
     icon: <ClipboardList size={16} />,
     expandable: false,
   },
-  {
-    id: 'performance',
-    label: 'Performance & Compliance',
-    icon: <BarChart2Icon size={16} />,
-    expandable: true,
-    children: [
-      { id: 'walmart-shipments', label: 'Walmart Shipments' },
-      { id: 'target-shipments', label: 'Target Shipments' },
-      { id: 'damaged-box', label: 'Damaged Box Detection' },
-    ],
-  },
-
   // ── Inbound & Yard ─────────────────────────────────────────────────────────
   {
     id: 'inbound',
@@ -234,6 +222,19 @@ const menuItems: MenuItem[] = [
       { id: 'history', label: 'History' },
       { id: 'cost-calculator', label: 'Cost Calculator' },
       { id: 'claim', label: 'Claim' },
+    ],
+  },
+
+  // ── Performance & Compliance (after Finance, before Integration)
+  {
+    id: 'performance',
+    label: 'Performance & Compliance',
+    icon: <BarChart2Icon size={16} />,
+    expandable: true,
+    children: [
+      { id: 'walmart-shipments', label: 'Walmart Shipments' },
+      { id: 'target-shipments', label: 'Target Shipments' },
+      { id: 'damaged-box', label: 'Damaged Box Detection' },
     ],
   },
 
@@ -613,39 +614,27 @@ function NavSidebar() {
 
         {/* Workspace Section */}
         <div className="border-t border-gray-100 pt-3">
-        <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1">Order &amp; Planning</p>
+        <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1">Workspace</p>
         <nav className="space-y-0.5 mb-3">
-          {renderMenuSection(menuItems.slice(1,6))}
+          {renderMenuSection(menuItems.slice(1,5))}
         </nav>
-        <div className="border-t border-gray-100 mx-3 mb-2 mt-1" />
-        <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1">Inbound &amp; Yard</p>
         <nav className="space-y-0.5 mb-3">
-          {renderMenuSection(menuItems.slice(6,8))}
+          {renderMenuSection(menuItems.slice(5,7))}
         </nav>
-        <div className="border-t border-gray-100 mx-3 mb-2 mt-1" />
-        <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1">Inventory</p>
+        <nav className="space-y-0.5 mb-3">
+          {renderMenuSection(menuItems.slice(7,8))}
+        </nav>
         <nav className="space-y-0.5 mb-3">
           {renderMenuSection(menuItems.slice(8,9))}
         </nav>
-        <div className="border-t border-gray-100 mx-3 mb-2 mt-1" />
-        <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1">Outbound</p>
         <nav className="space-y-0.5 mb-3">
-          {renderMenuSection(menuItems.slice(9,10))}
+          {renderMenuSection(menuItems.slice(9,12))}
         </nav>
-        <div className="border-t border-gray-100 mx-3 mb-2 mt-1" />
-        <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1">Shipping &amp; Freight</p>
         <nav className="space-y-0.5 mb-3">
-          {renderMenuSection(menuItems.slice(10,13))}
+          {renderMenuSection(menuItems.slice(12,13))}
         </nav>
-        <div className="border-t border-gray-100 mx-3 mb-2 mt-1" />
-        <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1">Returns</p>
         <nav className="space-y-0.5 mb-3">
-          {renderMenuSection(menuItems.slice(13,14))}
-        </nav>
-        <div className="border-t border-gray-100 mx-3 mb-2 mt-1" />
-        <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1">Finance</p>
-        <nav className="space-y-0.5 mb-3">
-          {renderMenuSection(menuItems.slice(14,15))}
+          {renderMenuSection(menuItems.slice(13,15))}
         </nav>
         <div className="border-t border-gray-100 mx-3 mb-2 mt-1" />
         <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1">Integration</p>
