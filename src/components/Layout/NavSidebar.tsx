@@ -91,12 +91,6 @@ const menuItems: MenuItem[] = [
     icon: <Wrench size={16} />,
     expandable: false,
   },
-  {
-    id: 'automated-order-entry',
-    label: 'Automated Order Entry',
-    icon: <ClipboardList size={16} />,
-    expandable: false,
-  },
   // ── Inbound & Yard ─────────────────────────────────────────────────────────
   {
     id: 'inbound',
@@ -167,30 +161,28 @@ const menuItems: MenuItem[] = [
     ],
   },
 
-  // ── Shipping & Freight ─────────────────────────────────────────────────────
+  // ── Shipping (merged: Domestic + International + Freight Quote) ───────────
   {
     id: 'supply-chain',
     label: 'Shipping',
     icon: <Link2 size={16} />,
     expandable: true,
     children: [
-      { id: 'tracking', label: 'Tracking', path: '/shipping/tracking' },
+      { id: 'tracking', label: 'Domestic Tracking', path: '/shipping/tracking' },
+      { id: 'shipment-tracking', label: 'International Tracking', path: '/international-new/tracking' },
+      { id: 'freight-quote', label: 'Freight Quote', path: '/outbound/freight-quote' },
     ],
   },
+
+  // ── Automation ─────────────────────────────────────────────────────────────
   {
-    id: 'international-new',
-    label: 'International',
-    icon: <Navigation size={16} />,
+    id: 'automation',
+    label: 'Automation',
+    icon: <Zap size={16} />,
     expandable: true,
     children: [
-      { id: 'shipment-tracking', label: 'Shipment Tracking', path: '/international-new/tracking' },
+      { id: 'automated-order-entry', label: 'Automated Order Entry' },
     ],
-  },
-  {
-    id: 'freight-quote',
-    label: 'Freight Quote',
-    icon: <DollarSign size={16} />,
-    expandable: false,
   },
 
   // ── Returns ────────────────────────────────────────────────────────────────
@@ -616,30 +608,27 @@ function NavSidebar() {
         <div className="border-t border-gray-100 pt-3">
         <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1">Workspace</p>
         <nav className="space-y-0.5 mb-3">
-          {renderMenuSection(menuItems.slice(1,5))}
+          {renderMenuSection(menuItems.slice(1,4))}
         </nav>
         <nav className="space-y-0.5 mb-3">
-          {renderMenuSection(menuItems.slice(5,7))}
+          {renderMenuSection(menuItems.slice(4,6))}
+        </nav>
+        <nav className="space-y-0.5 mb-3">
+          {renderMenuSection(menuItems.slice(6,7))}
         </nav>
         <nav className="space-y-0.5 mb-3">
           {renderMenuSection(menuItems.slice(7,8))}
         </nav>
         <nav className="space-y-0.5 mb-3">
-          {renderMenuSection(menuItems.slice(8,9))}
+          {renderMenuSection(menuItems.slice(8,11))}
         </nav>
         <nav className="space-y-0.5 mb-3">
-          {renderMenuSection(menuItems.slice(9,12))}
-        </nav>
-        <nav className="space-y-0.5 mb-3">
-          {renderMenuSection(menuItems.slice(12,13))}
-        </nav>
-        <nav className="space-y-0.5 mb-3">
-          {renderMenuSection(menuItems.slice(13,15))}
+          {renderMenuSection(menuItems.slice(11,13))}
         </nav>
         <div className="border-t border-gray-100 mx-3 mb-2 mt-1" />
         <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1">Integration</p>
         <nav className="space-y-0.5 mb-3">
-          {renderMenuSection(menuItems.slice(15))}
+          {renderMenuSection(menuItems.slice(13))}
         </nav>
         </div>
 
