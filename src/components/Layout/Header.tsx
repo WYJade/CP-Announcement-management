@@ -280,17 +280,17 @@ function Header() {
               {/* × Assistant close */}
               <button
                 onClick={() => setAssistantOpen(false)}
-                className="flex items-center gap-1.5 px-2.5 h-8 text-xs font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
               >
                 <X size={13} />
                 <span>Assistant</span>
               </button>
-              {/* AI Assistant — highlighted active state (the "red box" in screenshot) */}
-              <div className="flex items-center gap-1.5 px-3 h-8 bg-violet-50 border border-violet-200 rounded-lg">
-                <div className="w-5 h-5 bg-violet-600 rounded-full flex items-center justify-center shrink-0">
+              {/* AI Assistant — highlighted active capsule */}
+              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-violet-600 rounded-lg">
+                <div className="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center shrink-0">
                   <Bot size={11} className="text-white" />
                 </div>
-                <span className="text-xs font-semibold text-violet-700">AI Assistant</span>
+                <span className="text-xs font-semibold text-white">AI Assistant</span>
               </div>
               {/* Controls */}
               <button onClick={() => setDarkMode(v => !v)} className="p-1.5 rounded-md hover:bg-gray-100 text-gray-400 transition-colors">
