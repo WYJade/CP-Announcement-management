@@ -23,6 +23,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import LanguageSwitcher from './LanguageSwitcher'
 import { useFavorites } from '../../context/FavoritesContext'
 import { useRole } from '../../context/RoleContext'
+import { useAssistant } from '../../context/AssistantContext'
 
 // ─── Path → readable label ────────────────────────────────────────────────────
 function getPageLabel(pathname: string): string {
@@ -75,7 +76,7 @@ const QUICK_PROMPTS = [
   'Get a freight quote for shipping 5 non-stackable items (each 33x33x33 inches, 33 lbs, class 50, NMFC code nmfc) from Los Angeles, CA 90012 to Westchester, CA 90045',
 ]
 
-// ─── Assistant Panel (Perplexity-style slide-in from right) ──────────────────
+// ─── Assistant Panel (Perplexity-style slide-in from right, full-height) ─────
 function AssistantPanel({ onClose }: { onClose: () => void }) {
   const location = useLocation()
   const [input, setInput] = useState('')
@@ -109,56 +110,44 @@ function AssistantPanel({ onClose }: { onClose: () => void }) {
 
   return (
     <>
-      {/* Backdrop */}
+      {/* Panel — full height from header bottom, flush right, bordered left */}
       <div
-        className="fixed inset-0 z-[9998] bg-black/10"
-        onClick={onClose}
-      />
-
-      {/* Panel — slides in from right, sits below the header */}
-      <div
-        className="fixed right-0 top-14 bottom-0 z-[9999] flex flex-col bg-white border-l border-gray-200 shadow-2xl assistant-panel"
-        style={{ width: '380px' }}
+        className="fixed right-0 top-14 bottom-0 z-[9999] flex flex-col bg-white border-l border-gray-200 shadow-xl assistant-panel"
+        style={{ width: '360px' }}
       >
-        {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-primary-600 rounded-xl flex items-center justify-center shadow-sm">
-              <Bot size={17} className="text-white" />
+        {/* Panel header — matches screenshot with Avatar + title + controls */}
+        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-white shrink-0">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 bg-violet-500 rounded-full flex items-center justify-center shadow-sm">
+              <Bot size={15} className="text-white" />
             </div>
-            <div>
-              <p className="text-sm font-semibold text-gray-800">AI Assistant</p>
-              <p className="text-[10px] text-gray-400">Powered by Client Portal</p>
-            </div>
+            <span className="text-sm font-semibold text-gray-800">AI Assistant</span>
           </div>
           <div className="flex items-center gap-1">
-            <button onClick={reset} title="Reset conversation" className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors">
+            <button onClick={reset} title="Reset" className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors">
               <RefreshCw size={13} />
             </button>
-            <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors">
+            <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors" title="Close">
               <X size={14} />
             </button>
           </div>
         </div>
 
         {/* Content area */}
-        <div className="flex-1 overflow-y-auto bg-gray-50">
+        <div className="flex-1 overflow-y-auto bg-white">
           {!hasStarted ? (
             <div className="flex flex-col items-center px-6 pt-10 pb-4">
-              <div className="w-14 h-14 bg-primary-100 rounded-2xl flex items-center justify-center mb-4">
-                <Bot size={26} className="text-primary-600" />
-              </div>
-              <h2 className="text-xl font-bold text-gray-900 text-center mb-1.5">Welcome to AI Assistant</h2>
+              <h2 className="text-xl font-bold text-gray-900 text-center mb-2">Welcome to AI Assistant</h2>
               <p className="text-xs text-gray-500 text-center mb-8 leading-relaxed max-w-xs">
-                A chat agent to help you query and operate on the web pages
+                This is a chat agent to help query and operate on the web pages
               </p>
-              <p className="text-xs font-semibold text-gray-600 mb-3 self-start">You can try asking me:</p>
+              <p className="text-xs font-medium text-gray-600 mb-3 self-start">You can try asking me:</p>
               <div className="w-full space-y-2.5">
                 {QUICK_PROMPTS.map((p, i) => (
                   <button
                     key={i}
                     onClick={() => send(p)}
-                    className="w-full text-left px-4 py-3.5 bg-white hover:bg-primary-50 border border-gray-200 hover:border-primary-200 rounded-xl text-xs text-gray-700 transition-all leading-relaxed shadow-sm"
+                    className="w-full text-left px-4 py-3 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-xl text-xs text-gray-700 transition-all leading-relaxed"
                   >
                     {p}
                   </button>
@@ -166,19 +155,19 @@ function AssistantPanel({ onClose }: { onClose: () => void }) {
               </div>
             </div>
           ) : (
-            <div className="px-5 py-4 space-y-4">
+            <div className="px-4 py-4 space-y-4">
               {messages.map((m, i) => (
                 <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'} gap-2.5`}>
                   {m.role === 'assistant' && (
-                    <div className="w-7 h-7 bg-primary-100 rounded-full flex items-center justify-center shrink-0 mt-0.5">
-                      <Bot size={12} className="text-primary-600" />
+                    <div className="w-7 h-7 bg-violet-100 rounded-full flex items-center justify-center shrink-0 mt-0.5">
+                      <Bot size={12} className="text-violet-600" />
                     </div>
                   )}
                   <div
                     className={`max-w-[85%] px-4 py-3 rounded-2xl text-xs leading-relaxed ${
                       m.role === 'user'
                         ? 'bg-primary-600 text-white rounded-br-sm'
-                        : 'bg-white border border-gray-100 text-gray-700 shadow-sm rounded-bl-sm'
+                        : 'bg-gray-50 border border-gray-100 text-gray-700 rounded-bl-sm'
                     }`}
                     dangerouslySetInnerHTML={{ __html: formatText(m.text) }}
                   />
@@ -189,9 +178,9 @@ function AssistantPanel({ onClose }: { onClose: () => void }) {
           )}
         </div>
 
-        {/* Input area */}
+        {/* Input area — bottom, matches screenshot */}
         <div className="border-t border-gray-100 bg-white shrink-0 px-4 py-3">
-          <div className="flex items-center gap-2 bg-gray-100 rounded-2xl px-4 py-3 focus-within:bg-white focus-within:ring-2 focus-within:ring-primary-200 transition-all">
+          <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 focus-within:border-primary-400 focus-within:bg-white transition-all">
             <input
               value={input}
               onChange={e => setInput(e.target.value)}
@@ -201,8 +190,8 @@ function AssistantPanel({ onClose }: { onClose: () => void }) {
               autoFocus
             />
           </div>
-          <div className="flex items-center justify-between mt-2 px-1">
-            <div className="flex items-center gap-2">
+          <div className="flex items-center justify-between mt-2 px-0.5">
+            <div className="flex items-center gap-1.5">
               <button className="w-7 h-7 bg-primary-600 rounded-full flex items-center justify-center hover:bg-primary-700 transition-colors" title="Sparkles">
                 <Sparkles size={12} className="text-white" />
               </button>
@@ -210,14 +199,14 @@ function AssistantPanel({ onClose }: { onClose: () => void }) {
                 <Users size={14} />
               </button>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
               <button className="p-1.5 hover:bg-gray-100 rounded-lg text-gray-400 transition-colors" title="Image">
                 <Image size={14} />
               </button>
               <button
                 onClick={() => send()}
                 disabled={!input.trim()}
-                className="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center hover:bg-primary-700 disabled:bg-gray-300 transition-colors"
+                className="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center hover:bg-primary-700 disabled:bg-gray-200 transition-colors"
                 title="Send"
               >
                 <Send size={13} className="text-white" />
@@ -229,11 +218,11 @@ function AssistantPanel({ onClose }: { onClose: () => void }) {
 
       <style>{`
         .assistant-panel {
-          animation: slideInRight 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+          animation: assistantSlideIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        @keyframes slideInRight {
-          from { transform: translateX(100%); opacity: 0; }
-          to   { transform: translateX(0);    opacity: 1; }
+        @keyframes assistantSlideIn {
+          from { transform: translateX(100%); }
+          to   { transform: translateX(0); }
         }
       `}</style>
     </>
@@ -247,10 +236,10 @@ function Header() {
   const location = useLocation()
   const { isFavorited, toggleFavorite } = useFavorites()
   const { role, setRole } = useRole()
+  const { assistantOpen, setAssistantOpen } = useAssistant()
   const [helpOpen, setHelpOpen] = useState(false)
   const [roleOpen, setRoleOpen] = useState(false)
   const [darkMode, setDarkMode] = useState(false)
-  const [assistantOpen, setAssistantOpen] = useState(false)
   const helpRef = useRef<HTMLDivElement>(null)
   const roleRef = useRef<HTMLDivElement>(null)
 

@@ -464,6 +464,7 @@ function NavSidebar() {
   const [expandedItems, setExpandedItems] = useState<string[]>(['dashboards', 'support'])
   // aiMode: when true, sidebar shows only AI Agents view
   const [aiMode, setAiMode] = useState(false)
+  const [favShowAll, setFavShowAll] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
   const { getUnreadCount } = useCollaboration()
@@ -681,20 +682,31 @@ function NavSidebar() {
           <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1">Favorites</p>
           <nav className="space-y-0.5">
             {favorites.length > 0 ? (
-              favorites.map(fav => (
-                <button
-                  key={fav.path}
-                  onClick={() => navigate(fav.path)}
-                  className={`flex items-center w-full px-3 py-1.5 text-xs rounded-md transition-colors ${
-                    location.pathname === fav.path
-                      ? 'bg-primary-50 text-primary-700 font-medium'
-                      : 'text-gray-600 hover:bg-gray-100'
-                  }`}
-                >
-                  <span className="w-1.5 h-1.5 rounded-full bg-rose-400 mr-2.5 shrink-0" />
-                  <span className="truncate">{fav.label}</span>
-                </button>
-              ))
+              <>
+                {(favShowAll ? favorites : favorites.slice(0, 10)).map(fav => (
+                  <button
+                    key={fav.path}
+                    onClick={() => navigate(fav.path)}
+                    className={`flex items-center w-full px-3 py-1.5 text-xs rounded-md transition-colors ${
+                      location.pathname === fav.path
+                        ? 'bg-primary-50 text-primary-700 font-medium'
+                        : 'text-gray-600 hover:bg-gray-100'
+                    }`}
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-rose-400 mr-2.5 shrink-0" />
+                    <span className="truncate">{fav.label}</span>
+                  </button>
+                ))}
+                {favorites.length > 10 && (
+                  <button
+                    onClick={() => setFavShowAll(v => !v)}
+                    className="flex items-center w-full px-3 py-1.5 text-xs text-primary-500 hover:text-primary-700 hover:bg-gray-50 rounded-md transition-colors"
+                  >
+                    <ChevronDown size={12} className={`mr-1.5 transition-transform ${favShowAll ? 'rotate-180' : ''}`} />
+                    {favShowAll ? '收起' : `更多 (${favorites.length - 10})`}
+                  </button>
+                )}
+              </>
             ) : (
               <p className="text-[10px] text-gray-400 px-3 py-1.5 italic">
                 Click ♡ in the header to add favorites
@@ -752,7 +764,7 @@ function NavSidebar() {
         <button
           onClick={() => {
             setAiMode(true)
-            navigate('/agents')
+            navigate('/agents?nav=chat')
           }}
           className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-violet-50 border border-violet-200 hover:bg-violet-100 transition-all"
         >
