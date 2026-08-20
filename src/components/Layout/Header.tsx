@@ -285,14 +285,7 @@ function Header() {
                 <X size={13} />
                 <span>Assistant</span>
               </button>
-              {/* AI Assistant — highlighted active capsule */}
-              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-violet-600 rounded-lg">
-                <div className="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center shrink-0">
-                  <Bot size={11} className="text-white" />
-                </div>
-                <span className="text-xs font-semibold text-white">AI Assistant</span>
-              </div>
-              {/* Controls */}
+              {/* Controls only — no AI Assistant capsule in header */}
               <button onClick={() => setDarkMode(v => !v)} className="p-1.5 rounded-md hover:bg-gray-100 text-gray-400 transition-colors">
                 {darkMode ? <Sun size={14} className="text-amber-500" /> : <Moon size={14} />}
               </button>
@@ -319,7 +312,15 @@ function Header() {
           className="fixed top-14 right-0 bottom-0 z-[9999] flex flex-col bg-white border-l border-gray-200 shadow-2xl assistant-panel"
           style={{ width: `${PANEL_WIDTH}px` }}
         >
-          {/* Chat body — no header row inside panel */}
+          {/* Panel title row — AI Assistant icon + text */}
+          <div className="shrink-0 flex items-center gap-2.5 px-4 py-3 border-b border-gray-100 bg-white">
+            <div className="w-8 h-8 bg-violet-600 rounded-full flex items-center justify-center shrink-0">
+              <Bot size={15} className="text-white" />
+            </div>
+            <span className="text-sm font-semibold text-gray-800">AI Assistant</span>
+          </div>
+
+          {/* Chat body */}
           <AssistantBody key={resetKey} onReset={() => setResetKey(k => k + 1)} />
         </div>
       )}
