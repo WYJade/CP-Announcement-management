@@ -218,7 +218,7 @@ const menuItems: MenuItem[] = [
       { id: 'card-balance', label: 'Card and Balance' },
       { id: 'history', label: 'History' },
       { id: 'cost-calculator', label: 'Cost Calculator' },
-      { id: 'claim', label: 'Claim' },
+      { id: 'claim', label: 'Claim', path: '/finance/claims' },
     ],
   },
 

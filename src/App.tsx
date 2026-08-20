@@ -36,6 +36,7 @@ import HomePage from './components/Home/HomePage'
 import AccountManagement from './components/System/AccountManagement'
 import CarrierAppointment from './components/Carrier/CarrierAppointment'
 import AppointmentList from './components/Inbound/AppointmentList'
+import ClaimList from './components/Finance/ClaimList'
 
 function App() {
   return (
@@ -117,6 +118,9 @@ function App() {
 
         {/* Inbound */}
         <Route path="inbound/appointment-list" element={<AppointmentList />} />
+
+        {/* Finance — Claim */}
+        <Route path="finance/claims" element={<ClaimList />} />
       </Route>
     </Routes>
   )
