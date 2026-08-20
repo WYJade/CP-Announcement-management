@@ -142,6 +142,7 @@ const menuItems: MenuItem[] = [
       { id: 'order-carrier', label: 'Order Carrier Update' },
       { id: 'order-entry', label: 'Order Entry' },
       { id: 'small-parcel', label: 'Small Parcel Tracking Status' },
+      { id: 'automated-order-entry', label: 'Automated Order Entry' },
     ],
   },
 
@@ -159,18 +160,9 @@ const menuItems: MenuItem[] = [
     ],
   },
 
-  // ── Automation ─────────────────────────────────────────────────────────────
-  {
-    id: 'automation',
-    label: 'Automation',
-    icon: <Zap size={16} />,
-    expandable: true,
-    children: [
-      { id: 'automated-order-entry', label: 'Automated Order Entry' },
-    ],
-  },
+  // ── Automation — removed, Automated Order Entry moved to Outbound ─────────
 
-  // ── Yard Management (after Automation, before Returns) ────────────────────
+  // ── Yard Management (after Outbound, before Returns) ─────────────────────
   {
     id: 'yard',
     label: 'Yard Management',
@@ -732,15 +724,15 @@ function NavSidebar() {
           {renderMenuSection(menuItems.slice(6,7))}
         </nav>
         <nav className="space-y-0.5 mb-3">
-          {renderMenuSection(menuItems.slice(7,11))}
+          {renderMenuSection(menuItems.slice(7,10))}
         </nav>
         <nav className="space-y-0.5 mb-3">
-          {renderMenuSection(menuItems.slice(11,13))}
+          {renderMenuSection(menuItems.slice(10,12))}
         </nav>
         <div className="border-t border-gray-100 mx-3 mb-2 mt-1" />
         <p className="text-[10px] font-semibold text-gray-400 px-3 mb-1">Integration</p>
         <nav className="space-y-0.5 mb-3">
-          {renderMenuSection(menuItems.slice(13))}
+          {renderMenuSection(menuItems.slice(12))}
         </nav>
         </div>
 
