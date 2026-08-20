@@ -82,7 +82,7 @@ function MiniBarChart({ data }: { data: { label: string; value: number }[] }) {
 export default function InsightsPage() {
   const navigate = useNavigate()
   const [activeSession, setActiveSession] = useState<string | null>(null)
-  const [activeDashboard, setActiveDashboard] = useState<'kpi'|'otif'|'ticket'|null>(null)
+  const [activeDashboard, setActiveDashboard] = useState<'kpi'|'otif'|'ticket'|'report-otif-summary'|'report-lead-time'|'report-penalties'|'report-routing'|'report-root-cause'|null>(null)
   const [sessions, setSessions] = useState<ChatSession[]>(INITIAL_SESSIONS)
   const [dashboards, setDashboards] = useState<SavedDashboard[]>(INITIAL_DASHBOARDS)
   const savedDashboards = dashboards

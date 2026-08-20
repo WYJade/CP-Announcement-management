@@ -462,11 +462,20 @@ function GlobalSearch() {
 
 function NavSidebar() {
   const [expandedItems, setExpandedItems] = useState<string[]>(['dashboards', 'support'])
+  // aiMode: when true, sidebar shows only AI Agents view
+  const [aiMode, setAiMode] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
   const { getUnreadCount } = useCollaboration()
   const supportUnread = getUnreadCount()
   const { favorites } = useFavorites()
+
+  // Enter AI mode when navigating to /agents
+  useEffect(() => {
+    if (location.pathname === '/agents') {
+      setAiMode(true)
+    }
+  }, [location.pathname])
 
   // Recently used pages — track navigation history
   const [recentPages, setRecentPages] = useState<{ label: string; path: string }[]>([
@@ -563,6 +572,89 @@ function NavSidebar() {
     )
   })
 
+  const agentSubItems = [
+    { label: 'Chat', path: '/agents?nav=chat' },
+    { label: 'Agent Workstation', path: '/agents?nav=workstation' },
+    { label: 'Customize', path: '/agents?nav=customize' },
+    { label: 'Marketplace', path: '/agents?nav=marketplace' },
+  ]
+
+  // ── AI Agents mode sidebar ──────────────────────────────────────────────────
+  if (aiMode) {
+    return (
+      <div className="w-56 bg-white border-r border-gray-200 h-screen fixed left-0 top-0 z-40 flex flex-col overflow-hidden">
+        <div className="flex-1 overflow-y-auto py-4 px-3">
+          {/* Logo */}
+          <div className="flex items-center gap-2 px-3 mb-4">
+            <div className="w-7 h-7 bg-primary-600 rounded-lg flex items-center justify-center">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="white" />
+                <path d="M2 17L12 22L22 17" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M2 12L12 17L22 12" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+            <span className="text-sm font-bold text-gray-800">Client Portal</span>
+          </div>
+
+          {/* AI Agents header block */}
+          <div className="px-1 mb-3">
+            <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-violet-50 border border-violet-200">
+              <div className="w-8 h-8 bg-violet-500 rounded-xl flex items-center justify-center shrink-0 shadow-sm">
+                <Bot size={16} className="text-white" />
+              </div>
+              <div className="flex-1 text-left min-w-0">
+                <p className="text-xs font-bold text-violet-700 leading-snug">AI Agents</p>
+                <p className="text-[9px] text-violet-400 leading-tight">Your AI agent</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Sub-menu items */}
+          <nav className="space-y-0.5 mb-4">
+            {agentSubItems.map(item => (
+              <button
+                key={item.path}
+                onClick={() => navigate(item.path)}
+                className={`w-full text-left px-4 py-2 text-sm rounded-md transition-colors ${
+                  location.pathname + location.search === item.path
+                    ? 'bg-violet-50 text-violet-700 font-medium'
+                    : 'text-gray-600 hover:bg-violet-50 hover:text-violet-700'
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
+          </nav>
+
+          {/* Recents */}
+          <div className="border-t border-gray-100 pt-3">
+            <p className="text-[9px] font-semibold text-gray-400 uppercase px-3 mb-1.5 flex items-center gap-1">
+              <Clock size={9} /> RECENTS
+            </p>
+            <button
+              onClick={() => navigate('/agents?nav=chat')}
+              className="w-full text-left px-4 py-1.5 text-xs text-gray-500 hover:text-violet-700 hover:bg-violet-50 rounded-md transition-colors truncate"
+            >
+              查询下SH20260716 对应的出入库记录
+            </button>
+          </div>
+        </div>
+
+        {/* Back to full nav */}
+        <div className="px-3 pb-4 pt-2 bg-white shrink-0 border-t border-gray-100">
+          <button
+            onClick={() => { setAiMode(false); navigate('/') }}
+            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
+          >
+            <ChevronRight size={14} className="rotate-180 shrink-0" />
+            <span>Back to Navigation</span>
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  // ── Normal mode sidebar ─────────────────────────────────────────────────────
   return (
     <div className="w-56 bg-white border-r border-gray-200 h-screen fixed left-0 top-0 z-40 flex flex-col overflow-hidden">
       {/* Scrollable content */}
@@ -658,11 +750,10 @@ function NavSidebar() {
       {/* ── Sticky AI Agents bottom entry ── */}
       <div className="px-3 pb-3 pt-1.5 bg-white shrink-0 border-t border-gray-100">
         <button
-          onClick={() => setExpandedItems(prev =>
-            prev.includes('ai-agents-bottom')
-              ? prev.filter(i => i !== 'ai-agents-bottom')
-              : [...prev, 'ai-agents-bottom']
-          )}
+          onClick={() => {
+            setAiMode(true)
+            navigate('/agents')
+          }}
           className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-violet-50 border border-violet-200 hover:bg-violet-100 transition-all"
         >
           <div className="w-8 h-8 bg-violet-500 rounded-xl flex items-center justify-center shrink-0 shadow-sm">
@@ -672,35 +763,8 @@ function NavSidebar() {
             <p className="text-xs font-bold text-violet-700 leading-snug">AI Agents</p>
             <p className="text-[9px] text-violet-400 leading-tight">Your AI agent</p>
           </div>
-          <ChevronDown size={13} className={`text-violet-400 transition-transform shrink-0 ${expandedItems.includes('ai-agents-bottom') ? 'rotate-180' : ''}`} />
+          <ChevronRight size={13} className="text-violet-400 shrink-0" />
         </button>
-
-        {expandedItems.includes('ai-agents-bottom') && (
-          <div className="mt-1 rounded-xl bg-violet-50 border border-violet-100 py-1 overflow-hidden">
-            {[
-              { label: 'Chat', path: '/agents?nav=chat' },
-              { label: 'Agent Workstation', path: '/agents?nav=workstation' },
-              { label: 'Customize', path: '/agents?nav=customize' },
-              { label: 'Marketplace', path: '/agents?nav=marketplace' },
-            ].map(item => (
-              <button key={item.path} onClick={() => navigate(item.path)}
-                className={`w-full text-left px-4 py-1.5 text-xs transition-colors ${
-                  location.pathname + location.search === item.path
-                    ? 'text-violet-700 font-medium bg-violet-100'
-                    : 'text-gray-600 hover:text-violet-700 hover:bg-violet-100'
-                }`}>{item.label}</button>
-            ))}
-            <div className="px-4 pt-1.5 pb-0.5">
-              <p className="text-[9px] font-semibold text-gray-400 uppercase flex items-center gap-1">
-                <Clock size={9} /> RECENTS
-              </p>
-            </div>
-            <button onClick={() => navigate('/agents?nav=chat')}
-              className="w-full text-left px-4 py-1.5 text-xs text-gray-500 hover:text-violet-700 hover:bg-violet-100 transition-colors truncate">
-              查询下SH20260716 对应的出入库记录
-            </button>
-          </div>
-        )}
       </div>
     </div>
   )

@@ -4,7 +4,6 @@ import Header from './Header'
 import CarrierSidebar from './CarrierSidebar'
 import AnnouncementBanner from '../common/AnnouncementBanner'
 import OnboardingTour from '../common/OnboardingTour'
-import FloatingAssistant from '../common/FloatingAssistant'
 import { FavoritesProvider } from '../../context/FavoritesContext'
 import { RoleProvider, useRole } from '../../context/RoleContext'
 
@@ -23,7 +22,6 @@ function LayoutInner() {
         <main className="ml-56 mt-14 overflow-auto min-h-screen">
           <Outlet />
         </main>
-        <FloatingAssistant />
       </div>
     )
   }
@@ -36,7 +34,6 @@ function LayoutInner() {
         <main className="mt-14 overflow-hidden h-[calc(100vh-56px)]">
           <Outlet />
         </main>
-        <FloatingAssistant />
       </div>
     )
   }
@@ -52,7 +49,6 @@ function LayoutInner() {
         </div>
       </main>
       {isHomePage && <OnboardingTour />}
-      <FloatingAssistant />
     </div>
   )
 }
