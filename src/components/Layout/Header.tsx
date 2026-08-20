@@ -276,31 +276,29 @@ function Header() {
 
           {/* Assistant — when closed: simple button; when open: inline header row */}
           {assistantOpen ? (
-            <div className="flex items-center gap-0 border border-gray-200 rounded-lg overflow-hidden">
+            <div className="flex items-center gap-1">
               {/* × Assistant close */}
               <button
                 onClick={() => setAssistantOpen(false)}
-                className="flex items-center gap-1.5 px-3 h-8 text-xs font-medium text-gray-700 hover:bg-gray-50 transition-colors border-r border-gray-200"
+                className="flex items-center gap-1.5 px-2.5 h-8 text-xs font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
               >
                 <X size={13} />
                 <span>Assistant</span>
               </button>
-              {/* Avatar + title */}
-              <div className="flex items-center gap-2 px-3 h-8 bg-white">
-                <div className="w-6 h-6 bg-violet-600 rounded-full flex items-center justify-center shrink-0">
-                  <Bot size={12} className="text-white" />
+              {/* AI Assistant — highlighted active state (the "red box" in screenshot) */}
+              <div className="flex items-center gap-1.5 px-3 h-8 bg-violet-50 border border-violet-200 rounded-lg">
+                <div className="w-5 h-5 bg-violet-600 rounded-full flex items-center justify-center shrink-0">
+                  <Bot size={11} className="text-white" />
                 </div>
-                <span className="text-xs font-semibold text-gray-800">AI Assistant</span>
+                <span className="text-xs font-semibold text-violet-700">AI Assistant</span>
               </div>
               {/* Controls */}
-              <div className="flex items-center px-1 h-8 border-l border-gray-200 gap-0.5">
-                <button onClick={() => setDarkMode(v => !v)} className="p-1 rounded hover:bg-gray-100 text-gray-400 transition-colors">
-                  {darkMode ? <Sun size={13} className="text-amber-500" /> : <Moon size={13} />}
-                </button>
-                <button onClick={() => setResetKey(k => k + 1)} className="p-1 rounded hover:bg-gray-100 text-gray-400 transition-colors">
-                  <RefreshCw size={12} />
-                </button>
-              </div>
+              <button onClick={() => setDarkMode(v => !v)} className="p-1.5 rounded-md hover:bg-gray-100 text-gray-400 transition-colors">
+                {darkMode ? <Sun size={14} className="text-amber-500" /> : <Moon size={14} />}
+              </button>
+              <button onClick={() => setResetKey(k => k + 1)} className="p-1.5 rounded-md hover:bg-gray-100 text-gray-400 transition-colors">
+                <RefreshCw size={13} />
+              </button>
             </div>
           ) : (
             <button
