@@ -37,6 +37,7 @@ import AccountManagement from './components/System/AccountManagement'
 import CarrierAppointment from './components/Carrier/CarrierAppointment'
 import AppointmentList from './components/Inbound/AppointmentList'
 import ClaimList from './components/Finance/ClaimList'
+import ShipmentsList from './components/Shipping/ShipmentsList'
 
 function App() {
   return (
@@ -77,6 +78,7 @@ function App() {
 
         {/* Shipping */}
         <Route path="shipping/shipments" element={<Shipments />} />
+        <Route path="shipping/shipments-list" element={<ShipmentsList />} />
         <Route path="shipping/tracking" element={<Tracking />} />
         <Route path="shipping/shipper-shipments" element={<ShipperShipmentManagement />} />
 

@@ -274,63 +274,54 @@ function Header() {
           {/* Language */}
           <LanguageSwitcher />
 
-          {/* Assistant toggle button */}
-          <button
-            onClick={() => setAssistantOpen(v => !v)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border ${
-              assistantOpen
-                ? 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
-                : 'bg-white text-gray-700 border-gray-200 hover:bg-primary-50 hover:text-primary-700 hover:border-primary-200'
-            }`}
-            title={assistantOpen ? 'Close AI Assistant' : 'Open AI Assistant'}
-          >
-            <Bot size={14} className="text-primary-500" />
-            <span>Assistant</span>
-          </button>
+          {/* Assistant — when closed: simple button; when open: inline header row */}
+          {assistantOpen ? (
+            <div className="flex items-center gap-0 border border-gray-200 rounded-lg overflow-hidden">
+              {/* × Assistant close */}
+              <button
+                onClick={() => setAssistantOpen(false)}
+                className="flex items-center gap-1.5 px-3 h-8 text-xs font-medium text-gray-700 hover:bg-gray-50 transition-colors border-r border-gray-200"
+              >
+                <X size={13} />
+                <span>Assistant</span>
+              </button>
+              {/* Avatar + title */}
+              <div className="flex items-center gap-2 px-3 h-8 bg-white">
+                <div className="w-6 h-6 bg-violet-600 rounded-full flex items-center justify-center shrink-0">
+                  <Bot size={12} className="text-white" />
+                </div>
+                <span className="text-xs font-semibold text-gray-800">AI Assistant</span>
+              </div>
+              {/* Controls */}
+              <div className="flex items-center px-1 h-8 border-l border-gray-200 gap-0.5">
+                <button onClick={() => setDarkMode(v => !v)} className="p-1 rounded hover:bg-gray-100 text-gray-400 transition-colors">
+                  {darkMode ? <Sun size={13} className="text-amber-500" /> : <Moon size={13} />}
+                </button>
+                <button onClick={() => setResetKey(k => k + 1)} className="p-1 rounded hover:bg-gray-100 text-gray-400 transition-colors">
+                  <RefreshCw size={12} />
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button
+              onClick={() => setAssistantOpen(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border bg-white text-gray-700 border-gray-200 hover:bg-primary-50 hover:text-primary-700 hover:border-primary-200 transition-all"
+              title="Open AI Assistant"
+            >
+              <Bot size={14} className="text-primary-500" />
+              <span>Assistant</span>
+            </button>
+          )}
         </div>
       </header>
 
-      {/* ── Assistant panel — top-0 to bottom-0, overlaps header right portion ── */}
+      {/* ── Assistant panel — starts below header (top-14), full height ── */}
       {assistantOpen && (
         <div
-          className="fixed top-0 right-0 bottom-0 z-[9999] flex flex-col bg-white border-l border-gray-200 shadow-2xl assistant-panel"
+          className="fixed top-14 right-0 bottom-0 z-[9999] flex flex-col bg-white border-l border-gray-200 shadow-2xl assistant-panel"
           style={{ width: `${PANEL_WIDTH}px` }}
         >
-          {/* Panel header row — exactly h-14, same height as main header */}
-          <div className="h-14 shrink-0 flex items-center border-b border-gray-200 bg-white px-4 gap-3">
-            {/* Close */}
-            <button
-              onClick={() => setAssistantOpen(false)}
-              className="flex items-center gap-1.5 text-xs text-gray-600 hover:text-gray-900 font-medium shrink-0"
-              title="Close Assistant"
-            >
-              <X size={14} />
-              <span>Assistant</span>
-            </button>
-
-            {/* Divider */}
-            <div className="w-px h-5 bg-gray-200 shrink-0" />
-
-            {/* Avatar + title */}
-            <div className="flex items-center gap-2 flex-1 min-w-0">
-              <div className="w-7 h-7 bg-violet-600 rounded-full flex items-center justify-center shrink-0">
-                <Bot size={14} className="text-white" />
-              </div>
-              <span className="text-sm font-semibold text-gray-800 truncate">AI Assistant</span>
-            </div>
-
-            {/* Controls */}
-            <div className="flex items-center gap-1 shrink-0">
-              <button onClick={() => setDarkMode(v => !v)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 transition-colors">
-                {darkMode ? <Sun size={14} className="text-amber-500" /> : <Moon size={14} />}
-              </button>
-              <button onClick={() => setResetKey(k => k + 1)} title="Reset" className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors">
-                <RefreshCw size={13} />
-              </button>
-            </div>
-          </div>
-
-          {/* Chat body */}
+          {/* Chat body — no header row inside panel */}
           <AssistantBody key={resetKey} onReset={() => setResetKey(k => k + 1)} />
         </div>
       )}
