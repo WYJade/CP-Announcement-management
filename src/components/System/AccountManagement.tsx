@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, X, Edit2, Users } from 'lucide-react'
+import { Plus, X, Edit2, Users, Link } from 'lucide-react'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface Account {
@@ -18,6 +18,13 @@ interface CreateForm {
   username: string; email: string; firstName: string; lastName: string
   contact: string; password: string; confirmPassword: string; status: string
 }
+
+// ─── Tenant options ───────────────────────────────────────────────────────────
+const TENANT_OPTIONS = [
+  { value: '', label: 'Select Tenant' },
+  { value: 'unis-llc', label: 'Unis, LLC（LT）' },
+  { value: 'unis-trans', label: 'Unis Transportation LLC（SBFH）' },
+]
 
 // ─── Sample data ──────────────────────────────────────────────────────────────
 const INITIAL_ACCOUNTS: Account[] = [
@@ -38,13 +45,13 @@ function CreateAccountModal({ defaultSubType, onClose, onSave }: {
     username: 'evelyn_role@teml.net', email: '', firstName: '', lastName: '',
     contact: '', password: '', confirmPassword: '', status: 'Active',
   })
+  const [tenant, setTenant] = useState('')
   const [customers, setCustomers] = useState('')
   const [roles, setRoles] = useState('')
-  const [errors, setErrors] = useState<Partial<Record<keyof CreateForm, string>>>({})
-  const [submitted, setSubmitted] = useState(false)
+  const [errors, setErrors] = useState<Partial<Record<keyof CreateForm | 'tenant', string>>>({})
 
   const validate = () => {
-    const e: Partial<Record<keyof CreateForm, string>> = {}
+    const e: Partial<Record<keyof CreateForm | 'tenant', string>> = {}
     if (!form.username.trim()) e.username = 'Required'
     if (!form.email.trim()) e.email = 'Please enter email'
     if (!form.firstName.trim()) e.firstName = 'Please enter first name'
@@ -52,6 +59,7 @@ function CreateAccountModal({ defaultSubType, onClose, onSave }: {
     if (!form.password) e.password = 'Use 8+ chars with upper, lower, number, and symbol'
     else if (form.password.length < 8) e.password = 'Use 8+ chars with upper, lower, number, and symbol'
     if (form.confirmPassword !== form.password) e.confirmPassword = 'Passwords do not match'
+    if (!tenant) e.tenant = 'Please select a tenant'
     setErrors(e)
     return Object.keys(e).length === 0
   }
@@ -73,15 +81,13 @@ function CreateAccountModal({ defaultSubType, onClose, onSave }: {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Username <span className="text-red-500">*</span></label>
               <input value={form.username} onChange={e => setForm(f => ({ ...f, username: e.target.value }))}
-                placeholder="Enter username"
-                className={`${inp('username')} bg-gray-50`} />
+                placeholder="Enter username" className={`${inp('username')} bg-gray-50`} />
               {errors.username && <p className="text-xs text-red-500 mt-1">{errors.username}</p>}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Email <span className="text-red-500">*</span></label>
               <input type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
-                placeholder="Enter email"
-                className={inp('email')} />
+                placeholder="Enter email" className={inp('email')} />
               {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
             </div>
           </div>
@@ -91,15 +97,13 @@ function CreateAccountModal({ defaultSubType, onClose, onSave }: {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">First Name <span className="text-red-500">*</span></label>
               <input value={form.firstName} onChange={e => setForm(f => ({ ...f, firstName: e.target.value }))}
-                placeholder="Enter first name"
-                className={inp('firstName')} />
+                placeholder="Enter first name" className={inp('firstName')} />
               {errors.firstName && <p className="text-xs text-red-500 mt-1">{errors.firstName}</p>}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Last Name <span className="text-red-500">*</span></label>
               <input value={form.lastName} onChange={e => setForm(f => ({ ...f, lastName: e.target.value }))}
-                placeholder="Enter last name"
-                className={inp('lastName')} />
+                placeholder="Enter last name" className={inp('lastName')} />
               {errors.lastName && <p className="text-xs text-red-500 mt-1">{errors.lastName}</p>}
             </div>
           </div>
@@ -127,8 +131,7 @@ function CreateAccountModal({ defaultSubType, onClose, onSave }: {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Password <span className="text-red-500">*</span></label>
               <input type="password" value={form.password} onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
-                placeholder="Enter password"
-                className={inp('password')} />
+                placeholder="Enter password" className={inp('password')} />
               {errors.password
                 ? <p className="text-xs text-red-500 mt-1">{errors.password}</p>
                 : <p className="text-xs text-gray-400 mt-1">Use 8+ chars with upper, lower, number, and symbol</p>}
@@ -136,13 +139,29 @@ function CreateAccountModal({ defaultSubType, onClose, onSave }: {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Confirm Password <span className="text-red-500">*</span></label>
               <input type="password" value={form.confirmPassword} onChange={e => setForm(f => ({ ...f, confirmPassword: e.target.value }))}
-                placeholder="Confirm password"
-                className={inp('confirmPassword')} />
+                placeholder="Confirm password" className={inp('confirmPassword')} />
               {errors.confirmPassword && <p className="text-xs text-red-500 mt-1">{errors.confirmPassword}</p>}
             </div>
           </div>
 
-          {/* Row 5: Customer & Facility + Roles */}
+          {/* Row 5: Tenant (new, full width) */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              Tenant <span className="text-red-500">*</span>
+            </label>
+            <select
+              value={tenant}
+              onChange={e => setTenant(e.target.value)}
+              className={`w-full border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400/30 focus:border-primary-500 transition-colors ${errors.tenant ? 'border-red-400 bg-red-50' : 'border-gray-300'} ${!tenant ? 'text-gray-400' : 'text-gray-800'}`}
+            >
+              {TENANT_OPTIONS.map(o => (
+                <option key={o.value} value={o.value} disabled={o.value === ''}>{o.label}</option>
+              ))}
+            </select>
+            {errors.tenant && <p className="text-xs text-red-500 mt-1">{errors.tenant}</p>}
+          </div>
+
+          {/* Row 6: Customer & Facility + Roles */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Customer &amp; Facility</label>
@@ -180,10 +199,154 @@ function CreateAccountModal({ defaultSubType, onClose, onSave }: {
   )
 }
 
-// ─── Account Table (shared between tabs) ──────────────────────────────────────
-function AccountTable({
-  accounts, searchUser, searchEmail, filterStatus,
-}: {
+// ─── Link IAM Account Modal ───────────────────────────────────────────────────
+function LinkIAMModal({ onClose, onConfirm }: {
+  onClose: () => void
+  onConfirm: (username: string) => void
+}) {
+  const [iamUsername, setIamUsername] = useState('')
+  const [email, setEmail] = useState('')
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
+  const [contact, setContact] = useState('')
+  const [status, setStatus] = useState('Active')
+  const [tenant, setTenant] = useState('')
+  const [customers, setCustomers] = useState('')
+  const [role, setRole] = useState('')
+  const [errors, setErrors] = useState<{ username?: string; tenant?: string }>({})
+
+  const validate = () => {
+    const e: { username?: string; tenant?: string } = {}
+    if (!iamUsername.trim()) e.username = 'IAM username is required'
+    if (!tenant) e.tenant = 'Please select a tenant'
+    setErrors(e)
+    return Object.keys(e).length === 0
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center px-4" onClick={onClose}>
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-xl max-h-[90vh] flex flex-col" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between px-6 py-4 border-b">
+          <h3 className="text-base font-semibold text-gray-900">Set IAM Account as Customer Primary Account</h3>
+          <button onClick={onClose}><X size={16} className="text-gray-400 hover:text-gray-600" /></button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4">
+          {/* Row 1: Username + Email */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Username <span className="text-red-500">*</span>
+              </label>
+              <input
+                value={iamUsername}
+                onChange={e => setIamUsername(e.target.value)}
+                placeholder="Search IAM username"
+                className={`w-full border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400/30 focus:border-primary-500 transition-colors ${errors.username ? 'border-red-400 bg-red-50' : 'border-gray-300'}`}
+              />
+              {errors.username && <p className="text-xs text-red-500 mt-1">{errors.username}</p>}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
+              <input value={email} onChange={e => setEmail(e.target.value)} placeholder=""
+                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400/30 focus:border-primary-500 bg-gray-50" readOnly />
+            </div>
+          </div>
+
+          {/* Row 2: First Name + Last Name */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">First Name</label>
+              <input value={firstName} readOnly placeholder=""
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-gray-50 text-gray-400" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Last Name</label>
+              <input value={lastName} readOnly placeholder=""
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-gray-50 text-gray-400" />
+            </div>
+          </div>
+
+          {/* Row 3: Contact + Status */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Contact Number</label>
+              <input value={contact} readOnly placeholder=""
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-gray-50 text-gray-400" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Status</label>
+              <select value={status} onChange={e => setStatus(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400/30 focus:border-primary-500">
+                <option>Active</option>
+                <option>Inactive</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Tenant (new, full width, above Customer & Facility) */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              Tenant <span className="text-red-500">*</span>
+            </label>
+            <select
+              value={tenant}
+              onChange={e => setTenant(e.target.value)}
+              className={`w-full border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400/30 focus:border-primary-500 transition-colors ${errors.tenant ? 'border-red-400 bg-red-50' : 'border-gray-300'} ${!tenant ? 'text-gray-400' : 'text-gray-800'}`}
+            >
+              {TENANT_OPTIONS.map(o => (
+                <option key={o.value} value={o.value} disabled={o.value === ''}>{o.label}</option>
+              ))}
+            </select>
+            {errors.tenant && <p className="text-xs text-red-500 mt-1">{errors.tenant}</p>}
+          </div>
+
+          {/* Customer & Facility */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              Customer &amp; Facility <span className="text-red-500">*</span>
+            </label>
+            <p className="text-xs text-gray-500 mb-1">Select Customers</p>
+            <select value={customers} onChange={e => setCustomers(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400/30 focus:border-primary-500 text-gray-400">
+              <option value="">Select customers</option>
+              <option value="c1">ADOORN LLC</option>
+              <option value="c2">THE ONLY BEAN LLC</option>
+              <option value="c3">VITA COCO</option>
+              <option value="c4">ORGAIN LLC</option>
+              <option value="c5">PLEASS GLOBAL</option>
+            </select>
+          </div>
+
+          {/* Role */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Role</label>
+            <select value={role} onChange={e => setRole(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400/30 focus:border-primary-500 text-gray-400">
+              <option value="">Please select role</option>
+              <option value="admin">Admin</option>
+              <option value="viewer">Viewer</option>
+              <option value="editor">Editor</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t">
+          <button onClick={onClose} className="px-5 py-2.5 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
+          <button
+            onClick={() => { if (validate()) onConfirm(iamUsername) }}
+            className="px-5 py-2.5 text-sm text-white bg-primary-600 rounded-lg hover:bg-primary-700 font-medium"
+          >
+            Confirm Link
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ─── Account Table ────────────────────────────────────────────────────────────
+function AccountTable({ accounts, searchUser, searchEmail, filterStatus }: {
   accounts: Account[]
   searchUser: string
   searchEmail: string
@@ -251,6 +414,7 @@ export default function AccountManagement() {
   const [accounts, setAccounts] = useState<Account[]>(INITIAL_ACCOUNTS)
   const [activeTab, setActiveTab] = useState<'租户子账号' | '客户子账号'>('租户子账号')
   const [showCreate, setShowCreate] = useState(false)
+  const [showLinkIAM, setShowLinkIAM] = useState(false)
   const [searchUser, setSearchUser] = useState('')
   const [searchEmail, setSearchEmail] = useState('')
   const [filterStatus, setFilterStatus] = useState('')
@@ -273,9 +437,24 @@ export default function AccountManagement() {
     setShowCreate(false)
   }
 
+  const handleLinkIAM = (username: string) => {
+    const newAcc: Account = {
+      id: `a${Date.now()}`,
+      username,
+      email: '',
+      accountType: 'SUB',
+      subAccountType: activeTab,
+      customers: 0,
+      roles: 'Viewer',
+      status: 'Active',
+      lastLogin: 'Never',
+    }
+    setAccounts(prev => [...prev, newAcc])
+    setShowLinkIAM(false)
+  }
+
   return (
     <div className="p-6">
-      {/* Page header — title only */}
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Account Management</h1>
 
       {/* Tabs */}
@@ -295,9 +474,16 @@ export default function AccountManagement() {
         ))}
       </div>
 
-      {/* Search filters with Create Account outside top-right */}
+      {/* Filters + action buttons */}
       <div className="relative mb-5">
-        <div className="flex justify-end mb-2">
+        <div className="flex justify-end gap-2 mb-2">
+          {/* Link IAM Account button — before Create Account */}
+          <button
+            onClick={() => setShowLinkIAM(true)}
+            className="flex items-center gap-1.5 px-4 py-2 bg-white text-primary-600 text-sm font-medium rounded-lg border border-primary-300 hover:bg-primary-50 transition-colors shadow-sm"
+          >
+            <Link size={14} /> Link IAM Account
+          </button>
           <button
             onClick={() => setShowCreate(true)}
             className="flex items-center gap-1.5 px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors shadow-sm"
@@ -305,6 +491,7 @@ export default function AccountManagement() {
             <Plus size={14} /> Create Account
           </button>
         </div>
+
         <div className="bg-white border border-gray-200 rounded-xl p-5">
           <div className="grid grid-cols-3 gap-4 mb-4">
             <div>
@@ -345,12 +532,18 @@ export default function AccountManagement() {
         filterStatus={filterStatus}
       />
 
-      {/* Create Modal */}
+      {/* Modals */}
       {showCreate && (
         <CreateAccountModal
           defaultSubType={activeTab}
           onClose={() => setShowCreate(false)}
           onSave={handleCreate}
+        />
+      )}
+      {showLinkIAM && (
+        <LinkIAMModal
+          onClose={() => setShowLinkIAM(false)}
+          onConfirm={handleLinkIAM}
         />
       )}
     </div>
