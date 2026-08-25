@@ -227,7 +227,7 @@ function LinkIAMModal({ onClose, onConfirm }: {
     <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center px-4" onClick={onClose}>
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-xl max-h-[90vh] flex flex-col" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between px-6 py-4 border-b">
-          <h3 className="text-base font-semibold text-gray-900">Set IAM Account as Customer Primary Account</h3>
+          <h3 className="text-base font-semibold text-gray-900">Set IAM Account as Customer Account</h3>
           <button onClick={onClose}><X size={16} className="text-gray-400 hover:text-gray-600" /></button>
         </div>
 
