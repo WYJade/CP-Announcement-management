@@ -2,8 +2,11 @@ import { useState, useRef, useEffect } from 'react'
 import { Plus, X, ChevronDown, ChevronRight, MoreHorizontal, Edit2, Copy, Trash2, Sparkles } from 'lucide-react'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
-type RoleType = 'Internal' | 'External'
+type RoleType = 'Tenant Role' | 'Customer Role'
 type RoleStatus = 'Active' | 'Inactive'
+type TenantOption = 'Unis, LLC' | 'Unis Transportation LLC'
+
+const TENANT_OPTIONS: TenantOption[] = ['Unis, LLC', 'Unis Transportation LLC']
 
 interface PermissionNode {
   id: string
@@ -16,6 +19,7 @@ interface Role {
   id: string
   name: string
   description: string
+  tenant: TenantOption | ''
   roleType: RoleType
   modules: string[]
   users: number
@@ -77,20 +81,23 @@ const MODULE_OPTIONS = PERMISSION_TREE.map(n => n.label)
 const INITIAL_ROLES: Role[] = [
   {
     id: 'r1', name: 'sub-Admin', description: 'No description provided.',
-    roleType: 'Internal',
+    tenant: 'Unis, LLC',
+    roleType: 'Tenant Role',
     modules: ['Web Methods', 'International', 'Warehouse Map'],
     users: 1, status: 'Active', lastModified: '2026/08/28',
   },
   {
     id: 'r2', name: 'sdssss', description: 'No description provided.',
-    roleType: 'Internal',
+    tenant: 'Unis Transportation LLC',
+    roleType: 'Tenant Role',
     modules: ['Dashboards'],
     users: 1, status: 'Active', lastModified: '2026/08/26',
   },
   {
     id: 'r3', name: 'Client Portal –UF External User',
     description: '供外部客户访问 UF 系统中的客户服务功能及其他授权的业务数据…',
-    roleType: 'External',
+    tenant: 'Unis, LLC',
+    roleType: 'Customer Role',
     modules: [],
     users: 40, status: 'Active', lastModified: '2026/08/24',
   },
@@ -171,10 +178,12 @@ function RoleForm({
 }) {
   const [name, setName] = useState(initial?.name ?? '')
   const [description, setDescription] = useState(initial?.description ?? '')
-  const [roleType, setRoleType] = useState<RoleType>(initial?.roleType ?? 'Internal')
+  const [tenant, setTenant] = useState<TenantOption | ''>(initial?.tenant ?? '')
+  const [roleType, setRoleType] = useState<RoleType>(initial?.roleType ?? 'Tenant Role')
   const [status, setStatus] = useState<RoleStatus>(initial?.status ?? 'Active')
   const [checked, setChecked] = useState<Set<string>>(new Set())
   const [nameError, setNameError] = useState('')
+  const [tenantError, setTenantError] = useState('')
   const [roleTypeError, setRoleTypeError] = useState('')
 
   const toggle = (id: string) => {
@@ -188,9 +197,10 @@ function RoleForm({
   const handleSave = () => {
     let valid = true
     if (!name.trim()) { setNameError('Role name is required'); valid = false } else setNameError('')
+    if (!tenant) { setTenantError('Tenant is required'); valid = false } else setTenantError('')
     if (!roleType) { setRoleTypeError('Role type is required'); valid = false } else setRoleTypeError('')
     if (!valid) return
-    onSave({ name, description, roleType, status, modules: [] })
+    onSave({ name, description, tenant, roleType, status, modules: [] })
   }
 
   return (
@@ -241,13 +251,29 @@ function RoleForm({
               />
             </div>
 
-            {/* Role Type — above Status */}
+            {/* Tenant — above Role Type */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Tenant <span className="text-red-500">*</span>
+              </label>
+              <select
+                value={tenant}
+                onChange={e => { setTenant(e.target.value as TenantOption | ''); setTenantError('') }}
+                className={`w-full border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400/30 focus:border-primary-500 transition-colors ${tenantError ? 'border-red-400 bg-red-50' : 'border-gray-300'} ${!tenant ? 'text-gray-400' : 'text-gray-800'}`}
+              >
+                <option value="">Select Tenant</option>
+                {TENANT_OPTIONS.map(t => <option key={t} value={t}>{t}</option>)}
+              </select>
+              {tenantError && <p className="text-xs text-red-500 mt-1">{tenantError}</p>}
+            </div>
+
+            {/* Role Type — Tenant Role / Customer Role */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">
                 Role Type <span className="text-red-500">*</span>
               </label>
               <div className="flex items-center gap-4">
-                {(['Internal', 'External'] as RoleType[]).map(t => (
+                {(['Tenant Role', 'Customer Role'] as RoleType[]).map(t => (
                   <label key={t} className="flex items-center gap-1.5 cursor-pointer">
                     <input
                       type="radio"
@@ -392,13 +418,15 @@ export default function RoleManagement() {
   const [filterModule, setFilterModule] = useState('')
   const [filterStatus, setFilterStatus] = useState('')
   const [filterRoleType, setFilterRoleType] = useState('')
+  const [filterTenant, setFilterTenant] = useState('')
   const [filterRoleName, setFilterRoleName] = useState('')
-  const [activeFilters, setActiveFilters] = useState({ module: '', status: '', roleType: '', roleName: '' })
+  const [activeFilters, setActiveFilters] = useState({ module: '', status: '', roleType: '', tenant: '', roleName: '' })
 
   const filtered = roles.filter(r => {
     if (activeFilters.roleName && !r.name.toLowerCase().includes(activeFilters.roleName.toLowerCase())) return false
     if (activeFilters.status && r.status !== activeFilters.status) return false
     if (activeFilters.roleType && r.roleType !== activeFilters.roleType) return false
+    if (activeFilters.tenant && r.tenant !== activeFilters.tenant) return false
     if (activeFilters.module && !r.modules.includes(activeFilters.module)) return false
     return true
   })
@@ -461,7 +489,7 @@ export default function RoleManagement() {
 
       {/* Filter card */}
       <div className="bg-white border border-gray-200 rounded-xl p-5 mb-5">
-        <div className="grid grid-cols-4 gap-4 mb-4">
+        <div className="grid grid-cols-5 gap-4 mb-4">
           {/* Module */}
           <div>
             <label className="block text-xs font-medium text-gray-500 mb-1.5">Module</label>
@@ -481,14 +509,23 @@ export default function RoleManagement() {
               <option>Inactive</option>
             </select>
           </div>
+          {/* Tenant */}
+          <div>
+            <label className="block text-xs font-medium text-gray-500 mb-1.5">Tenant</label>
+            <select value={filterTenant} onChange={e => setFilterTenant(e.target.value)}
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 focus:outline-none focus:border-primary-400">
+              <option value="">Select Tenant</option>
+              {TENANT_OPTIONS.map(t => <option key={t} value={t}>{t}</option>)}
+            </select>
+          </div>
           {/* Role Type */}
           <div>
             <label className="block text-xs font-medium text-gray-500 mb-1.5">Role Type</label>
             <select value={filterRoleType} onChange={e => setFilterRoleType(e.target.value)}
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 focus:outline-none focus:border-primary-400">
               <option value="">Select Role Type</option>
-              <option>Internal</option>
-              <option>External</option>
+              <option>Tenant Role</option>
+              <option>Customer Role</option>
             </select>
           </div>
           {/* Role Name */}
@@ -501,11 +538,11 @@ export default function RoleManagement() {
         </div>
         <div className="flex justify-end gap-2">
           <button
-            onClick={() => { setFilterModule(''); setFilterStatus(''); setFilterRoleType(''); setFilterRoleName(''); setActiveFilters({ module: '', status: '', roleType: '', roleName: '' }) }}
+            onClick={() => { setFilterModule(''); setFilterStatus(''); setFilterRoleType(''); setFilterTenant(''); setFilterRoleName(''); setActiveFilters({ module: '', status: '', roleType: '', tenant: '', roleName: '' }) }}
             className="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50"
           >Reset</button>
           <button
-            onClick={() => setActiveFilters({ module: filterModule, status: filterStatus, roleType: filterRoleType, roleName: filterRoleName })}
+            onClick={() => setActiveFilters({ module: filterModule, status: filterStatus, roleType: filterRoleType, tenant: filterTenant, roleName: filterRoleName })}
             className="px-4 py-2 text-sm text-white bg-primary-600 rounded-lg hover:bg-primary-700"
           >Search</button>
         </div>
@@ -516,7 +553,7 @@ export default function RoleManagement() {
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-gray-50 border-b border-gray-200">
-              {['Role Name', 'Description', 'Role Type', 'Modules', 'Users', 'Status', 'Last Modified', 'Actions'].map(h => (
+              {['Role Name', 'Description', 'Tenant', 'Role Type', 'Modules', 'Users', 'Status', 'Last Modified', 'Actions'].map(h => (
                 <th key={h} className="text-left py-3 px-4 text-xs font-semibold text-gray-500 whitespace-nowrap">{h}</th>
               ))}
             </tr>
@@ -525,10 +562,11 @@ export default function RoleManagement() {
             {filtered.map(role => (
               <tr key={role.id} className="hover:bg-gray-50 transition-colors">
                 <td className="py-3.5 px-4 font-medium text-gray-800">{role.name}</td>
-                <td className="py-3.5 px-4 text-gray-500 text-xs max-w-[200px] truncate">{role.description}</td>
+                <td className="py-3.5 px-4 text-gray-500 text-xs max-w-[180px] truncate">{role.description}</td>
+                <td className="py-3.5 px-4 text-gray-600 text-xs whitespace-nowrap">{role.tenant || '–'}</td>
                 <td className="py-3.5 px-4">
                   <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold ${
-                    role.roleType === 'Internal'
+                    role.roleType === 'Tenant Role'
                       ? 'bg-blue-50 text-blue-700'
                       : 'bg-orange-50 text-orange-700'
                   }`}>
@@ -571,7 +609,7 @@ export default function RoleManagement() {
               </tr>
             ))}
             {filtered.length === 0 && (
-              <tr><td colSpan={8} className="text-center py-12 text-gray-400 text-sm">No roles found</td></tr>
+              <tr><td colSpan={9} className="text-center py-12 text-gray-400 text-sm">No roles found</td></tr>
             )}
           </tbody>
         </table>
