@@ -394,11 +394,14 @@ function RoleForm({
               </div>
             </div>
 
-            {/* Fixed tab: 菜单功能/API权限 */}
-            <div className="border-b border-gray-200 mb-4">
+            {/* Fixed tab: 菜单功能/API权限 + hint text */}
+            <div className="border-b border-gray-200 mb-4 flex items-center justify-between">
               <div className="inline-block px-1 pb-2 text-sm font-semibold text-primary-600 border-b-2 border-primary-600">
                 菜单功能/API权限
               </div>
+              <p className="text-xs text-amber-600 font-medium pb-2">
+                此处配置的 API 权限仅对 Client Portal 本体及 Agent 生效，不影响页面功能。
+              </p>
             </div>
 
             {/* Permission tree */}
