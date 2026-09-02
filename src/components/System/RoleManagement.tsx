@@ -12,7 +12,8 @@ interface PermissionNode {
   id: string
   label: string
   children?: PermissionNode[]
-  actions?: string[]
+  actions?: string[]        // 页面功能
+  apis?: string[]           // API权限
 }
 
 interface Role {
@@ -31,46 +32,46 @@ interface Role {
 const PERMISSION_TREE: PermissionNode[] = [
   {
     id: 'dashboards', label: 'Dashboards', children: [
-      { id: 'otif-dash', label: 'OTIF Dashboard', actions: ['View'] },
-      { id: 'kpi-dash', label: 'KPI Dashboard', actions: ['View', 'Create Project'] },
-      { id: 'ticket-insights', label: 'Ticket Insights', actions: ['View'] },
+      { id: 'otif-dash', label: 'OTIF Dashboard', actions: ['View'], apis: ['OTIF Dashboard View', 'OTIF Data Query'] },
+      { id: 'kpi-dash', label: 'KPI Dashboard', actions: ['View', 'Create Project'], apis: ['KPI Dashboard View', 'KPI Order Summary Query', 'Create KPI Project'] },
+      { id: 'ticket-insights', label: 'Ticket Insights', actions: ['View'], apis: ['Ticket Insights Query'] },
     ],
   },
   {
     id: 'purchase-mgmt', label: 'Purchase Management', children: [
-      { id: 'projects', label: 'Projects', actions: ['View'] },
-      { id: 'purchase-request', label: 'Purchase Request', actions: ['View', 'Add New'] },
-      { id: 'purchase-order', label: 'Purchase Order', actions: ['View', 'Add New', 'Edit'] },
+      { id: 'projects', label: 'Projects', actions: ['View'], apis: ['Project List Query'] },
+      { id: 'purchase-request', label: 'Purchase Request', actions: ['View', 'Add New'], apis: ['Purchase Request Query', 'Create Purchase Request'] },
+      { id: 'purchase-order', label: 'Purchase Order', actions: ['View', 'Add New', 'Edit'], apis: ['Purchase Order Query', 'Create Purchase Order', 'Update Purchase Order'] },
     ],
   },
   {
     id: 'sales-order', label: 'Sales Order', children: [
-      { id: 'wholesale', label: 'Wholesale Orders', actions: ['View', 'Export'] },
-      { id: 'retail', label: 'Retail Orders', actions: ['View', 'Export'] },
+      { id: 'wholesale', label: 'Wholesale Orders', actions: ['View', 'Export'], apis: ['Wholesale Order Query', 'Export Wholesale Orders'] },
+      { id: 'retail', label: 'Retail Orders', actions: ['View', 'Export'], apis: ['Retail Order Query', 'Export Retail Orders'] },
     ],
   },
   {
     id: 'inbound', label: 'Inbound', children: [
-      { id: 'inbound-inquiry', label: 'Inquiry', actions: ['View', 'Export'] },
-      { id: 'receipt-entry', label: 'Receipt Entry', actions: ['View', 'Add New'] },
+      { id: 'inbound-inquiry', label: 'Inquiry', actions: ['View', 'Export'], apis: ['Inbound Receipt Query', 'Inbound SKU Detail Query', 'Export Inbound Inquiry Details'] },
+      { id: 'receipt-entry', label: 'Receipt Entry', actions: ['View', 'Add New'], apis: ['Receipt Entry Query', 'Create Receipt Entry', 'Receipt Item Detail Query'] },
     ],
   },
   {
     id: 'inventory', label: 'Inventory', children: [
-      { id: 'inventory-activity', label: 'Inventory Activity', actions: ['View', 'Export'] },
-      { id: 'item-master', label: 'Item Master', actions: ['View'] },
+      { id: 'inventory-activity', label: 'Inventory Activity', actions: ['View', 'Export'], apis: ['Inventory Activity Query', 'Export Inventory Activity'] },
+      { id: 'item-master', label: 'Item Master', actions: ['View'], apis: ['Item Master Query', 'Item Detail Query'] },
     ],
   },
   {
     id: 'outbound', label: 'Outbound', children: [
-      { id: 'outbound-inquiry', label: 'Inquiry', actions: ['View', 'Export'] },
-      { id: 'freight-quote', label: 'Freight Quote', actions: ['View', 'Create'] },
+      { id: 'outbound-inquiry', label: 'Inquiry', actions: ['View', 'Export'], apis: ['Outbound Order Query', 'Export Outbound Inquiry', 'Outbound Order Detail Query'] },
+      { id: 'freight-quote', label: 'Freight Quote', actions: ['View', 'Create'], apis: ['Freight Quote Query', 'Create Freight Quote', 'Freight Rate Query'] },
     ],
   },
   {
     id: 'finance', label: 'Finance', children: [
-      { id: 'invoice', label: 'Invoice', actions: ['View', 'Pay', 'Export'] },
-      { id: 'claim', label: 'Claim', actions: ['View', 'Create'] },
+      { id: 'invoice', label: 'Invoice', actions: ['View', 'Pay', 'Export'], apis: ['Invoice List Query', 'Invoice Detail Query', 'Pay Invoice', 'Export Invoice'] },
+      { id: 'claim', label: 'Claim', actions: ['View', 'Create'], apis: ['Claim List Query', 'Claim Detail Query', 'File New Claim'] },
     ],
   },
 ]
@@ -104,6 +105,8 @@ const INITIAL_ROLES: Role[] = [
 ]
 
 // ─── Permission tree node component ──────────────────────────────────────────
+// Top-level (depth=0): section header with expand/collapse + checkbox
+// Second-level (depth=1): sub-menu label + two-column table (页面功能 | API权限)
 function PermNode({
   node, depth = 0, checked, onToggle,
 }: {
@@ -112,56 +115,98 @@ function PermNode({
   checked: Set<string>
   onToggle: (id: string) => void
 }) {
-  const [expanded, setExpanded] = useState(depth === 0)
+  const [expanded, setExpanded] = useState(true)
   const hasChildren = !!node.children?.length
+  const isTopLevel = depth === 0
+  const hasActions = !!node.actions?.length
+  const hasApis = !!node.apis?.length
 
-  return (
-    <div style={{ marginLeft: depth * 20 }}>
-      <div className="flex items-center gap-2 py-1">
-        {hasChildren ? (
-          <button onClick={() => setExpanded(v => !v)} className="text-gray-400 hover:text-gray-600 transition-colors">
+  if (isTopLevel) {
+    return (
+      <div className="mb-2">
+        {/* Top-level header row — purple-tinted */}
+        <div className="flex items-center gap-2 py-2 px-3 bg-violet-50 rounded-lg mb-1">
+          <button onClick={() => setExpanded(v => !v)} className="text-violet-400 hover:text-violet-600 transition-colors">
             {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
           </button>
-        ) : <span className="w-3.5" />}
-        <input
-          type="checkbox"
-          checked={checked.has(node.id)}
-          onChange={() => onToggle(node.id)}
-          className="rounded border-gray-300 text-primary-600 focus:ring-primary-400"
-        />
-        <span className="text-sm text-gray-700">{node.label}</span>
+          <div className="w-4 h-4 rounded bg-violet-500 shrink-0 flex items-center justify-center">
+            <div className="w-2 h-2 bg-white rounded-sm" />
+          </div>
+          <span className="text-sm font-semibold text-gray-800">{node.label}</span>
+        </div>
+        {expanded && hasChildren && (
+          <div className="pl-3">
+            {node.children!.map(child => (
+              <PermNode key={child.id} node={child} depth={1} checked={checked} onToggle={onToggle} />
+            ))}
+          </div>
+        )}
       </div>
-      {hasChildren && expanded && (
-        <div>
-          {node.children!.map(child => (
-            <PermNode key={child.id} node={child} depth={depth + 1} checked={checked} onToggle={onToggle} />
-          ))}
-          {/* Action checkboxes */}
-          {node.actions?.map(action => (
-            <div key={action} className="flex items-center gap-2 py-0.5" style={{ marginLeft: (depth + 2) * 20 }}>
-              <input
-                type="checkbox"
-                checked={checked.has(`${node.id}:${action}`)}
-                onChange={() => onToggle(`${node.id}:${action}`)}
-                className="rounded border-gray-300 text-primary-600 focus:ring-primary-400"
-              />
-              <span className="text-xs text-gray-500">{action}</span>
-            </div>
-          ))}
+    )
+  }
+
+  // Leaf / second-level node
+  return (
+    <div className="mb-3">
+      {/* Sub-menu label row */}
+      <div className="flex items-center gap-2 py-1.5 mb-1">
+        <button onClick={() => setExpanded(v => !v)} className="text-gray-400 hover:text-gray-600 transition-colors">
+          {expanded ? <ChevronDown size={13} /> : <ChevronRight size={13} />}
+        </button>
+        <div className="w-4 h-4 rounded bg-violet-500 shrink-0 flex items-center justify-center">
+          <div className="w-2 h-2 bg-white rounded-sm" />
+        </div>
+        <span className="text-sm text-gray-700 font-medium">{node.label}</span>
+      </div>
+
+      {/* Two-column table for actions + apis */}
+      {expanded && (hasActions || hasApis) && (
+        <div className="ml-6 border border-gray-200 rounded-lg overflow-hidden">
+          {/* Column headers */}
+          <div className="grid grid-cols-2 border-b border-gray-200 bg-gray-50">
+            <div className="px-4 py-2 text-xs font-semibold text-gray-500 border-r border-gray-200">页面功能</div>
+            <div className="px-4 py-2 text-xs font-semibold text-gray-500">API 权限</div>
+          </div>
+          {/* Rows — zip actions and apis side by side */}
+          {(() => {
+            const acts = node.actions ?? []
+            const apis = node.apis ?? []
+            const maxLen = Math.max(acts.length, apis.length)
+            return Array.from({ length: maxLen }).map((_, i) => (
+              <div key={i} className={`grid grid-cols-2 ${i < maxLen - 1 ? 'border-b border-gray-100' : ''}`}>
+                {/* 页面功能 cell */}
+                <div className="px-4 py-2 border-r border-gray-100 flex items-center gap-2">
+                  {acts[i] !== undefined ? (
+                    <>
+                      <input
+                        type="checkbox"
+                        checked={checked.has(`${node.id}:action:${acts[i]}`)}
+                        onChange={() => onToggle(`${node.id}:action:${acts[i]}`)}
+                        className="rounded border-gray-300 text-violet-600 focus:ring-violet-400"
+                      />
+                      <span className="text-xs text-gray-700">{acts[i]}</span>
+                    </>
+                  ) : null}
+                </div>
+                {/* API权限 cell */}
+                <div className="px-4 py-2 flex items-center gap-2">
+                  {apis[i] !== undefined ? (
+                    <>
+                      <input
+                        type="checkbox"
+                        checked={checked.has(`${node.id}:api:${apis[i]}`)}
+                        onChange={() => onToggle(`${node.id}:api:${apis[i]}`)}
+                        className="rounded border-gray-300 text-violet-600 focus:ring-violet-400"
+                      />
+                      <span className="text-xs text-gray-700">{apis[i]}</span>
+                    </>
+                  ) : null}
+                </div>
+              </div>
+            ))
+          })()}
         </div>
       )}
-      {/* Action checkboxes for leaf nodes */}
-      {!hasChildren && node.actions && expanded && node.actions.map(action => (
-        <div key={action} className="flex items-center gap-2 py-0.5" style={{ marginLeft: (depth + 1) * 20 }}>
-          <input
-            type="checkbox"
-            checked={checked.has(`${node.id}:${action}`)}
-            onChange={() => onToggle(`${node.id}:${action}`)}
-            className="rounded border-gray-300 text-primary-600 focus:ring-primary-400"
-          />
-          <span className="text-xs text-gray-500">{action}</span>
-        </div>
-      ))}
     </div>
   )
 }
@@ -317,8 +362,9 @@ function RoleForm({
         {/* Right — Permission Configuration */}
         <div className="flex-1 min-w-0">
           <div className="bg-white border border-gray-200 rounded-xl p-5 h-full flex flex-col">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-sm font-semibold text-gray-800">Permission Configuration</h2>
+            {/* Header */}
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-sm font-semibold text-gray-800">权限配置</h2>
               <div className="flex items-center gap-2">
                 <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-white bg-primary-600 rounded-lg hover:bg-primary-700 font-medium">
                   <Sparkles size={12} /> Role Templates
@@ -327,7 +373,12 @@ function RoleForm({
                   onClick={() => {
                     const all = new Set<string>()
                     const addAll = (nodes: PermissionNode[]) => {
-                      nodes.forEach(n => { all.add(n.id); n.actions?.forEach(a => all.add(`${n.id}:${a}`)); if (n.children) addAll(n.children) })
+                      nodes.forEach(n => {
+                        all.add(n.id)
+                        n.actions?.forEach(a => all.add(`${n.id}:action:${a}`))
+                        n.apis?.forEach(a => all.add(`${n.id}:api:${a}`))
+                        if (n.children) addAll(n.children)
+                      })
                     }
                     addAll(PERMISSION_TREE)
                     setChecked(all)
@@ -342,7 +393,16 @@ function RoleForm({
                 </button>
               </div>
             </div>
-            <div className="flex-1 overflow-y-auto border border-gray-100 rounded-lg p-3">
+
+            {/* Fixed tab: 菜单功能/API权限 */}
+            <div className="border-b border-gray-200 mb-4">
+              <div className="inline-block px-1 pb-2 text-sm font-semibold text-primary-600 border-b-2 border-primary-600">
+                菜单功能/API权限
+              </div>
+            </div>
+
+            {/* Permission tree */}
+            <div className="flex-1 overflow-y-auto">
               {PERMISSION_TREE.map(node => (
                 <PermNode key={node.id} node={node} checked={checked} onToggle={toggle} />
               ))}
