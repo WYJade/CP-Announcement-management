@@ -169,6 +169,7 @@ const menuItems: MenuItem[] = [
     icon: <Building size={16} />,
     expandable: true,
     children: [
+      { id: 'yard-entry-list', label: 'Entry Monitor', path: '/yard/entry-list' },
       { id: 'equip-history', label: 'Equipment History Report' },
       { id: 'equip-report', label: 'Equipment Report' },
       { id: 'yard-status', label: 'Yard Status Report' },

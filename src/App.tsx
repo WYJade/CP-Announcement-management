@@ -39,6 +39,7 @@ import AppointmentList from './components/Inbound/AppointmentList'
 import ClaimList from './components/Finance/ClaimList'
 import ShipmentsList from './components/Shipping/ShipmentsList'
 import RoleManagement from './components/System/RoleManagement'
+import EntryList from './components/Yard/EntryList'
 
 function App() {
   return (
@@ -125,6 +126,9 @@ function App() {
 
         {/* Finance — Claim */}
         <Route path="finance/claims" element={<ClaimList />} />
+
+        {/* Yard Management — Entry Monitor */}
+        <Route path="yard/entry-list" element={<EntryList />} />
       </Route>
     </Routes>
   )
