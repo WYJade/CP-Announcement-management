@@ -46,11 +46,19 @@ interface EntryRecord {
   tractor: string
   trailer: string
   container: string
+  seal: string
   freightCarrier: string
   entryType: EntryType
   direction: string
   location: string
   loadTask: string
+  loadId: string
+  loadNo: string
+  receiptId: string
+  hasAppointment: boolean  // whether a pre-scheduled appointment exists
+  windowCheckIn: string    // Window Check-In timestamp; empty means not yet checked in
+  dockCheckIn: string      // Dock Check-In timestamp
+  dockCheckOut: string     // Dock Check-Out timestamp
   gateCheckIn: string
   gateCheckOut: string
   anomaly: AnomalyType
@@ -92,38 +100,42 @@ const MOCK_ENTRIES: EntryRecord[] = [
   {
     id:'e1', entryId:'ET-822803', status:'Window Checked In', dock:'DOCK33456',
     facility:'Ontario, CA', customer:'ADOORN LLC',
-    driverName:'', driverPhone:'', driverLicense:'', tractorCarrier:'',
-    equipType:'TRAILER', tractor:'', trailer:'4645', container:'', freightCarrier:'',
+    driverName:'Jason Miller', driverPhone:'(+1)9093451872', driverLicense:'CA-M293847', tractorCarrier:'SWIFT TRANSPORT',
+    equipType:'TRAILER', tractor:'T-10923', trailer:'4645', container:'CNTR-9901', seal:'SL-88421', freightCarrier:'SWIFT TRANSPORT',
     entryType:'Outbound', direction:'Outbound', location:'DOCK33456', loadTask:'TASK-35688(jfeng)',
-    gateCheckIn:'2026-09-08 10:04', gateCheckOut:'', anomaly:null,
+    loadId:'LD-20230', loadNo:'LN-5521', receiptId:'RCP-10040',
+    hasAppointment:true, windowCheckIn:'2026-09-08 10:18', dockCheckIn:'2026-09-08 10:35', dockCheckOut:'', gateCheckIn:'2026-09-08 10:04', gateCheckOut:'', anomaly:null,
     photos:[makePh('Driver'), makePh('Vehicle','vehicle'), makePh('Equipment','vehicle'), makePh('Camera In','camera')],
   },
   {
     id:'e2', entryId:'ET-822802', status:'Dock Checked Out', dock:'DOCK711',
     facility:'Ontario, CA', customer:'ADOORN LLC',
     driverName:'api fox', driverPhone:'(+1)2013694258', driverLicense:'DL83R4J484', tractorCarrier:'TTS',
-    equipType:'TRAILER', tractor:'LPR443', trailer:'FJWONIX', container:'', freightCarrier:'UPS',
+    equipType:'TRAILER', tractor:'LPR443', trailer:'FJWONIX', container:'CNTR-7701', seal:'SL-00312', freightCarrier:'UPS',
     entryType:'Outbound', direction:'Outbound', location:'DOCK711', loadTask:'TASK-837829(SMITH JOHN)',
-    gateCheckIn:'2026-09-08 03:14', gateCheckOut:'', anomaly:null,
+    loadId:'LD-20198', loadNo:'LN-5498', receiptId:'RCP-10045',
+    hasAppointment:true, windowCheckIn:'2026-09-08 03:22', dockCheckIn:'2026-09-08 03:40', dockCheckOut:'2026-09-08 05:12', gateCheckIn:'2026-09-08 03:14', gateCheckOut:'', anomaly:null,
     photos:[makePh('Driver'), makePh('Driver 2'), makePh('Vehicle','vehicle'), makePh('Vehicle 2','vehicle'), makePh('Equipment','vehicle'), makePh('Equipment 2','vehicle'), makePh('Camera In','camera'), makePh('Camera Out','camera')],
   },
   {
     id:'e3', entryId:'ET-822795', status:'Dropping Off Empty', dock:'YARD162',
     facility:'Fontana, CA', customer:'THE ONLY BEAN LLC',
-    driverName:'ESTHER CHEN', driverPhone:'(+1)2542492894', driverLicense:'12345568', tractorCarrier:'J B HUNT TRANSPORT INC',
-    equipType:'TRAILER', tractor:'', trailer:'8222733', container:'', freightCarrier:'J B HUNT TRANSPORT INC',
-    entryType:'Drop Off Empty', direction:'Drop Off Empty', location:'',
-    loadTask:'', gateCheckIn:'2026-09-08 02:41', gateCheckOut:'',
+    driverName:'ESTHER CHEN', driverPhone:'(+1)2542492894', driverLicense:'CA-12345568', tractorCarrier:'J B HUNT TRANSPORT INC',
+    equipType:'TRAILER', tractor:'T-33881', trailer:'8222733', container:'CNTR-5512', seal:'SL-44901', freightCarrier:'J B HUNT TRANSPORT INC',
+    entryType:'Drop Off Empty', direction:'Drop Off Empty', location:'YARD-B12',
+    loadTask:'TASK-35601(echen)', loadId:'LD-20187', loadNo:'LN-5490', receiptId:'RCP-10031',
+    hasAppointment:true, windowCheckIn:'', dockCheckIn:'', dockCheckOut:'', gateCheckIn:'2026-09-08 02:41', gateCheckOut:'',
     anomaly:'no-location', anomalyDetail:'Driver has not filled in the actual parking location.',
     photos:[makePh('Driver'), makePh('Driver 2'), makePh('Camera In','camera'), makePh('Camera In 2','camera'), makePh('Camera In 3','camera'), makePh('Camera In 4','camera'), makePh('Camera In 5','camera'), makePh('Camera In 6','camera'), makePh('Camera In 7','camera'), makePh('Camera In 8','camera')],
   },
   {
-    id:'e4', entryId:'ET-822711', status:'Gate Checked Out', dock:'',
+    id:'e4', entryId:'ET-822711', status:'Gate Checked Out', dock:'DOCK442',
     facility:'Garden City, NY', customer:'VITA COCO',
-    driverName:'test yuto', driverPhone:'(+1)9988880888', driverLicense:'43e534626', tractorCarrier:'AMC TRANSPORT SERVICES LLC',
-    equipType:'TRAILER', tractor:'', trailer:'PGNN', container:'', freightCarrier:'FEDEX FREIGHT INC',
-    entryType:'Outbound', direction:'Outbound', location:'', loadTask:'',
-    gateCheckIn:'2026-09-02 00:32', gateCheckOut:'2026-09-02 00:36',
+    driverName:'test yuto', driverPhone:'(+1)9988880888', driverLicense:'NY-43e534626', tractorCarrier:'AMC TRANSPORT SERVICES LLC',
+    equipType:'TRAILER', tractor:'T-66120', trailer:'PGNN', container:'CNTR-4402', seal:'SL-77654', freightCarrier:'FEDEX FREIGHT INC',
+    entryType:'Outbound', direction:'Outbound', location:'DOCK442', loadTask:'TASK-34991(jsmith)',
+    loadId:'LD-19854', loadNo:'LN-5200', receiptId:'RCP-09988',
+    hasAppointment:false, windowCheckIn:'2026-09-02 00:45', dockCheckIn:'2026-09-02 01:00', dockCheckOut:'2026-09-02 01:48', gateCheckIn:'2026-09-02 00:32', gateCheckOut:'2026-09-02 01:55',
     anomaly:'mismatch', anomalyDetail:'Driver info entered by carrier does not match gate check-in record.',
     mismatch:{
       byCarrier:{ name:'324234', phone:'(+1)2701661989', license:'46534354', carrier:'FEDEX FREIGHT INC', mcdot:'229039' },
@@ -134,20 +146,22 @@ const MOCK_ENTRIES: EntryRecord[] = [
   {
     id:'e5', entryId:'ET-822710', status:'Window Checked In', dock:'DOCK8976',
     facility:'Fontana, CA', customer:'ORGAIN LLC',
-    driverName:'', driverPhone:'', driverLicense:'', tractorCarrier:'',
-    equipType:'TRAILER', tractor:'', trailer:'PGNN', container:'', freightCarrier:'',
+    driverName:'Kevin Torres', driverPhone:'(+1)9095552341', driverLicense:'CA-K887712', tractorCarrier:'WERNER ENTERPRISES',
+    equipType:'TRAILER', tractor:'T-20541', trailer:'PGNN', container:'CNTR-3308', seal:'SL-33209', freightCarrier:'WERNER ENTERPRISES',
     entryType:'Outbound', direction:'Outbound', location:'DOCK8976', loadTask:'TASK-36384(jfeng)',
-    gateCheckIn:'2026-09-02 00:32', gateCheckOut:'', anomaly:null,
+    loadId:'LD-20175', loadNo:'LN-5481', receiptId:'RCP-10038',
+    hasAppointment:true, windowCheckIn:'2026-09-02 00:50', dockCheckIn:'2026-09-02 01:05', dockCheckOut:'', gateCheckIn:'2026-09-02 00:32', gateCheckOut:'', anomaly:null,
     photos:[makePh('Camera In','camera'), makePh('Camera In 2','camera')],
   },
   {
-    id:'e6', entryId:'ET-822804', status:'Need Window Check-In', dock:'',
+    id:'e6', entryId:'ET-822804', status:'Need Window Check-In', dock:'DOCK115',
     facility:'Chicago, IL', customer:'SAMUN INC',
-    driverName:'', driverPhone:'', driverLicense:'', tractorCarrier:'',
-    equipType:'', tractor:'', trailer:'', container:'', freightCarrier:'',
-    entryType:'Inbound', direction:'Inbound', location:'', loadTask:'',
-    gateCheckIn:'2026-09-08 10:04', gateCheckOut:'', anomaly:null,
-    photos:[],
+    driverName:'Maria Gonzalez', driverPhone:'(+1)3125559988', driverLicense:'IL-M334421', tractorCarrier:'COYOTE LOGISTICS',
+    equipType:'TRAILER', tractor:'T-77403', trailer:'TRL-2290', container:'CNTR-6614', seal:'SL-55820', freightCarrier:'COYOTE LOGISTICS',
+    entryType:'Inbound', direction:'Inbound', location:'', loadTask:'TASK-36401(mgonzalez)',
+    loadId:'LD-20231', loadNo:'LN-5522', receiptId:'RCP-10048',
+    hasAppointment:false, windowCheckIn:'', dockCheckIn:'', dockCheckOut:'', gateCheckIn:'2026-09-08 10:04', gateCheckOut:'', anomaly:null,
+    photos:[makePh('Driver'), makePh('Vehicle','vehicle'), makePh('Camera In','camera')],
   },
 ]
 
@@ -174,6 +188,50 @@ function StatusBadge({ status }: { status: EntryStatus }) {
     <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium ${s.bg} ${s.text}`}>
       <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`} />
       {status}
+    </span>
+  )
+}
+
+// ─── Window Check-In Badge (3-state logic) ────────────────────────────────────
+function WindowCheckInBadge({
+  hasAppointment, windowCheckIn, gateCheckIn,
+}: {
+  hasAppointment: boolean
+  windowCheckIn: string
+  gateCheckIn: string
+}) {
+  // Case 2 & 3b — has windowCheckIn or (no appt but gate check-in exists) → Arrived
+  if (windowCheckIn) {
+    return (
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+        Arrived at {windowCheckIn}
+      </span>
+    )
+  }
+  // Case 3b — no appointment, but already gate checked-in → treat as arrived
+  if (!hasAppointment && gateCheckIn) {
+    return (
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+        Arrived at {gateCheckIn}
+      </span>
+    )
+  }
+  // Case 3a — no appointment, no gate check-in yet
+  if (!hasAppointment) {
+    return (
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-gray-100 text-gray-500 border border-gray-200">
+        <span className="w-1.5 h-1.5 rounded-full bg-gray-400 shrink-0" />
+        Not Scheduled
+      </span>
+    )
+  }
+  // Case 1 — has appointment but windowCheckIn is empty → pending
+  return (
+    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+      <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse shrink-0" />
+      Pending Arrival
     </span>
   )
 }
@@ -397,15 +455,40 @@ function EntryDetailPanel({ entry, onClose }: { entry: EntryRecord; onClose: () 
           {/* Timeline */}
           <section>
             <h3 className="text-xs font-semibold text-gray-400 uppercase mb-2 flex items-center gap-1.5"><Clock size={12}/> Timeline</h3>
-            <div className="bg-gray-50 rounded-xl px-4 py-3 grid grid-cols-2 gap-3">
-              <div>
-                <p className="text-[10px] text-gray-400 mb-0.5">Gate Check-in</p>
-                <p className="text-sm font-medium text-gray-800">{entry.gateCheckIn||'–'}</p>
+            <div className="bg-gray-50 rounded-xl px-4 py-3 space-y-3">
+              {/* Gate Check-in / Check-out */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <p className="text-[10px] text-gray-400 mb-0.5">Gate Check-in</p>
+                  <p className="text-sm font-medium text-gray-800">{entry.gateCheckIn||'–'}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-gray-400 mb-0.5">Gate Check-out</p>
+                  <p className="text-sm font-medium text-gray-800">{entry.gateCheckOut||'–'}</p>
+                </div>
               </div>
-              <div>
-                <p className="text-[10px] text-gray-400 mb-0.5">Gate Check-out</p>
-                <p className="text-sm font-medium text-gray-800">{entry.gateCheckOut||'–'}</p>
+              {/* Window Check-In status — linked to windowCheckIn field */}
+              <div className="border-t border-gray-200 pt-2.5">
+                <p className="text-[10px] text-gray-400 mb-1.5">Window Check-in</p>
+                <WindowCheckInBadge
+                  hasAppointment={entry.hasAppointment}
+                  windowCheckIn={entry.windowCheckIn}
+                  gateCheckIn={entry.gateCheckIn}
+                />
               </div>
+              {/* Dock Check-in / Check-out */}
+              {(entry.dockCheckIn || entry.dockCheckOut) && (
+                <div className="border-t border-gray-200 pt-2.5 grid grid-cols-2 gap-3">
+                  <div>
+                    <p className="text-[10px] text-gray-400 mb-0.5">Dock Check-in</p>
+                    <p className="text-sm font-medium text-gray-800">{entry.dockCheckIn||'–'}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-gray-400 mb-0.5">Dock Check-out</p>
+                    <p className="text-sm font-medium text-gray-800">{entry.dockCheckOut||'–'}</p>
+                  </div>
+                </div>
+              )}
             </div>
           </section>
 
@@ -428,12 +511,18 @@ function EntryDetailPanel({ entry, onClose }: { entry: EntryRecord; onClose: () 
           <section>
             <h3 className="text-xs font-semibold text-gray-400 uppercase mb-2 flex items-center gap-1.5"><Truck size={12}/> Equipment</h3>
             <div className="bg-gray-50 rounded-xl px-4 py-3 space-y-1.5">
-              {[['Type',entry.equipType],['Tractor',entry.tractor],['Trailer',entry.trailer],['Container',entry.container],['Freight Carrier',entry.freightCarrier]].map(([l,v])=>v?(
+              {([['Type',entry.equipType],['Tractor',entry.tractor],['Trailer',entry.trailer],['Container',entry.container],['Freight Carrier',entry.freightCarrier]] as [string,string][]).map(([l,v])=>v?(
                 <div key={l} className="flex justify-between text-xs">
                   <span className="text-gray-400">{l}</span>
                   <span className="text-gray-800 font-medium">{v}</span>
                 </div>
               ):null)}
+              {entry.seal && (
+                <div className="flex justify-between text-xs">
+                  <span className="text-gray-400">Seal</span>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-medium text-xs">{entry.seal}</span>
+                </div>
+              )}
             </div>
           </section>
 
@@ -447,8 +536,8 @@ function EntryDetailPanel({ entry, onClose }: { entry: EntryRecord; onClose: () 
             </div>
           </section>
 
-          {/* Direction */}
-          {entry.loadTask && (
+          {/* Direction & Load Info */}
+          {(entry.loadTask||entry.loadId||entry.loadNo||entry.receiptId) && (
             <section>
               <h3 className="text-xs font-semibold text-gray-400 uppercase mb-2">Direction &amp; Load</h3>
               <div className="bg-gray-50 rounded-xl px-4 py-3 space-y-1.5">
@@ -456,10 +545,34 @@ function EntryDetailPanel({ entry, onClose }: { entry: EntryRecord; onClose: () 
                   <span className="text-gray-400">Direction</span>
                   <span className={`font-medium ${entry.direction==='Outbound'?'text-emerald-600':entry.direction==='Inbound'?'text-blue-600':'text-gray-700'}`}>{entry.direction}</span>
                 </div>
-                <div className="flex justify-between text-xs">
-                  <span className="text-gray-400">Load Task</span>
-                  <span className="text-primary-600 font-medium">{entry.loadTask}</span>
-                </div>
+                {entry.loadTask&&(
+                  <div className="flex justify-between text-xs">
+                    <span className="text-gray-400">Load Task</span>
+                    <span className="text-primary-600 font-medium">{entry.loadTask}</span>
+                  </div>
+                )}
+                {(entry.loadId||entry.loadNo||entry.receiptId)&&(
+                  <div className="border-t border-gray-200 pt-1.5 mt-1 space-y-1.5">
+                    {entry.loadId&&(
+                      <div className="flex justify-between text-xs">
+                        <span className="text-gray-400">Load ID</span>
+                        <span className="text-gray-800 font-medium">{entry.loadId}</span>
+                      </div>
+                    )}
+                    {entry.loadNo&&(
+                      <div className="flex justify-between text-xs">
+                        <span className="text-gray-400">Load No.</span>
+                        <span className="text-gray-800 font-medium">{entry.loadNo}</span>
+                      </div>
+                    )}
+                    {entry.receiptId&&(
+                      <div className="flex justify-between text-xs">
+                        <span className="text-gray-400">Receipt ID</span>
+                        <span className="text-gray-800 font-medium">{entry.receiptId}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </section>
           )}
@@ -574,32 +687,115 @@ function EntryCard({ entry, onViewDetail, onViewMismatch }: {
       </div>
 
       {/* Card body */}
-      <div className="px-4 py-3 grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
+      <div className="px-4 py-3 grid grid-cols-2 lg:grid-cols-5 gap-x-4 gap-y-3 text-xs">
+
+        {/* ── Col 1: Check In / Out 时间轴 ── */}
+        <div className="lg:col-span-1">
+          <p className="text-gray-400 mb-2 font-semibold uppercase tracking-wide text-[10px]">Check In / Out</p>
+          <div className="space-y-1.5">
+            {/* Gate Check-In */}
+            <div className="flex items-start gap-2">
+              <div className="flex flex-col items-center mt-0.5 shrink-0">
+                <span className={`w-2 h-2 rounded-full ${entry.gateCheckIn ? 'bg-emerald-500' : 'bg-gray-300'}`} />
+                <span className="w-px flex-1 bg-gray-200 min-h-[14px]" />
+              </div>
+              <div>
+                <p className="text-gray-400 leading-none">Gate In</p>
+                <p className={`font-medium mt-0.5 ${entry.gateCheckIn ? 'text-gray-800' : 'text-gray-300'}`}>{entry.gateCheckIn || '–'}</p>
+              </div>
+            </div>
+            {/* Window Check-In */}
+            <div className="flex items-start gap-2">
+              <div className="flex flex-col items-center mt-0.5 shrink-0">
+                <span className={`w-2 h-2 rounded-full ${entry.windowCheckIn ? 'bg-emerald-500' : entry.hasAppointment ? 'bg-amber-400 animate-pulse' : 'bg-gray-300'}`} />
+                <span className="w-px flex-1 bg-gray-200 min-h-[14px]" />
+              </div>
+              <div>
+                <p className="text-gray-400 leading-none">Window In</p>
+                {entry.windowCheckIn ? (
+                  <p className="font-medium mt-0.5 text-emerald-700">{entry.windowCheckIn}</p>
+                ) : entry.hasAppointment ? (
+                  <p className="font-medium mt-0.5 text-gray-300">–</p>
+                ) : entry.gateCheckIn ? (
+                  <p className="font-medium mt-0.5 text-emerald-700">{entry.gateCheckIn}</p>
+                ) : (
+                  <p className="font-medium mt-0.5 text-gray-300">–</p>
+                )}
+              </div>
+            </div>
+            {/* Dock Check-In */}
+            <div className="flex items-start gap-2">
+              <div className="flex flex-col items-center mt-0.5 shrink-0">
+                <span className={`w-2 h-2 rounded-full ${entry.dockCheckIn ? 'bg-emerald-500' : 'bg-gray-300'}`} />
+                <span className="w-px flex-1 bg-gray-200 min-h-[14px]" />
+              </div>
+              <div>
+                <p className="text-gray-400 leading-none">Dock In</p>
+                <p className={`font-medium mt-0.5 ${entry.dockCheckIn ? 'text-gray-800' : 'text-gray-300'}`}>{entry.dockCheckIn || '–'}</p>
+              </div>
+            </div>
+            {/* Dock / Gate Check-Out */}
+            <div className="flex items-start gap-2">
+              <div className="flex flex-col items-center mt-0.5 shrink-0">
+                <span className={`w-2 h-2 rounded-full ${(entry.dockCheckOut || entry.gateCheckOut) ? 'bg-violet-500' : 'bg-gray-300'}`} />
+              </div>
+              <div>
+                <p className="text-gray-400 leading-none">{entry.dockCheckOut ? 'Dock Out' : 'Gate Out'}</p>
+                <p className={`font-medium mt-0.5 ${(entry.dockCheckOut || entry.gateCheckOut) ? 'text-gray-800' : 'text-gray-300'}`}>
+                  {entry.dockCheckOut || entry.gateCheckOut || '–'}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Col 2: Driver ── */}
         <div>
-          <p className="text-gray-400 mb-1 font-medium">Driver</p>
+          <p className="text-gray-400 mb-1 font-semibold uppercase tracking-wide text-[10px]">Driver</p>
           {entry.driverName?<p className="text-gray-700 font-medium">{entry.driverName}</p>:<p className="text-gray-300 italic">–</p>}
           {entry.tractorCarrier&&<p className="text-gray-400 mt-0.5 truncate">{entry.tractorCarrier}</p>}
         </div>
+
+        {/* ── Col 3: Equipment ── */}
         <div>
-          <p className="text-gray-400 mb-1 font-medium">Equipment</p>
+          <p className="text-gray-400 mb-1 font-semibold uppercase tracking-wide text-[10px]">Equipment</p>
           <p className="text-gray-700">{entry.equipType||'–'}</p>
-          {entry.trailer&&<p className="text-gray-400">Trailer: {entry.trailer}</p>}
-          {entry.freightCarrier&&<p className="text-gray-400 truncate">{entry.freightCarrier}</p>}
+          {entry.tractor   &&<p className="text-gray-500 mt-0.5">Tractor: <span className="text-gray-700 font-medium">{entry.tractor}</span></p>}
+          {entry.trailer   &&<p className="text-gray-500">Trailer: <span className="text-gray-700 font-medium">{entry.trailer}</span></p>}
+          {entry.container &&<p className="text-gray-500">Container: <span className="text-gray-700 font-medium">{entry.container}</span></p>}
+          {entry.seal      &&(
+            <p className="text-gray-500 flex items-center gap-1 mt-0.5">
+              Seal: <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 font-medium">{entry.seal}</span>
+            </p>
+          )}
+          {entry.freightCarrier && entry.freightCarrier !== entry.tractorCarrier &&
+            <p className="text-gray-400 truncate mt-0.5">{entry.freightCarrier}</p>}
         </div>
+
+        {/* ── Col 4: Entry Type + Load Info ── */}
         <div>
-          <p className="text-gray-400 mb-1 font-medium">Entry Type</p>
+          <p className="text-gray-400 mb-1 font-semibold uppercase tracking-wide text-[10px]">Entry Type</p>
           <p className={`font-medium ${entry.entryType==='Outbound'?'text-emerald-600':entry.entryType==='Inbound'?'text-blue-600':'text-gray-600'}`}>{entry.entryType}</p>
           {entry.loadTask&&<p className="text-primary-500 mt-0.5 truncate">{entry.loadTask}</p>}
+          {(entry.loadId||entry.loadNo||entry.receiptId)&&(
+            <div className="mt-1.5 space-y-0.5 border-t border-gray-100 pt-1.5">
+              {entry.loadId   &&<p className="text-gray-400">Load ID: <span className="text-gray-700 font-medium">{entry.loadId}</span></p>}
+              {entry.loadNo   &&<p className="text-gray-400">Load No.: <span className="text-gray-700 font-medium">{entry.loadNo}</span></p>}
+              {entry.receiptId&&<p className="text-gray-400">Receipt: <span className="text-gray-700 font-medium">{entry.receiptId}</span></p>}
+            </div>
+          )}
         </div>
+
+        {/* ── Col 5: Location ── */}
         <div>
-          <p className="text-gray-400 mb-1 font-medium">Gate Check-in</p>
-          <p className="text-gray-700">{entry.gateCheckIn}</p>
+          <p className="text-gray-400 mb-1 font-semibold uppercase tracking-wide text-[10px]">Location</p>
           {entry.location
-            ?<p className="text-gray-400 mt-0.5 flex items-center gap-1"><MapPin size={10}/>{entry.location}</p>
+            ?<p className="text-gray-700 font-medium flex items-center gap-1"><MapPin size={10}/>{entry.location}</p>
             :entry.anomaly==='no-location'
-              ?<p className="text-amber-500 mt-0.5 flex items-center gap-1 font-medium"><MapPin size={10}/>No location</p>
-              :null}
+              ?<p className="text-amber-500 flex items-center gap-1 font-medium"><MapPin size={10}/>No location</p>
+              :<p className="text-gray-300 italic">–</p>}
         </div>
+
       </div>
 
       {/* Photo strip — always shown at bottom of card if photos exist */}
