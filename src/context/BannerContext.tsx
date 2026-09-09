@@ -112,6 +112,7 @@ export function BannerProvider({ children }: { children: ReactNode }) {
         '/supply-chain/tracking',
         '/finance/invoices',
         '/dashboard/kpi',
+        '/yard/entry-list',
       ]
 
       // If current page is excluded, show no banners
