@@ -478,13 +478,61 @@ function EntryDetailPanel({ entry, onClose }: { entry: EntryRecord; onClose: () 
   )
 }
 
+// ─── Inline Photo Strip (always visible at bottom of card) ───────────────────
+function InlinePhotoStrip({ photos }: { photos: Photo[] }) {
+  const [lightboxIdx, setLightboxIdx] = useState<number | null>(null)
+  const MAX_VISIBLE = 8
+  const visible = photos.slice(0, MAX_VISIBLE)
+  const extra   = photos.length - MAX_VISIBLE
+
+  return (
+    <>
+      <div className="flex items-end gap-3 overflow-x-auto pb-0.5">
+        {visible.map((p, i) => (
+          <div key={p.id} className="flex flex-col items-center gap-1 shrink-0">
+            <button
+              onClick={() => setLightboxIdx(i)}
+              className="relative w-14 h-11 rounded-lg overflow-hidden border border-gray-200 hover:border-primary-400 hover:scale-105 transition-all group"
+            >
+              <img src={p.url} alt={p.label} className="w-full h-full object-cover"
+                onError={e => { (e.target as HTMLImageElement).src = p.type === 'camera' ? PLACEHOLDER_CAM : PLACEHOLDER_DARK }} />
+              {p.type === 'camera' && (
+                <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                  <Camera size={10} className="text-white" />
+                </div>
+              )}
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+                <ZoomIn size={12} className="text-white" />
+              </div>
+            </button>
+            <span className="text-[9px] text-gray-400 w-14 text-center truncate">{p.label}</span>
+          </div>
+        ))}
+        {extra > 0 && (
+          <div className="flex flex-col items-center gap-1 shrink-0">
+            <button
+              onClick={() => setLightboxIdx(MAX_VISIBLE)}
+              className="w-14 h-11 rounded-lg border border-dashed border-gray-300 hover:border-primary-400 bg-gray-50 hover:bg-primary-50 flex flex-col items-center justify-center text-gray-400 hover:text-primary-600 transition-all"
+            >
+              <span className="text-xs font-semibold">+{extra}</span>
+            </button>
+            <span className="text-[9px] text-gray-400">more</span>
+          </div>
+        )}
+      </div>
+      {lightboxIdx !== null && (
+        <PhotoLightbox photos={photos} startIndex={lightboxIdx} onClose={() => setLightboxIdx(null)} />
+      )}
+    </>
+  )
+}
+
 // ─── Entry Card ───────────────────────────────────────────────────────────────
 function EntryCard({ entry, onViewDetail, onViewMismatch }: {
   entry: EntryRecord
   onViewDetail: ()=>void
   onViewMismatch: ()=>void
 }) {
-  const [showPhotos, setShowPhotos] = useState(false)
   const hasAnomaly = !!entry.anomaly
   const photoCount = entry.photos.length
 
@@ -514,10 +562,9 @@ function EntryCard({ entry, onViewDetail, onViewMismatch }: {
 
         <div className="flex items-center gap-2">
           {photoCount > 0 && (
-            <button onClick={()=>setShowPhotos(v=>!v)}
-              className={`flex items-center gap-1.5 text-xs font-medium transition-colors px-2.5 py-1 rounded-lg ${showPhotos?'bg-primary-100 text-primary-700':'text-gray-500 hover:text-primary-600 hover:bg-gray-100'}`}>
-              <Camera size={13}/> {photoCount} Photos
-            </button>
+            <span className="flex items-center gap-1.5 text-xs text-gray-400 px-2 py-1">
+              <Camera size={13} className="text-gray-400" /> {photoCount} Photos
+            </span>
           )}
           <button onClick={onViewDetail}
             className="flex items-center gap-1.5 text-xs text-primary-600 hover:text-primary-800 font-medium transition-colors px-2 py-1 rounded-lg hover:bg-gray-100">
@@ -555,11 +602,10 @@ function EntryCard({ entry, onViewDetail, onViewMismatch }: {
         </div>
       </div>
 
-      {/* Inline photo strip */}
-      {showPhotos && photoCount > 0 && (
-        <div className="border-t border-gray-100 px-4 py-3 bg-gray-50">
-          <p className="text-xs font-semibold text-gray-500 mb-2 flex items-center gap-1.5"><Camera size={12}/> Photos &amp; Camera ({photoCount})</p>
-          <PhotoGallery photos={entry.photos} maxVisible={10} />
+      {/* Photo strip — always shown at bottom of card if photos exist */}
+      {entry.photos.length > 0 && (
+        <div className="border-t border-gray-100 px-4 py-3">
+          <InlinePhotoStrip photos={entry.photos} />
         </div>
       )}
     </div>
