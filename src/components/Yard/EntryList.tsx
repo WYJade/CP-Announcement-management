@@ -913,12 +913,12 @@ export default function EntryList() {
           {/* Date range */}
           <div>
             <label className="block text-xs text-gray-400 font-medium mb-1">Gate Check-in From</label>
-            <input type="date" value={dateFrom} onChange={e=>setDateFrom(e.target.value)}
+            <input type="date" lang="en" value={dateFrom} onChange={e=>setDateFrom(e.target.value)}
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 focus:outline-none focus:border-primary-400"/>
           </div>
           <div>
             <label className="block text-xs text-gray-400 font-medium mb-1">Gate Check-in To</label>
-            <input type="date" value={dateTo} onChange={e=>setDateTo(e.target.value)}
+            <input type="date" lang="en" value={dateTo} onChange={e=>setDateTo(e.target.value)}
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 focus:outline-none focus:border-primary-400"/>
           </div>
 
