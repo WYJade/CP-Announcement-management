@@ -118,23 +118,49 @@ function ChatView() {
 
       {/* Chat content */}
       <div className="flex-1 flex flex-col items-center justify-center px-8 py-12">
-        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-6">
-          <MessageCircle size={28} className="text-gray-400" />
+        {/* Icon */}
+        <div className="w-16 h-16 bg-gradient-to-br from-violet-500 to-violet-600 rounded-2xl flex items-center justify-center mb-5 shadow-lg shadow-violet-200">
+          <MessageCircle size={28} className="text-white" />
         </div>
-        <h2 className="text-xl font-bold text-gray-900 mb-2">Ask something. I will help you check it</h2>
-        <p className="text-sm text-gray-500 text-center max-w-lg leading-relaxed mb-6">
-          <strong>Order status · SLA · Inventory · Policy text · System workflows</strong> are all supported.
-          AI automatically calls the right Tool for data, cites policies, and lists sources. For batch or structured workflows, go to <span className="underline font-medium">Agent Workstation</span>.
+
+        {/* Agent selector */}
+        <button className="flex items-center gap-1.5 mb-5 px-3 py-1.5 rounded-full border border-gray-200 hover:border-violet-300 hover:bg-violet-50 transition-colors">
+          <span className="w-2 h-2 rounded-full bg-emerald-500" />
+          <span className="text-sm text-gray-700 font-medium">OMSV3 销售订单取消操作 Agent</span>
+          <ChevronDown size={13} className="text-gray-400" />
+        </button>
+
+        {/* Title */}
+        <h2 className="text-2xl font-bold text-gray-900 mb-3">问点什么，我帮你查</h2>
+
+        {/* Subtitle */}
+        <p className="text-sm text-gray-500 text-center max-w-xl leading-relaxed mb-6">
+          <strong className="text-gray-700">订单状态・SLA・库存・政策原文・系统流程</strong> 都能问。AI 自动调用对应 Tool 取数 / 引用政策、列出来源；关键结果
+          （订单详情、表格、时间线）会在右侧 dashboard 自动带出。需要批量/结构化工作流（盖采运、审批推送、跨工作台联动）请到{' '}
+          <button className="text-violet-600 underline font-medium hover:text-violet-800">Agent Workstation。</button>
         </p>
-        <div className="flex flex-wrap gap-2 justify-center mb-4">
-          {['Where is ORD-8821 now?', 'Which SLA items are close today?', 'How did SLA perform in the last 7d?', 'VIP cancellation policy?', 'SKU-005 FBA inventory?'].map(q => (
-            <button key={q} className="text-xs px-3 py-1.5 border border-gray-200 rounded-full text-gray-600 hover:bg-gray-50 hover:border-gray-300">{q}</button>
+
+        {/* Quick chips */}
+        <div className="flex flex-wrap gap-2 justify-center mb-5">
+          {[
+            { icon: '🔍', text: 'ORD-8821 现在到哪了？' },
+            { icon: '📋', text: '今天哪些 SLA 快超时？' },
+            { icon: '📈', text: '近 7d SLA 表现？' },
+            { icon: '👑', text: 'VIP 取消政策？' },
+            { icon: '📦', text: 'SKU-005 FBA 库存？' },
+          ].map(({ icon, text }) => (
+            <button key={text}
+              className="flex items-center gap-1.5 text-xs px-3 py-1.5 border border-gray-200 rounded-full text-gray-600 hover:bg-gray-50 hover:border-violet-300 hover:text-violet-700 transition-colors">
+              <span>{icon}</span>{text}
+            </button>
           ))}
         </div>
-        <div className="flex items-center gap-4 text-[10px] text-gray-400">
-          <span>⚡ Cross-Tool automation</span>
-          <span>🔨 Built for ad-hoc Q&A</span>
-          <span>📐 Structured → Agent Workstation</span>
+
+        {/* Feature hints */}
+        <div className="flex items-center gap-5 text-[11px] text-gray-400">
+          <span className="flex items-center gap-1">⚡ 跨 Tool 自动调用</span>
+          <span className="flex items-center gap-1">🔨 适合 ad-hoc 单问用</span>
+          <span className="flex items-center gap-1">📐 结构化 → Agent Workstation</span>
         </div>
       </div>
 
@@ -177,17 +203,19 @@ function ChatView() {
 
       {/* Input */}
       <div className="px-8 pb-6">
-        <div className="border border-gray-200 rounded-xl px-4 py-3 flex items-center gap-3 focus-within:border-primary-300">
-          <Paperclip size={16} className="text-gray-400 cursor-pointer" />
+        <div className="border border-gray-200 rounded-xl px-4 py-3 flex items-center gap-3 focus-within:border-violet-300 focus-within:ring-2 focus-within:ring-violet-100 transition-all">
+          <Paperclip size={16} className="text-gray-400 cursor-pointer hover:text-gray-600" />
           <input type="text" value={input} onChange={e => handleInputChange(e.target.value)}
-            placeholder="Ask any OMS question — data / knowledge / policy... Type @ to reference orders/products/shipments"
+            placeholder="问任何 OMS 相关问题 — 数据 / 知识 / 政策... 输入 @ 引用订单/商品/运单"
             className="flex-1 text-sm outline-none text-gray-700 placeholder-gray-400" />
-          <Mic size={16} className="text-gray-400 cursor-pointer" />
-          <button className="w-8 h-8 bg-gray-900 rounded-full flex items-center justify-center hover:bg-gray-800">
+          <Mic size={16} className="text-gray-400 cursor-pointer hover:text-gray-600" />
+          <button className="w-8 h-8 bg-violet-600 rounded-full flex items-center justify-center hover:bg-violet-700 transition-colors">
             <Send size={14} className="text-white" />
           </button>
         </div>
-        <p className="text-[10px] text-gray-400 text-center mt-2">Type @ to select: Sales Orders · Inbound · Inventory · Outbound · Shipment · Invoice</p>
+        <p className="text-[10px] text-gray-400 text-center mt-2">
+          Enter 发送 · @ 引用订单/货品/运单  常要做工作流？<button className="text-violet-500 hover:underline">前往 Agent Workstation</button>
+        </p>
       </div>
     </div>
   )
