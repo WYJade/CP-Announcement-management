@@ -113,6 +113,7 @@ export function BannerProvider({ children }: { children: ReactNode }) {
         '/finance/invoices',
         '/dashboard/kpi',
         '/yard/entry-list',
+        '/agents',
       ]
 
       // If current page is excluded, show no banners
