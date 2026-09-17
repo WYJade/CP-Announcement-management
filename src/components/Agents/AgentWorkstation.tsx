@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
 import {
   MessageSquare, Zap, Settings, Store, Search, Clock,
@@ -73,6 +73,225 @@ export default function AgentWorkstation() {
   )
 }
 
+// ─── Quick-reply definitions per tab (All-in-One Copilot) ────────────────────
+const COPILOT_TABS = [
+  {
+    id: 'inbound',
+    label: 'Inbound',
+    color: 'bg-blue-500',
+    chips: [
+      '帮我查一下进行中的RN有哪些？',
+      '帮我查一下未完成且超过7天未更新状态的RN有哪些？',
+      '帮我查一下APP#：APPT-3763的当前状态。',
+    ],
+  },
+  {
+    id: 'inventory',
+    label: 'Inventory',
+    color: 'bg-emerald-500',
+    chips: [
+      '帮我查一下Item：SKU-A100在什么位置？现在什么状态？',
+      '帮我查一下在Ontario, CA facility中\'Goods Type\'为Expired的库存有多少？',
+      '库存调整单提交后，发现数量填错了，能撤回或修改吗？',
+    ],
+  },
+  {
+    id: 'outbound',
+    label: 'Outbound',
+    color: 'bg-amber-500',
+    chips: [
+      '帮我查一下Order #：DN-8821001的订单状态',
+      '出库单录入时，\'Order Type\'怎么选？Reference需要填什么？',
+      '帮我对目前在Ontario, CA facility中的出库单做一下汇总。',
+    ],
+  },
+]
+
+// ─── Simulated Agent responses ────────────────────────────────────────────────
+type SimMsg = { role: 'user' | 'agent'; text: string; lines?: string[] }
+
+const SIM_RESPONSES: Record<string, SimMsg[]> = {
+  '帮我查一下进行中的RN有哪些？': [
+    { role: 'user', text: '帮我查一下进行中的RN有哪些？' },
+    {
+      role: 'agent',
+      text: '正在查询进行中的 Receipt Notice（RN）...',
+      lines: [
+        '✅ 共找到 **4 条**进行中的 RN：',
+        '',
+        '| RN # | 状态 | 到仓日期 | 供应商 |',
+        '|---|---|---|---|',
+        '| RN-38199 | In Progress | 2026-09-10 | ACME Supplies |',
+        '| RN-38198 | Receiving | 2026-09-09 | Global Goods |',
+        '| RN-38197 | Pending QC | 2026-09-08 | SharkNinja |',
+        '| RN-38195 | Scheduled | 2026-09-12 | THE ONLY BEAN |',
+        '',
+        '如需查看某条 RN 的详细信息，请告诉我 RN 编号。',
+      ],
+    },
+  ],
+  '帮我查一下未完成且超过7天未更新状态的RN有哪些？': [
+    { role: 'user', text: '帮我查一下未完成且超过7天未更新状态的RN有哪些？' },
+    {
+      role: 'agent',
+      text: '正在筛选未完成且超过 7 天未更新的 RN...',
+      lines: [
+        '⚠️ 共找到 **2 条**符合条件的 RN：',
+        '',
+        '| RN # | 最后更新 | 距今 | 状态 | 供应商 |',
+        '|---|---|---|---|---|',
+        '| RN-38193 | 2026-08-30 | 12天前 | Pending QC | VITA COCO |',
+        '| RN-38190 | 2026-08-28 | 14天前 | On Hold | ORGAIN LLC |',
+        '',
+        '建议及时跟进这两条 RN，避免影响入库时效。是否需要我生成一份催办通知？',
+      ],
+    },
+  ],
+  '帮我查一下APP#：APPT-3763的当前状态。': [
+    { role: 'user', text: '帮我查一下APP#：APPT-3763的当前状态。' },
+    {
+      role: 'agent',
+      text: '正在查询 APPT-3763 的状态...',
+      lines: [
+        '📋 **APPT-3763** 当前状态详情：',
+        '',
+        '- **状态**：CHECKED IN ✅',
+        '- **承运商**：FEDEX FREIGHT INC',
+        '- **客户**：SharkNinja Sales Company',
+        '- **预约时间**：2026-08-11 01:00',
+        '- **签到时间**：2026-08-11 00:22',
+        '- **操作员**：estherccc',
+        '',
+        '该预约已正常签到，无异常。如需修改或取消，请前往 Appointment 页面操作。',
+      ],
+    },
+  ],
+  '帮我查一下Item：SKU-A100在什么位置？现在什么状态？': [
+    { role: 'user', text: '帮我查一下Item：SKU-A100在什么位置？现在什么状态？' },
+    {
+      role: 'agent',
+      text: '正在定位 SKU-A100 的库存位置...',
+      lines: [
+        '📦 **SKU-A100** 库存定位结果：',
+        '',
+        '- **当前仓库**：Ontario, CA',
+        '- **库区**：Zone B — 货架 B-04-03',
+        '- **可用数量**：1,240 units',
+        '- **冻结数量**：80 units（关联出库单 DN-8821001）',
+        '- **货物状态**：Normal ✅',
+        '- **最后盘点**：2026-09-05',
+        '',
+        '如需查看完整库存记录或调拨，请告诉我。',
+      ],
+    },
+  ],
+  '帮我查一下在Ontario, CA facility中\'Goods Type\'为Expired的库存有多少？': [
+    { role: 'user', text: '帮我查一下在Ontario, CA facility中\'Goods Type\'为Expired的库存有多少？' },
+    {
+      role: 'agent',
+      text: '正在查询 Ontario, CA 中 Expired 类型库存...',
+      lines: [
+        '⚠️ **Ontario, CA** — Expired 库存汇总：',
+        '',
+        '| SKU | 品名 | 数量 | 过期日期 |',
+        '|---|---|---|---|',
+        '| SKU-C350 | Protein Bar Mix | 320 units | 2026-08-01 |',
+        '| SKU-E520 | Coconut Water 1L | 150 units | 2026-07-15 |',
+        '',
+        '**合计：470 units** 已过期，建议尽快发起报废或退货流程。',
+        '是否需要我生成 Disposition 申请单？',
+      ],
+    },
+  ],
+  '库存调整单提交后，发现数量填错了，能撤回或修改吗？': [
+    { role: 'user', text: '库存调整单提交后，发现数量填错了，能撤回或修改吗？' },
+    {
+      role: 'agent',
+      text: '正在检索库存调整单撤回政策...',
+      lines: [
+        '📋 **库存调整单修改政策**：',
+        '',
+        '- **状态为 Pending（待审批）**：✅ 可以撤回，进入调整单详情页点击"撤回"即可重新编辑。',
+        '- **状态为 Approved（已审批）**：❌ 无法直接修改，需联系仓库主管在系统内做反向调整单抵消。',
+        '- **状态为 Processed（已执行）**：❌ 库存已变更，须通过新建调整单 + 说明原因的方式纠正。',
+        '',
+        '💡 建议：如果调整单刚刚提交且状态仍为 Pending，请立即前往 **Inventory → Adjustment** 页面撤回。',
+        '需要我帮你定位该调整单吗？',
+      ],
+    },
+  ],
+  '帮我查一下Order #：DN-8821001的订单状态': [
+    { role: 'user', text: '帮我查一下Order #：DN-8821001的订单状态' },
+    {
+      role: 'agent',
+      text: '正在查询出库单 DN-8821001...',
+      lines: [
+        '🚚 **DN-8821001** 出库单状态：',
+        '',
+        '- **状态**：Picking In Progress 🔄',
+        '- **客户**：SharkNinja Sales Company',
+        '- **仓库**：Ontario, CA — Dock 711',
+        '- **承运商**：UPS',
+        '- **预计发货**：2026-09-09 14:00',
+        '- **关联库存**：SKU-A100 × 200 units，SKU-B200 × 50 units',
+        '- **拣货完成率**：75%（150 / 200 件已拣）',
+        '',
+        '拣货仍在进行中，预计 2-3 小时内完成。是否需要实时通知？',
+      ],
+    },
+  ],
+  '出库单录入时，\'Order Type\'怎么选？Reference需要填什么？': [
+    { role: 'user', text: '出库单录入时，\'Order Type\'怎么选？Reference需要填什么？' },
+    {
+      role: 'agent',
+      text: '正在检索出库单录入规范...',
+      lines: [
+        '📋 **出库单录入指南**：',
+        '',
+        '**Order Type 选择规则：**',
+        '| 场景 | 选择值 |',
+        '|---|---|',
+        '| 正常客户发货 | Sales Order |',
+        '| 客户退货出库 | Return |',
+        '| 仓库间调拨 | Transfer |',
+        '| 样品/赠品 | Sample |',
+        '| 报废处理 | Disposal |',
+        '',
+        '**Reference 填写规范：**',
+        '- Sales Order → 填写客户 PO 号（如：PO-20260901）',
+        '- Transfer → 填写目标仓库代码（如：GA-WH-01）',
+        '- Return → 填写原出库单号（如：DN-XXXXXXX）',
+        '- 若无强制要求，可填写内部备注或留空。',
+        '',
+        '如有具体订单不确定如何填写，可把订单发给我帮你判断。',
+      ],
+    },
+  ],
+  '帮我对目前在Ontario, CA facility中的出库单做一下汇总。': [
+    { role: 'user', text: '帮我对目前在Ontario, CA facility中的出库单做一下汇总。' },
+    {
+      role: 'agent',
+      text: '正在统计 Ontario, CA 的出库单数据...',
+      lines: [
+        '📊 **Ontario, CA — 出库单汇总**（截至 2026-09-09 10:00）：',
+        '',
+        '| 状态 | 单数 | 件数 |',
+        '|---|---|---|',
+        '| Pending | 8 | 1,240 units |',
+        '| Picking | 5 | 820 units |',
+        '| Packed | 3 | 450 units |',
+        '| Shipped | 12 | 2,100 units |',
+        '| On Hold | 2 | 300 units |',
+        '',
+        '**合计：30 单，4,910 units**',
+        '',
+        '⚠️ 2 单处于 On Hold 状态，可能影响发货时效，建议优先处理。',
+        '需要我导出明细或查看某个具体状态的列表吗？',
+      ],
+    },
+  ],
+}
+
 // ─── Agent Definitions ───────────────────────────────────────────────────────
 
 const AGENTS = [
@@ -82,28 +301,12 @@ const AGENTS = [
     dot: 'bg-violet-500',
     iconBg: 'from-violet-500 to-violet-600',
     shadowColor: 'shadow-violet-200',
-    accentText: 'text-violet-600',
-    accentBorder: 'border-violet-300',
-    accentHoverBg: 'hover:bg-violet-50',
-    accentHoverText: 'hover:text-violet-700',
-    accentRing: 'focus-within:border-violet-300 focus-within:ring-violet-100',
     sendBg: 'bg-violet-600 hover:bg-violet-700',
+    accentRing: 'focus-within:border-violet-300 focus-within:ring-violet-100',
     greeting: '有什么我能帮到你？',
-    subtitle: (
-      <>
-        <strong className="text-gray-700">订单状态 · 入库跟踪 · 库存查询 · 出库进度 · 政策文件</strong> 全都能问。
-        AI 自动跨模块取数、引用政策并给出来源；遇到复杂批量任务，请到{' '}
-        <span className="text-violet-600 underline font-medium cursor-pointer">Agent Workstation</span>。
-      </>
-    ),
-    categories: [
-      { label: '📦 Order', chips: ['ORD-8821 现在到哪了？', '我最近有哪些异常订单？', 'VIP 客户取消政策是什么？'] },
-      { label: '🚚 Inbound', chips: ['ASN-20260601 入库进度？', '本周有哪些 PO 待入库？'] },
-      { label: '📊 Inventory', chips: ['SKU-005 当前可用库存多少？', '有哪些 SKU 库存低于安全线？'] },
-      { label: '📤 Outbound', chips: ['今天有哪些订单待发货？', 'SHP-10021 当前状态？'] },
-    ],
-    placeholder: '问任何与订单、库存、入库、出库相关的问题... 输入 @ 引用单号',
-    hints: ['⚡ 跨模块自动取数', '🔍 政策原文引用', '📐 复杂任务 → Agent Workstation'],
+    subtitleText: '订单状态 · 入库跟踪 · 库存查询 · 出库进度 全都能问。AI 自动跨模块取数、结合业务场景、引用真实数据给出输出结果；',
+    placeholder: '问任何与入库、库存、出库相关的问题... 输入 @ 引用单号',
+    hints: ['⚡ 跨模块自动取数', '🔍 结合真实业务场景', '📐 复杂任务 → Agent Workstation'],
   },
   {
     id: 'inbound',
@@ -111,26 +314,12 @@ const AGENTS = [
     dot: 'bg-blue-500',
     iconBg: 'from-blue-500 to-blue-600',
     shadowColor: 'shadow-blue-200',
-    accentText: 'text-blue-600',
-    accentBorder: 'border-blue-300',
-    accentHoverBg: 'hover:bg-blue-50',
-    accentHoverText: 'hover:text-blue-700',
-    accentRing: 'focus-within:border-blue-300 focus-within:ring-blue-100',
     sendBg: 'bg-blue-600 hover:bg-blue-700',
+    accentRing: 'focus-within:border-blue-300 focus-within:ring-blue-100',
     greeting: '入库问题，帮你查清楚',
-    subtitle: (
-      <>
-        专注 <strong className="text-gray-700">ASN 状态 · PO 跟踪 · 收货进度 · 差异问题 · 入库时效</strong>。
-        输入 ASN 号或 PO 号，立即获取当前状态、预计到仓时间和异常提示。
-      </>
-    ),
-    categories: [
-      { label: '📋 ASN 跟踪', chips: ['ASN-20260601 现在什么状态？', '本周还有哪些 ASN 未到仓？', 'ASN-20260602 有异常吗？'] },
-      { label: '📦 PO 管理', chips: ['PO-38199 收货进度怎样？', '哪些 PO 已超出预计入库日期？'] },
-      { label: '⚠️ 差异处理', chips: ['最近有哪些收货差异未处理？', 'RN-38197 差异原因是什么？'] },
-    ],
-    placeholder: '输入 ASN 号、PO 号或直接描述问题... 如：ASN-20260601 现在到哪了？',
-    hints: ['📋 ASN / PO 实时状态', '⚠️ 差异自动识别', '🕐 入库时效分析'],
+    subtitleText: '专注 ASN 状态 · RN 跟踪 · 收货进度 · 预约管理。输入单号或描述问题，立即获取当前状态与异常提示。',
+    placeholder: '输入 RN 号、ASN 号或直接描述问题...',
+    hints: ['📋 RN / ASN 实时状态', '📅 预约管理', '⚠️ 异常自动识别'],
   },
   {
     id: 'inventory',
@@ -138,26 +327,12 @@ const AGENTS = [
     dot: 'bg-emerald-500',
     iconBg: 'from-emerald-500 to-emerald-600',
     shadowColor: 'shadow-emerald-200',
-    accentText: 'text-emerald-600',
-    accentBorder: 'border-emerald-300',
-    accentHoverBg: 'hover:bg-emerald-50',
-    accentHoverText: 'hover:text-emerald-700',
-    accentRing: 'focus-within:border-emerald-300 focus-within:ring-emerald-100',
     sendBg: 'bg-emerald-600 hover:bg-emerald-700',
+    accentRing: 'focus-within:border-emerald-300 focus-within:ring-emerald-100',
     greeting: '库存信息，一问即知',
-    subtitle: (
-      <>
-        专注 <strong className="text-gray-700">库存查询 · 安全库存预警 · SKU 定位 · 库龄分析 · 调拨建议</strong>。
-        直接输入 SKU 或产品名，快速获取库存快照与预警信息。
-      </>
-    ),
-    categories: [
-      { label: '🔎 库存查询', chips: ['SKU-005 当前可用库存？', 'FBA 和自有仓各有多少？', 'SKU-B200 在哪个库位？'] },
-      { label: '🚨 预警管理', chips: ['哪些 SKU 低于安全库存线？', '本周有哪些库存预警未处理？'] },
-      { label: '📊 库龄分析', chips: ['库龄超过 90 天的 SKU 有哪些？', 'SKU-A100 滞销风险如何？'] },
-    ],
-    placeholder: '输入 SKU 编号或产品名称... 如：SKU-005 当前可用库存多少？',
-    hints: ['📦 实时库存快照', '🚨 安全库存预警', '📊 库龄与滞销分析'],
+    subtitleText: '专注 库存查询 · 货物定位 · 过期/异常库存 · 调整单政策。直接输入 SKU 或描述场景，快速获取库存快照与建议。',
+    placeholder: '输入 SKU 编号或描述问题... 如：SKU-A100 在哪里？',
+    hints: ['📦 实时库存快照', '🚨 过期/异常预警', '📋 调整单政策查询'],
   },
   {
     id: 'outbound',
@@ -165,181 +340,386 @@ const AGENTS = [
     dot: 'bg-amber-500',
     iconBg: 'from-amber-500 to-orange-500',
     shadowColor: 'shadow-amber-200',
-    accentText: 'text-amber-600',
-    accentBorder: 'border-amber-300',
-    accentHoverBg: 'hover:bg-amber-50',
-    accentHoverText: 'hover:text-amber-700',
-    accentRing: 'focus-within:border-amber-300 focus-within:ring-amber-100',
     sendBg: 'bg-amber-500 hover:bg-amber-600',
+    accentRing: 'focus-within:border-amber-300 focus-within:ring-amber-100',
     greeting: '出库发货，实时掌握',
-    subtitle: (
-      <>
-        专注 <strong className="text-gray-700">发货状态 · 运单追踪 · SLA 监控 · 异常报警 · 承运商表现</strong>。
-        输入订单号或运单号，立即获取发货进度、预计送达时间和延误预警。
-      </>
-    ),
-    categories: [
-      { label: '🚚 发货追踪', chips: ['SHP-10021 现在到哪了？', '今天有哪些订单待发货？', 'ORD-8821 发货了吗？'] },
-      { label: '⏱️ SLA 监控', chips: ['今天哪些 SLA 快超时？', '近 7d SLA 达成率怎样？'] },
-      { label: '⚠️ 异常处理', chips: ['有哪些包裹延误超过 2 天？', 'SSHAS2608072 有异常吗？'] },
-    ],
-    placeholder: '输入订单号、运单号或直接描述问题... 如：ORD-8821 发货了吗？',
-    hints: ['🚚 运单实时追踪', '⏱️ SLA 达成率监控', '⚠️ 延误自动预警'],
+    subtitleText: '专注 出库单状态 · 发货进度 · 录入规范 · 仓库汇总。输入出库单号或直接描述场景，立即获取结果与操作建议。',
+    placeholder: '输入出库单号或直接描述问题... 如：DN-8821001 状态？',
+    hints: ['🚚 出库单实时追踪', '📋 录入规范查询', '📊 仓库出库汇总'],
   },
 ]
+
+// ─── Markdown-lite renderer for agent responses ──────────────────────────────
+function AgentLine({ text }: { text: string }) {
+  // Bold **text**
+  const parts = text.split(/(\*\*[^*]+\*\*)/)
+  return (
+    <span>
+      {parts.map((p, i) =>
+        p.startsWith('**') && p.endsWith('**')
+          ? <strong key={i} className="font-semibold text-gray-800">{p.slice(2, -2)}</strong>
+          : <span key={i}>{p}</span>
+      )}
+    </span>
+  )
+}
+
+function AgentBubble({ lines, done }: { lines: string[]; done: boolean }) {
+  // Detect table rows
+  const isTableRow = (s: string) => s.startsWith('|')
+  const isSeparator = (s: string) => /^\|[-| :]+\|$/.test(s.trim())
+
+  let inTable = false
+  const rendered: React.ReactNode[] = []
+  let tableRows: string[][] = []
+
+  const flushTable = () => {
+    if (tableRows.length === 0) return
+    const [header, , ...body] = tableRows
+    rendered.push(
+      <div key={`tbl-${rendered.length}`} className="overflow-x-auto my-2">
+        <table className="text-xs border-collapse w-full">
+          <thead>
+            <tr className="bg-gray-100">
+              {header.filter(Boolean).map((h, i) => (
+                <th key={i} className="px-3 py-1.5 text-left text-gray-600 font-semibold border border-gray-200 whitespace-nowrap">
+                  <AgentLine text={h.trim()} />
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {body.map((row, ri) => (
+              <tr key={ri} className="even:bg-gray-50">
+                {row.filter(Boolean).map((cell, ci) => (
+                  <td key={ci} className="px-3 py-1.5 border border-gray-200 text-gray-700 whitespace-nowrap">
+                    <AgentLine text={cell.trim()} />
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    )
+    tableRows = []
+    inTable = false
+  }
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i]
+    if (isSeparator(line)) continue
+    if (isTableRow(line)) {
+      inTable = true
+      tableRows.push(line.split('|').slice(1, -1))
+      continue
+    }
+    if (inTable) flushTable()
+
+    if (line === '') {
+      rendered.push(<div key={i} className="h-2" />)
+    } else if (line.startsWith('- ')) {
+      rendered.push(
+        <div key={i} className="flex items-start gap-1.5 text-xs text-gray-700">
+          <span className="mt-1 w-1 h-1 rounded-full bg-gray-400 shrink-0" />
+          <AgentLine text={line.slice(2)} />
+        </div>
+      )
+    } else {
+      rendered.push(
+        <p key={i} className="text-xs text-gray-700 leading-relaxed">
+          <AgentLine text={line} />
+        </p>
+      )
+    }
+  }
+  if (inTable) flushTable()
+
+  return (
+    <div className="space-y-0.5">
+      {rendered}
+      {!done && (
+        <span className="inline-flex gap-0.5 mt-1">
+          {[0, 1, 2].map(i => (
+            <span key={i} className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-bounce"
+              style={{ animationDelay: `${i * 0.15}s` }} />
+          ))}
+        </span>
+      )}
+    </div>
+  )
+}
 
 // ─── Chat View ───────────────────────────────────────────────────────────────
 
 function ChatView() {
+  type ChatMsg = { role: 'user' | 'agent'; text: string; lines?: string[]; done?: boolean }
+
   const [input, setInput] = useState('')
-  const [showModuleSelect, setShowModuleSelect] = useState(false)
-  const [selectedModule, setSelectedModule] = useState<string | null>(null)
   const [activeAgentId, setActiveAgentId] = useState('all-in-one')
   const [showAgentDropdown, setShowAgentDropdown] = useState(false)
-  const [activeCategoryIdx, setActiveCategoryIdx] = useState(0)
+  const [activeTabId, setActiveTabId] = useState('inbound')
+  const [messages, setMessages] = useState<ChatMsg[]>([])
+  const [isTyping, setIsTyping] = useState(false)
+  const [showModuleSelect, setShowModuleSelect] = useState(false)
+  const [selectedModule, setSelectedModule] = useState<string | null>(null)
+  const bottomRef = useRef<HTMLDivElement>(null)
 
   const agent = AGENTS.find(a => a.id === activeAgentId)!
+  const currentTab = COPILOT_TABS.find(t => t.id === activeTabId)!
 
-  // Reset category tab when agent changes
+  // Auto-scroll to bottom when messages change
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
+
   const handleSelectAgent = (id: string) => {
     setActiveAgentId(id)
-    setActiveCategoryIdx(0)
     setShowAgentDropdown(false)
+    setMessages([])
+  }
+
+  const handleTabClick = (id: string) => {
+    setActiveTabId(id)
+    setMessages([])
+  }
+
+  const simulateResponse = (question: string) => {
+    const sim = SIM_RESPONSES[question]
+    if (!sim || sim.length < 2) return
+
+    const agentMsg = sim[1]
+    // Step 1: show "thinking" bubble
+    setMessages(prev => [...prev, { role: 'agent', text: agentMsg.text, lines: [], done: false }])
+
+    // Step 2: stream lines one by one
+    const allLines = agentMsg.lines ?? []
+    let idx = 0
+    const interval = setInterval(() => {
+      idx++
+      setMessages(prev => {
+        const updated = [...prev]
+        const last = { ...updated[updated.length - 1] }
+        last.lines = allLines.slice(0, idx)
+        last.done = idx >= allLines.length
+        updated[updated.length - 1] = last
+        return updated
+      })
+      if (idx >= allLines.length) {
+        clearInterval(interval)
+        setIsTyping(false)
+      }
+    }, 120)
+  }
+
+  const handleSend = (text?: string) => {
+    const q = (text ?? input).trim()
+    if (!q || isTyping) return
+    setInput('')
+    setIsTyping(true)
+    setMessages(prev => [...prev, { role: 'user', text: q }])
+    setTimeout(() => simulateResponse(q), 600)
+  }
+
+  const handleChipClick = (chip: string) => {
+    setInput(chip)
+    setTimeout(() => handleSend(chip), 50)
   }
 
   const handleInputChange = (val: string) => {
     setInput(val)
-    if (val.endsWith('@')) {
-      setShowModuleSelect(true)
-      setSelectedModule(null)
-    } else if (!val.includes('@')) {
-      setShowModuleSelect(false)
-      setSelectedModule(null)
-    }
+    if (val.endsWith('@')) { setShowModuleSelect(true); setSelectedModule(null) }
+    else if (!val.includes('@')) setShowModuleSelect(false)
   }
 
   const handleSelectModule = (moduleId: string) => setSelectedModule(moduleId)
-
   const handleSelectRef = (ref: string) => {
     const mod = CHAT_MODULES.find(m => m.id === selectedModule)
     setInput(input.replace(/@$/, '') + `@${mod?.label}/${ref} `)
-    setShowModuleSelect(false)
-    setSelectedModule(null)
+    setShowModuleSelect(false); setSelectedModule(null)
   }
 
-  const handleBack = () => setSelectedModule(null)
-
-  const currentChips = agent.categories[activeCategoryIdx]?.chips ?? []
+  const inConversation = messages.length > 0
 
   return (
-    <div className="flex flex-col h-full relative" onClick={() => showAgentDropdown && setShowAgentDropdown(false)}>
-      {/* Top bar */}
-      <div className="flex items-center gap-3 px-5 py-3 border-b border-gray-100">
-        <Plus size={16} className="text-gray-400 cursor-pointer hover:text-gray-600" />
-        <Clock size={16} className="text-gray-400 cursor-pointer hover:text-gray-600" />
-        <span className="text-sm text-gray-700 font-medium">查询下SH20260716 对应的出入库记录</span>
-        <span className="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">● Connector+flow</span>
+    <div className="flex flex-col h-full bg-white" onClick={() => showAgentDropdown && setShowAgentDropdown(false)}>
+
+      {/* ── Top bar ── */}
+      <div className="flex items-center gap-3 px-5 py-3 border-b border-gray-100 shrink-0">
+        <button className="p-1 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors">
+          <Plus size={15} />
+        </button>
+        <button className="p-1 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors">
+          <Clock size={15} />
+        </button>
+        <span className="text-xs text-gray-500 font-medium truncate">查询下SH20260716 对应的出入库记录</span>
+        <span className="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium shrink-0">● Connector+flow</span>
       </div>
 
-      {/* Main chat content */}
-      <div className="flex-1 flex flex-col items-center justify-center px-8 py-10 overflow-y-auto">
+      {/* ── Welcome / Conversation area ── */}
+      <div className="flex-1 overflow-y-auto">
+        {!inConversation ? (
+          /* ──── EMPTY STATE ──── */
+          <div className="flex flex-col items-center justify-center min-h-full px-6 py-8">
 
-        {/* Agent icon */}
-        <div className={`w-14 h-14 bg-gradient-to-br ${agent.iconBg} rounded-2xl flex items-center justify-center mb-4 shadow-lg ${agent.shadowColor} transition-all duration-300`}>
-          <MessageCircle size={26} className="text-white" />
-        </div>
+            {/* Agent icon */}
+            <div className={`w-12 h-12 bg-gradient-to-br ${agent.iconBg} rounded-2xl flex items-center justify-center mb-3 shadow-md ${agent.shadowColor}`}>
+              <MessageCircle size={22} className="text-white" />
+            </div>
 
-        {/* Agent selector pill */}
-        <div className="relative mb-6" onClick={e => e.stopPropagation()}>
-          <button
-            onClick={() => setShowAgentDropdown(v => !v)}
-            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full border transition-all duration-150 ${showAgentDropdown ? `border-gray-300 bg-gray-50` : `border-gray-200 hover:border-gray-300 hover:bg-gray-50`}`}
-          >
-            <span className={`w-2 h-2 rounded-full ${agent.dot} shrink-0`} />
-            <span className="text-sm text-gray-800 font-medium">{agent.name}</span>
-            <ChevronDown size={13} className={`text-gray-400 transition-transform ${showAgentDropdown ? 'rotate-180' : ''}`} />
-          </button>
+            {/* Agent selector */}
+            <div className="relative mb-4" onClick={e => e.stopPropagation()}>
+              <button
+                onClick={() => setShowAgentDropdown(v => !v)}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all text-sm"
+              >
+                <span className={`w-2 h-2 rounded-full ${agent.dot}`} />
+                <span className="text-gray-700 font-medium">{agent.name}</span>
+                <ChevronDown size={12} className={`text-gray-400 transition-transform ${showAgentDropdown ? 'rotate-180' : ''}`} />
+              </button>
+              {showAgentDropdown && (
+                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1.5 w-60 bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden">
+                  <div className="px-3 py-2 border-b border-gray-100">
+                    <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">切换 Agent</p>
+                  </div>
+                  {AGENTS.map(a => (
+                    <button key={a.id} onClick={() => handleSelectAgent(a.id)}
+                      className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-gray-50 ${a.id === activeAgentId ? 'bg-violet-50' : ''}`}>
+                      <span className={`w-2 h-2 rounded-full ${a.dot}`} />
+                      <span className={`text-sm ${a.id === activeAgentId ? 'font-semibold text-violet-700' : 'text-gray-600 font-medium'}`}>{a.name}</span>
+                      {a.id === activeAgentId && <span className="ml-auto text-[10px] text-violet-500">当前</span>}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
 
-          {/* Dropdown */}
-          {showAgentDropdown && (
-            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1.5 w-64 bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden">
-              <div className="px-3 py-2 border-b border-gray-100">
-                <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">Select Agent</p>
+            {/* Greeting */}
+            <h2 className="text-xl font-bold text-gray-900 mb-2">{agent.greeting}</h2>
+            <p className="text-xs text-gray-500 text-center max-w-md leading-relaxed mb-5">
+              <span className="font-medium text-gray-600">订单状态 · 入库跟踪 · 库存查询 · 出库进度</span>
+              {' '}全都能问。AI 自动跨模块取数、结合业务场景、引用真实数据给出输出结果；
+            </p>
+
+            {/* Tab selector + chips card */}
+            <div className="w-full max-w-lg bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
+              {/* Tabs */}
+              <div className="flex border-b border-gray-100">
+                {COPILOT_TABS.map(tab => (
+                  <button key={tab.id} onClick={() => handleTabClick(tab.id)}
+                    className={`flex-1 py-2.5 text-xs font-semibold transition-all relative ${
+                      tab.id === activeTabId
+                        ? 'text-gray-900'
+                        : 'text-gray-400 hover:text-gray-600'
+                    }`}
+                  >
+                    <span className="flex items-center justify-center gap-1.5">
+                      <span className={`w-1.5 h-1.5 rounded-full ${tab.color}`} />
+                      {tab.label}
+                    </span>
+                    {tab.id === activeTabId && (
+                      <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-900 rounded-full" />
+                    )}
+                  </button>
+                ))}
               </div>
-              {AGENTS.map(a => (
-                <button
-                  key={a.id}
-                  onClick={() => handleSelectAgent(a.id)}
-                  className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-gray-50 ${a.id === activeAgentId ? 'bg-gray-50' : ''}`}
-                >
-                  <span className={`w-2.5 h-2.5 rounded-full ${a.dot} shrink-0`} />
-                  <span className={`text-sm font-medium ${a.id === activeAgentId ? 'text-gray-900' : 'text-gray-600'}`}>{a.name}</span>
-                  {a.id === activeAgentId && (
-                    <span className="ml-auto text-[10px] bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">当前</span>
-                  )}
-                </button>
+
+              {/* Chip list */}
+              <div className="divide-y divide-gray-50">
+                {currentTab.chips.map((chip, idx) => (
+                  <button key={idx} onClick={() => handleChipClick(chip)}
+                    className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-gray-50 transition-colors group">
+                    <span className="text-sm text-gray-700 leading-snug pr-4">{chip}</span>
+                    <ChevronRight size={14} className="text-gray-300 group-hover:text-gray-500 shrink-0 transition-colors" />
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Hints */}
+            <div className="flex items-center gap-4 mt-5 flex-wrap justify-center">
+              {agent.hints.map(h => (
+                <span key={h} className="text-[11px] text-gray-400">{h}</span>
               ))}
             </div>
-          )}
-        </div>
-
-        {/* Greeting + description */}
-        <h2 className="text-2xl font-bold text-gray-900 mb-3 transition-all duration-300">{agent.greeting}</h2>
-        <p className="text-sm text-gray-500 text-center max-w-lg leading-relaxed mb-6 transition-all duration-300">
-          {agent.subtitle}
-        </p>
-
-        {/* Category tabs + chips */}
-        <div className="w-full max-w-xl mb-5">
-          {/* Tab bar */}
-          <div className="flex items-center gap-1 mb-3 overflow-x-auto pb-1 scrollbar-hide">
-            {agent.categories.map((cat, idx) => (
-              <button
-                key={cat.label}
-                onClick={() => setActiveCategoryIdx(idx)}
-                className={`shrink-0 text-xs px-3 py-1.5 rounded-full border transition-all ${
-                  idx === activeCategoryIdx
-                    ? `border-gray-900 bg-gray-900 text-white font-medium`
-                    : `border-gray-200 text-gray-500 hover:border-gray-300 hover:bg-gray-50`
-                }`}
-              >
-                {cat.label}
-              </button>
-            ))}
           </div>
-          {/* Chips */}
-          <div className="flex flex-col gap-2">
-            {currentChips.map(chip => (
-              <button
-                key={chip}
-                onClick={() => setInput(chip)}
-                className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl border border-gray-100 bg-gray-50 text-sm text-gray-700 text-left hover:border-gray-300 hover:bg-white hover:shadow-sm transition-all group`}
-              >
-                <span>{chip}</span>
-                <ChevronRight size={14} className="text-gray-300 group-hover:text-gray-500 shrink-0" />
-              </button>
-            ))}
-          </div>
-        </div>
+        ) : (
+          /* ──── CONVERSATION ──── */
+          <div className="flex flex-col px-6 py-5 gap-4 max-w-2xl mx-auto w-full">
 
-        {/* Feature hints */}
-        <div className="flex items-center gap-4 flex-wrap justify-center text-[11px] text-gray-400">
-          {agent.hints.map(h => <span key={h}>{h}</span>)}
-        </div>
+            {/* Compact agent header in conversation */}
+            <div className="flex items-center gap-2 pb-3 border-b border-gray-100">
+              <div className={`w-7 h-7 bg-gradient-to-br ${agent.iconBg} rounded-lg flex items-center justify-center shadow-sm`}>
+                <MessageCircle size={13} className="text-white" />
+              </div>
+              <span className="text-xs font-semibold text-gray-600">{agent.name}</span>
+              <button onClick={() => setMessages([])}
+                className="ml-auto text-[10px] text-gray-400 hover:text-gray-600 flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-gray-100 transition-colors">
+                <X size={11} /> 清除
+              </button>
+            </div>
+
+            {messages.map((msg, i) => (
+              <div key={i} className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+                {/* Avatar */}
+                {msg.role === 'agent' && (
+                  <div className={`w-7 h-7 bg-gradient-to-br ${agent.iconBg} rounded-lg flex items-center justify-center shadow-sm shrink-0 mt-0.5`}>
+                    <MessageCircle size={12} className="text-white" />
+                  </div>
+                )}
+                {msg.role === 'user' && (
+                  <div className="w-7 h-7 bg-gray-200 rounded-full flex items-center justify-center shrink-0 mt-0.5">
+                    <span className="text-[10px] font-bold text-gray-500">U</span>
+                  </div>
+                )}
+
+                {/* Bubble */}
+                <div className={`max-w-[80%] rounded-2xl px-4 py-3 ${
+                  msg.role === 'user'
+                    ? 'bg-violet-600 text-white rounded-tr-sm'
+                    : 'bg-gray-50 border border-gray-200 rounded-tl-sm'
+                }`}>
+                  {msg.role === 'user' ? (
+                    <p className="text-sm">{msg.text}</p>
+                  ) : (
+                    <>
+                      {/* Thinking label */}
+                      {!msg.done && (!msg.lines || msg.lines.length === 0) && (
+                        <p className="text-xs text-gray-500 mb-2">{msg.text}</p>
+                      )}
+                      {msg.lines && msg.lines.length > 0 && (
+                        <AgentBubble lines={msg.lines} done={!!msg.done} />
+                      )}
+                      {(!msg.lines || msg.lines.length === 0) && !msg.done && (
+                        <span className="inline-flex gap-0.5">
+                          {[0,1,2].map(i => (
+                            <span key={i} className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce"
+                              style={{ animationDelay: `${i * 0.15}s` }} />
+                          ))}
+                        </span>
+                      )}
+                    </>
+                  )}
+                </div>
+              </div>
+            ))}
+            <div ref={bottomRef} />
+          </div>
+        )}
       </div>
 
-      {/* Module/Reference Selection Dropdown */}
+      {/* ── @ Module Select Dropdown ── */}
       {showModuleSelect && (
-        <div className="absolute bottom-24 left-8 right-8 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden z-50">
+        <div className="absolute bottom-24 left-6 right-6 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden z-50">
           {!selectedModule ? (
             <>
-              <div className="px-4 py-2.5 border-b border-gray-100">
-                <p className="text-[10px] font-semibold text-gray-400 uppercase">SELECT MODULE</p>
+              <div className="px-4 py-2 border-b border-gray-100">
+                <p className="text-[10px] font-semibold text-gray-400 uppercase">选择模块</p>
               </div>
-              <div className="max-h-64 overflow-y-auto">
+              <div className="max-h-56 overflow-y-auto">
                 {CHAT_MODULES.map(mod => (
                   <button key={mod.id} onClick={() => handleSelectModule(mod.id)}
-                    className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 text-left border-b border-gray-50 transition-colors">
+                    className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-gray-50 text-left border-b border-gray-50 transition-colors">
                     <span className="text-sm font-medium text-gray-800">{mod.label}</span>
                     <span className="text-xs text-gray-400">{mod.count} items</span>
                   </button>
@@ -348,11 +728,11 @@ function ChatView() {
             </>
           ) : (
             <>
-              <div className="px-4 py-2.5 border-b border-gray-100 flex items-center justify-between">
-                <p className="text-[10px] font-semibold text-gray-400 uppercase">{CHAT_MODULES.find(m => m.id === selectedModule)?.label} — SELECT REFERENCE</p>
-                <button onClick={handleBack} className="text-xs text-gray-500 hover:text-gray-700">Back</button>
+              <div className="px-4 py-2 border-b border-gray-100 flex items-center justify-between">
+                <p className="text-[10px] font-semibold text-gray-400 uppercase">{CHAT_MODULES.find(m => m.id === selectedModule)?.label}</p>
+                <button onClick={() => setSelectedModule(null)} className="text-xs text-gray-500 hover:text-gray-700">← 返回</button>
               </div>
-              <div className="max-h-64 overflow-y-auto">
+              <div className="max-h-56 overflow-y-auto">
                 {CHAT_MODULES.find(m => m.id === selectedModule)?.refs.map(ref => (
                   <button key={ref} onClick={() => handleSelectRef(ref)}
                     className="w-full text-left px-4 py-2.5 hover:bg-gray-50 text-sm text-gray-700 border-b border-gray-50 transition-colors">
@@ -365,24 +745,30 @@ function ChatView() {
         </div>
       )}
 
-      {/* Input */}
-      <div className="px-8 pb-6 shrink-0">
-        <div className={`border border-gray-200 rounded-xl px-4 py-3 flex items-center gap-3 transition-all ${agent.accentRing} focus-within:ring-2`}>
-          <Paperclip size={16} className="text-gray-400 cursor-pointer hover:text-gray-600 shrink-0" />
+      {/* ── Input bar ── */}
+      <div className="px-5 pb-5 pt-2 shrink-0 border-t border-gray-100">
+        <div className={`border border-gray-200 rounded-2xl px-4 py-3 flex items-center gap-3 bg-white transition-all ${agent.accentRing} focus-within:ring-2 focus-within:shadow-sm`}>
+          <Paperclip size={15} className="text-gray-400 cursor-pointer hover:text-gray-600 shrink-0 transition-colors" />
           <input
             type="text"
             value={input}
             onChange={e => handleInputChange(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSend())}
             placeholder={agent.placeholder}
-            className="flex-1 text-sm outline-none text-gray-700 placeholder-gray-400"
+            disabled={isTyping}
+            className="flex-1 text-sm outline-none text-gray-700 placeholder-gray-400 bg-transparent disabled:opacity-50"
           />
-          <Mic size={16} className="text-gray-400 cursor-pointer hover:text-gray-600 shrink-0" />
-          <button className={`w-8 h-8 ${agent.sendBg} rounded-full flex items-center justify-center transition-colors shrink-0`}>
-            <Send size={14} className="text-white" />
+          <Mic size={15} className="text-gray-400 cursor-pointer hover:text-gray-600 shrink-0 transition-colors" />
+          <button
+            onClick={() => handleSend()}
+            disabled={!input.trim() || isTyping}
+            className={`w-8 h-8 ${agent.sendBg} rounded-full flex items-center justify-center transition-all shrink-0 disabled:opacity-40 disabled:cursor-not-allowed`}
+          >
+            <Send size={13} className="text-white" />
           </button>
         </div>
-        <p className="text-[10px] text-gray-400 text-center mt-2">
-          Enter 发送 · @ 引用订单/货品/运单 · 常要做工作流？
+        <p className="text-[10px] text-gray-400 text-center mt-1.5">
+          Enter 发送 · @ 引用单号 · 需要批量工作流？
           <button className="text-violet-500 hover:underline ml-0.5">前往 Agent Workstation</button>
         </p>
       </div>
