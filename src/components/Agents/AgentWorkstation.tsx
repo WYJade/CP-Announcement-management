@@ -73,12 +73,139 @@ export default function AgentWorkstation() {
   )
 }
 
+// ─── Agent Definitions ───────────────────────────────────────────────────────
+
+const AGENTS = [
+  {
+    id: 'all-in-one',
+    name: 'All-in-One Copilot',
+    dot: 'bg-violet-500',
+    iconBg: 'from-violet-500 to-violet-600',
+    shadowColor: 'shadow-violet-200',
+    accentText: 'text-violet-600',
+    accentBorder: 'border-violet-300',
+    accentHoverBg: 'hover:bg-violet-50',
+    accentHoverText: 'hover:text-violet-700',
+    accentRing: 'focus-within:border-violet-300 focus-within:ring-violet-100',
+    sendBg: 'bg-violet-600 hover:bg-violet-700',
+    greeting: '有什么我能帮到你？',
+    subtitle: (
+      <>
+        <strong className="text-gray-700">订单状态 · 入库跟踪 · 库存查询 · 出库进度 · 政策文件</strong> 全都能问。
+        AI 自动跨模块取数、引用政策并给出来源；遇到复杂批量任务，请到{' '}
+        <span className="text-violet-600 underline font-medium cursor-pointer">Agent Workstation</span>。
+      </>
+    ),
+    categories: [
+      { label: '📦 Order', chips: ['ORD-8821 现在到哪了？', '我最近有哪些异常订单？', 'VIP 客户取消政策是什么？'] },
+      { label: '🚚 Inbound', chips: ['ASN-20260601 入库进度？', '本周有哪些 PO 待入库？'] },
+      { label: '📊 Inventory', chips: ['SKU-005 当前可用库存多少？', '有哪些 SKU 库存低于安全线？'] },
+      { label: '📤 Outbound', chips: ['今天有哪些订单待发货？', 'SHP-10021 当前状态？'] },
+    ],
+    placeholder: '问任何与订单、库存、入库、出库相关的问题... 输入 @ 引用单号',
+    hints: ['⚡ 跨模块自动取数', '🔍 政策原文引用', '📐 复杂任务 → Agent Workstation'],
+  },
+  {
+    id: 'inbound',
+    name: 'CP-Inbound Agent',
+    dot: 'bg-blue-500',
+    iconBg: 'from-blue-500 to-blue-600',
+    shadowColor: 'shadow-blue-200',
+    accentText: 'text-blue-600',
+    accentBorder: 'border-blue-300',
+    accentHoverBg: 'hover:bg-blue-50',
+    accentHoverText: 'hover:text-blue-700',
+    accentRing: 'focus-within:border-blue-300 focus-within:ring-blue-100',
+    sendBg: 'bg-blue-600 hover:bg-blue-700',
+    greeting: '入库问题，帮你查清楚',
+    subtitle: (
+      <>
+        专注 <strong className="text-gray-700">ASN 状态 · PO 跟踪 · 收货进度 · 差异问题 · 入库时效</strong>。
+        输入 ASN 号或 PO 号，立即获取当前状态、预计到仓时间和异常提示。
+      </>
+    ),
+    categories: [
+      { label: '📋 ASN 跟踪', chips: ['ASN-20260601 现在什么状态？', '本周还有哪些 ASN 未到仓？', 'ASN-20260602 有异常吗？'] },
+      { label: '📦 PO 管理', chips: ['PO-38199 收货进度怎样？', '哪些 PO 已超出预计入库日期？'] },
+      { label: '⚠️ 差异处理', chips: ['最近有哪些收货差异未处理？', 'RN-38197 差异原因是什么？'] },
+    ],
+    placeholder: '输入 ASN 号、PO 号或直接描述问题... 如：ASN-20260601 现在到哪了？',
+    hints: ['📋 ASN / PO 实时状态', '⚠️ 差异自动识别', '🕐 入库时效分析'],
+  },
+  {
+    id: 'inventory',
+    name: 'CP-Inventory Agent',
+    dot: 'bg-emerald-500',
+    iconBg: 'from-emerald-500 to-emerald-600',
+    shadowColor: 'shadow-emerald-200',
+    accentText: 'text-emerald-600',
+    accentBorder: 'border-emerald-300',
+    accentHoverBg: 'hover:bg-emerald-50',
+    accentHoverText: 'hover:text-emerald-700',
+    accentRing: 'focus-within:border-emerald-300 focus-within:ring-emerald-100',
+    sendBg: 'bg-emerald-600 hover:bg-emerald-700',
+    greeting: '库存信息，一问即知',
+    subtitle: (
+      <>
+        专注 <strong className="text-gray-700">库存查询 · 安全库存预警 · SKU 定位 · 库龄分析 · 调拨建议</strong>。
+        直接输入 SKU 或产品名，快速获取库存快照与预警信息。
+      </>
+    ),
+    categories: [
+      { label: '🔎 库存查询', chips: ['SKU-005 当前可用库存？', 'FBA 和自有仓各有多少？', 'SKU-B200 在哪个库位？'] },
+      { label: '🚨 预警管理', chips: ['哪些 SKU 低于安全库存线？', '本周有哪些库存预警未处理？'] },
+      { label: '📊 库龄分析', chips: ['库龄超过 90 天的 SKU 有哪些？', 'SKU-A100 滞销风险如何？'] },
+    ],
+    placeholder: '输入 SKU 编号或产品名称... 如：SKU-005 当前可用库存多少？',
+    hints: ['📦 实时库存快照', '🚨 安全库存预警', '📊 库龄与滞销分析'],
+  },
+  {
+    id: 'outbound',
+    name: 'CP-Outbound Agent',
+    dot: 'bg-amber-500',
+    iconBg: 'from-amber-500 to-orange-500',
+    shadowColor: 'shadow-amber-200',
+    accentText: 'text-amber-600',
+    accentBorder: 'border-amber-300',
+    accentHoverBg: 'hover:bg-amber-50',
+    accentHoverText: 'hover:text-amber-700',
+    accentRing: 'focus-within:border-amber-300 focus-within:ring-amber-100',
+    sendBg: 'bg-amber-500 hover:bg-amber-600',
+    greeting: '出库发货，实时掌握',
+    subtitle: (
+      <>
+        专注 <strong className="text-gray-700">发货状态 · 运单追踪 · SLA 监控 · 异常报警 · 承运商表现</strong>。
+        输入订单号或运单号，立即获取发货进度、预计送达时间和延误预警。
+      </>
+    ),
+    categories: [
+      { label: '🚚 发货追踪', chips: ['SHP-10021 现在到哪了？', '今天有哪些订单待发货？', 'ORD-8821 发货了吗？'] },
+      { label: '⏱️ SLA 监控', chips: ['今天哪些 SLA 快超时？', '近 7d SLA 达成率怎样？'] },
+      { label: '⚠️ 异常处理', chips: ['有哪些包裹延误超过 2 天？', 'SSHAS2608072 有异常吗？'] },
+    ],
+    placeholder: '输入订单号、运单号或直接描述问题... 如：ORD-8821 发货了吗？',
+    hints: ['🚚 运单实时追踪', '⏱️ SLA 达成率监控', '⚠️ 延误自动预警'],
+  },
+]
+
 // ─── Chat View ───────────────────────────────────────────────────────────────
 
 function ChatView() {
   const [input, setInput] = useState('')
   const [showModuleSelect, setShowModuleSelect] = useState(false)
   const [selectedModule, setSelectedModule] = useState<string | null>(null)
+  const [activeAgentId, setActiveAgentId] = useState('all-in-one')
+  const [showAgentDropdown, setShowAgentDropdown] = useState(false)
+  const [activeCategoryIdx, setActiveCategoryIdx] = useState(0)
+
+  const agent = AGENTS.find(a => a.id === activeAgentId)!
+
+  // Reset category tab when agent changes
+  const handleSelectAgent = (id: string) => {
+    setActiveAgentId(id)
+    setActiveCategoryIdx(0)
+    setShowAgentDropdown(false)
+  }
 
   const handleInputChange = (val: string) => {
     setInput(val)
@@ -91,9 +218,7 @@ function ChatView() {
     }
   }
 
-  const handleSelectModule = (moduleId: string) => {
-    setSelectedModule(moduleId)
-  }
+  const handleSelectModule = (moduleId: string) => setSelectedModule(moduleId)
 
   const handleSelectRef = (ref: string) => {
     const mod = CHAT_MODULES.find(m => m.id === selectedModule)
@@ -102,12 +227,12 @@ function ChatView() {
     setSelectedModule(null)
   }
 
-  const handleBack = () => {
-    setSelectedModule(null)
-  }
+  const handleBack = () => setSelectedModule(null)
+
+  const currentChips = agent.categories[activeCategoryIdx]?.chips ?? []
 
   return (
-    <div className="flex flex-col h-full relative">
+    <div className="flex flex-col h-full relative" onClick={() => showAgentDropdown && setShowAgentDropdown(false)}>
       {/* Top bar */}
       <div className="flex items-center gap-3 px-5 py-3 border-b border-gray-100">
         <Plus size={16} className="text-gray-400 cursor-pointer hover:text-gray-600" />
@@ -116,57 +241,96 @@ function ChatView() {
         <span className="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">● Connector+flow</span>
       </div>
 
-      {/* Chat content */}
-      <div className="flex-1 flex flex-col items-center justify-center px-8 py-12">
-        {/* Icon */}
-        <div className="w-16 h-16 bg-gradient-to-br from-violet-500 to-violet-600 rounded-2xl flex items-center justify-center mb-5 shadow-lg shadow-violet-200">
-          <MessageCircle size={28} className="text-white" />
+      {/* Main chat content */}
+      <div className="flex-1 flex flex-col items-center justify-center px-8 py-10 overflow-y-auto">
+
+        {/* Agent icon */}
+        <div className={`w-14 h-14 bg-gradient-to-br ${agent.iconBg} rounded-2xl flex items-center justify-center mb-4 shadow-lg ${agent.shadowColor} transition-all duration-300`}>
+          <MessageCircle size={26} className="text-white" />
         </div>
 
-        {/* Agent selector */}
-        <button className="flex items-center gap-1.5 mb-5 px-3 py-1.5 rounded-full border border-gray-200 hover:border-violet-300 hover:bg-violet-50 transition-colors">
-          <span className="w-2 h-2 rounded-full bg-emerald-500" />
-          <span className="text-sm text-gray-700 font-medium">OMSV3 销售订单取消操作 Agent</span>
-          <ChevronDown size={13} className="text-gray-400" />
-        </button>
+        {/* Agent selector pill */}
+        <div className="relative mb-6" onClick={e => e.stopPropagation()}>
+          <button
+            onClick={() => setShowAgentDropdown(v => !v)}
+            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full border transition-all duration-150 ${showAgentDropdown ? `border-gray-300 bg-gray-50` : `border-gray-200 hover:border-gray-300 hover:bg-gray-50`}`}
+          >
+            <span className={`w-2 h-2 rounded-full ${agent.dot} shrink-0`} />
+            <span className="text-sm text-gray-800 font-medium">{agent.name}</span>
+            <ChevronDown size={13} className={`text-gray-400 transition-transform ${showAgentDropdown ? 'rotate-180' : ''}`} />
+          </button>
 
-        {/* Title */}
-        <h2 className="text-2xl font-bold text-gray-900 mb-3">问点什么，我帮你查</h2>
+          {/* Dropdown */}
+          {showAgentDropdown && (
+            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1.5 w-64 bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden">
+              <div className="px-3 py-2 border-b border-gray-100">
+                <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">Select Agent</p>
+              </div>
+              {AGENTS.map(a => (
+                <button
+                  key={a.id}
+                  onClick={() => handleSelectAgent(a.id)}
+                  className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-gray-50 ${a.id === activeAgentId ? 'bg-gray-50' : ''}`}
+                >
+                  <span className={`w-2.5 h-2.5 rounded-full ${a.dot} shrink-0`} />
+                  <span className={`text-sm font-medium ${a.id === activeAgentId ? 'text-gray-900' : 'text-gray-600'}`}>{a.name}</span>
+                  {a.id === activeAgentId && (
+                    <span className="ml-auto text-[10px] bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">当前</span>
+                  )}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
 
-        {/* Subtitle */}
-        <p className="text-sm text-gray-500 text-center max-w-xl leading-relaxed mb-6">
-          <strong className="text-gray-700">订单状态・SLA・库存・政策原文・系统流程</strong> 都能问。AI 自动调用对应 Tool 取数 / 引用政策、列出来源；关键结果
-          （订单详情、表格、时间线）会在右侧 dashboard 自动带出。需要批量/结构化工作流（盖采运、审批推送、跨工作台联动）请到{' '}
-          <button className="text-violet-600 underline font-medium hover:text-violet-800">Agent Workstation。</button>
+        {/* Greeting + description */}
+        <h2 className="text-2xl font-bold text-gray-900 mb-3 transition-all duration-300">{agent.greeting}</h2>
+        <p className="text-sm text-gray-500 text-center max-w-lg leading-relaxed mb-6 transition-all duration-300">
+          {agent.subtitle}
         </p>
 
-        {/* Quick chips */}
-        <div className="flex flex-wrap gap-2 justify-center mb-5">
-          {[
-            { icon: '🔍', text: 'ORD-8821 现在到哪了？' },
-            { icon: '📋', text: '今天哪些 SLA 快超时？' },
-            { icon: '📈', text: '近 7d SLA 表现？' },
-            { icon: '👑', text: 'VIP 取消政策？' },
-            { icon: '📦', text: 'SKU-005 FBA 库存？' },
-          ].map(({ icon, text }) => (
-            <button key={text}
-              className="flex items-center gap-1.5 text-xs px-3 py-1.5 border border-gray-200 rounded-full text-gray-600 hover:bg-gray-50 hover:border-violet-300 hover:text-violet-700 transition-colors">
-              <span>{icon}</span>{text}
-            </button>
-          ))}
+        {/* Category tabs + chips */}
+        <div className="w-full max-w-xl mb-5">
+          {/* Tab bar */}
+          <div className="flex items-center gap-1 mb-3 overflow-x-auto pb-1 scrollbar-hide">
+            {agent.categories.map((cat, idx) => (
+              <button
+                key={cat.label}
+                onClick={() => setActiveCategoryIdx(idx)}
+                className={`shrink-0 text-xs px-3 py-1.5 rounded-full border transition-all ${
+                  idx === activeCategoryIdx
+                    ? `border-gray-900 bg-gray-900 text-white font-medium`
+                    : `border-gray-200 text-gray-500 hover:border-gray-300 hover:bg-gray-50`
+                }`}
+              >
+                {cat.label}
+              </button>
+            ))}
+          </div>
+          {/* Chips */}
+          <div className="flex flex-col gap-2">
+            {currentChips.map(chip => (
+              <button
+                key={chip}
+                onClick={() => setInput(chip)}
+                className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl border border-gray-100 bg-gray-50 text-sm text-gray-700 text-left hover:border-gray-300 hover:bg-white hover:shadow-sm transition-all group`}
+              >
+                <span>{chip}</span>
+                <ChevronRight size={14} className="text-gray-300 group-hover:text-gray-500 shrink-0" />
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Feature hints */}
-        <div className="flex items-center gap-5 text-[11px] text-gray-400">
-          <span className="flex items-center gap-1">⚡ 跨 Tool 自动调用</span>
-          <span className="flex items-center gap-1">🔨 适合 ad-hoc 单问用</span>
-          <span className="flex items-center gap-1">📐 结构化 → Agent Workstation</span>
+        <div className="flex items-center gap-4 flex-wrap justify-center text-[11px] text-gray-400">
+          {agent.hints.map(h => <span key={h}>{h}</span>)}
         </div>
       </div>
 
       {/* Module/Reference Selection Dropdown */}
       {showModuleSelect && (
-        <div className="absolute bottom-24 left-8 right-8 bg-white border border-primary-200 rounded-xl shadow-lg overflow-hidden z-50">
+        <div className="absolute bottom-24 left-8 right-8 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden z-50">
           {!selectedModule ? (
             <>
               <div className="px-4 py-2.5 border-b border-gray-100">
@@ -191,7 +355,7 @@ function ChatView() {
               <div className="max-h-64 overflow-y-auto">
                 {CHAT_MODULES.find(m => m.id === selectedModule)?.refs.map(ref => (
                   <button key={ref} onClick={() => handleSelectRef(ref)}
-                    className="w-full text-left px-4 py-2.5 hover:bg-primary-50 text-sm text-gray-700 border-b border-gray-50 transition-colors">
+                    className="w-full text-left px-4 py-2.5 hover:bg-gray-50 text-sm text-gray-700 border-b border-gray-50 transition-colors">
                     {ref}
                   </button>
                 ))}
@@ -202,19 +366,24 @@ function ChatView() {
       )}
 
       {/* Input */}
-      <div className="px-8 pb-6">
-        <div className="border border-gray-200 rounded-xl px-4 py-3 flex items-center gap-3 focus-within:border-violet-300 focus-within:ring-2 focus-within:ring-violet-100 transition-all">
-          <Paperclip size={16} className="text-gray-400 cursor-pointer hover:text-gray-600" />
-          <input type="text" value={input} onChange={e => handleInputChange(e.target.value)}
-            placeholder="问任何 OMS 相关问题 — 数据 / 知识 / 政策... 输入 @ 引用订单/商品/运单"
-            className="flex-1 text-sm outline-none text-gray-700 placeholder-gray-400" />
-          <Mic size={16} className="text-gray-400 cursor-pointer hover:text-gray-600" />
-          <button className="w-8 h-8 bg-violet-600 rounded-full flex items-center justify-center hover:bg-violet-700 transition-colors">
+      <div className="px-8 pb-6 shrink-0">
+        <div className={`border border-gray-200 rounded-xl px-4 py-3 flex items-center gap-3 transition-all ${agent.accentRing} focus-within:ring-2`}>
+          <Paperclip size={16} className="text-gray-400 cursor-pointer hover:text-gray-600 shrink-0" />
+          <input
+            type="text"
+            value={input}
+            onChange={e => handleInputChange(e.target.value)}
+            placeholder={agent.placeholder}
+            className="flex-1 text-sm outline-none text-gray-700 placeholder-gray-400"
+          />
+          <Mic size={16} className="text-gray-400 cursor-pointer hover:text-gray-600 shrink-0" />
+          <button className={`w-8 h-8 ${agent.sendBg} rounded-full flex items-center justify-center transition-colors shrink-0`}>
             <Send size={14} className="text-white" />
           </button>
         </div>
         <p className="text-[10px] text-gray-400 text-center mt-2">
-          Enter 发送 · @ 引用订单/货品/运单  常要做工作流？<button className="text-violet-500 hover:underline">前往 Agent Workstation</button>
+          Enter 发送 · @ 引用订单/货品/运单 · 常要做工作流？
+          <button className="text-violet-500 hover:underline ml-0.5">前往 Agent Workstation</button>
         </p>
       </div>
     </div>
