@@ -465,6 +465,7 @@ function ChatView() {
   const [showModuleSelect, setShowModuleSelect] = useState(false)
   const [selectedModule, setSelectedModule] = useState<string | null>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
+  const inputRef  = useRef<HTMLTextAreaElement>(null)
 
   const agent = AGENTS.find(a => a.id === activeAgentId)!
   const currentTab = COPILOT_TABS.find(t => t.id === activeTabId)!
@@ -532,7 +533,17 @@ function ChatView() {
 
   const handleChipClick = (chip: string) => {
     setInput(chip)
-    setTimeout(() => handleSend(chip), 50)
+    // 聚焦输入框，将光标置于末尾，让用户可直接修改后再发送
+    setTimeout(() => {
+      const el = inputRef.current
+      if (el) {
+        el.focus()
+        el.setSelectionRange(chip.length, chip.length)
+        // 自动撑高
+        el.style.height = 'auto'
+        el.style.height = Math.min(el.scrollHeight, 160) + 'px'
+      }
+    }, 30)
   }
 
   const handleInputChange = (val: string) => {
@@ -638,6 +649,7 @@ function ChatView() {
 
                 {/* Textarea */}
                 <textarea
+                  ref={inputRef}
                   value={input}
                   onChange={e => { handleInputChange(e.target.value); e.target.style.height = 'auto'; e.target.style.height = Math.min(e.target.scrollHeight, 160) + 'px' }}
                   onKeyDown={e => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSend())}
