@@ -580,23 +580,37 @@ function ChatView() {
             <div className="relative mb-4" onClick={e => e.stopPropagation()}>
               <button
                 onClick={() => setShowAgentDropdown(v => !v)}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all text-sm"
+                className={`flex items-center gap-2.5 px-4 py-2 rounded-full border-2 transition-all text-sm font-medium shadow-sm
+                  ${showAgentDropdown
+                    ? 'border-blue-400 bg-blue-50 text-blue-700'
+                    : 'border-gray-200 bg-white text-gray-700 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600'
+                  }`}
               >
-                <span className={`w-2 h-2 rounded-full ${agent.dot}`} />
-                <span className="text-gray-700 font-medium">{agent.name}</span>
-                <ChevronDown size={12} className={`text-gray-400 transition-transform ${showAgentDropdown ? 'rotate-180' : ''}`} />
+                {/* switch icon */}
+                <ArrowLeftRight size={14} className={`shrink-0 transition-colors ${showAgentDropdown ? 'text-blue-500' : 'text-gray-400 group-hover:text-blue-400'}`} />
+                <span className="text-[11px] text-gray-400 font-normal">切换 Agent</span>
+                <span className="w-px h-3.5 bg-gray-200" />
+                <span className={`w-2 h-2 rounded-full ${agent.dot} shrink-0`} />
+                <span>{agent.name}</span>
+                <ChevronDown size={13} className={`text-gray-400 transition-transform shrink-0 ${showAgentDropdown ? 'rotate-180 text-blue-400' : ''}`} />
               </button>
+
               {showAgentDropdown && (
-                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1.5 w-60 bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden">
-                  <div className="px-3 py-2 border-b border-gray-100">
-                    <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">切换 Agent</p>
+                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden">
+                  <div className="px-4 py-2.5 border-b border-gray-100 flex items-center gap-2">
+                    <ArrowLeftRight size={12} className="text-gray-400" />
+                    <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide">切换 Agent</p>
                   </div>
                   {AGENTS.map(a => (
                     <button key={a.id} onClick={() => handleSelectAgent(a.id)}
-                      className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-gray-50 ${a.id === activeAgentId ? 'bg-violet-50' : ''}`}>
-                      <span className={`w-2 h-2 rounded-full ${a.dot}`} />
-                      <span className={`text-sm ${a.id === activeAgentId ? 'font-semibold text-violet-700' : 'text-gray-600 font-medium'}`}>{a.name}</span>
-                      {a.id === activeAgentId && <span className="ml-auto text-[10px] text-violet-500">当前</span>}
+                      className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-blue-50 ${a.id === activeAgentId ? 'bg-blue-50' : ''}`}>
+                      <span className={`w-2 h-2 rounded-full ${a.dot} shrink-0`} />
+                      <span className={`text-sm ${a.id === activeAgentId ? 'font-semibold text-blue-700' : 'text-gray-600 font-medium'}`}>{a.name}</span>
+                      {a.id === activeAgentId && (
+                        <span className="ml-auto flex items-center gap-1 text-[10px] text-blue-500 font-medium">
+                          <span className="w-1.5 h-1.5 rounded-full bg-blue-400" /> 当前
+                        </span>
+                      )}
                     </button>
                   ))}
                 </div>
