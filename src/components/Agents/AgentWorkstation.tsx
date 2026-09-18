@@ -477,6 +477,14 @@ function ChatView() {
     setActiveAgentId(id)
     setShowAgentDropdown(false)
     setMessages([])
+    // 每个 Agent 对应不同的默认激活 tab
+    const defaultTab: Record<string, string> = {
+      'all-in-one': 'inbound',
+      'inbound':    'inbound',
+      'inventory':  'inventory',
+      'outbound':   'outbound',
+    }
+    setActiveTabId(defaultTab[id] ?? 'inbound')
   }
 
   const handleTabClick = (id: string) => {
@@ -595,49 +603,52 @@ function ChatView() {
             </div>
 
             {/* Greeting */}
-            <h2 className="text-xl font-bold text-gray-900 mb-2">{agent.greeting}</h2>
-            <p className="text-xs text-gray-500 text-center max-w-md leading-relaxed mb-5">
-              <span className="font-medium text-gray-600">订单状态 · 入库跟踪 · 库存查询 · 出库进度</span>
-              {' '}全都能问。AI 自动跨模块取数、结合业务场景、引用真实数据给出输出结果；
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">{agent.greeting}</h2>
+            <p className="text-sm text-gray-500 text-center max-w-sm leading-relaxed mb-6">
+              {agent.subtitleText}
             </p>
 
-            {/* Tab selector + chips card */}
-            <div className="w-full max-w-lg bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
-              {/* Tabs */}
-              <div className="flex border-b border-gray-100">
+            {/* ── Tab bar (no card border, Kimi-style) ── */}
+            <div className="w-full max-w-lg mb-1">
+              <div className="flex items-center gap-0 overflow-x-auto scrollbar-hide border-b border-gray-100">
                 {COPILOT_TABS.map(tab => (
-                  <button key={tab.id} onClick={() => handleTabClick(tab.id)}
-                    className={`flex-1 py-2.5 text-xs font-semibold transition-all relative ${
+                  <button
+                    key={tab.id}
+                    onClick={() => handleTabClick(tab.id)}
+                    className={`relative shrink-0 px-5 py-2.5 text-sm font-medium transition-colors whitespace-nowrap ${
                       tab.id === activeTabId
                         ? 'text-gray-900'
                         : 'text-gray-400 hover:text-gray-600'
                     }`}
                   >
-                    <span className="flex items-center justify-center gap-1.5">
-                      <span className={`w-1.5 h-1.5 rounded-full ${tab.color}`} />
+                    <span className="flex items-center gap-1.5">
+                      <span className={`w-1.5 h-1.5 rounded-full ${tab.color} shrink-0`} />
                       {tab.label}
                     </span>
                     {tab.id === activeTabId && (
-                      <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-900 rounded-full" />
+                      <span className="absolute bottom-0 left-3 right-3 h-0.5 bg-gray-900 rounded-full" />
                     )}
                   </button>
                 ))}
               </div>
 
-              {/* Chip list */}
-              <div className="divide-y divide-gray-50">
+              {/* ── Chip list (borderless rows) ── */}
+              <div className="mt-1">
                 {currentTab.chips.map((chip, idx) => (
-                  <button key={idx} onClick={() => handleChipClick(chip)}
-                    className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-gray-50 transition-colors group">
+                  <button
+                    key={idx}
+                    onClick={() => handleChipClick(chip)}
+                    className="w-full flex items-center justify-between px-2 py-3 text-left hover:bg-gray-50 rounded-xl transition-colors group"
+                  >
                     <span className="text-sm text-gray-700 leading-snug pr-4">{chip}</span>
-                    <ChevronRight size={14} className="text-gray-300 group-hover:text-gray-500 shrink-0 transition-colors" />
+                    <span className="text-gray-300 group-hover:text-gray-500 text-base transition-colors shrink-0">↗</span>
                   </button>
                 ))}
               </div>
             </div>
 
             {/* Hints */}
-            <div className="flex items-center gap-4 mt-5 flex-wrap justify-center">
+            <div className="flex items-center gap-5 mt-3 flex-wrap justify-center">
               {agent.hints.map(h => (
                 <span key={h} className="text-[11px] text-gray-400">{h}</span>
               ))}
@@ -746,31 +757,33 @@ function ChatView() {
       )}
 
       {/* ── Input bar ── */}
-      <div className="px-5 pb-5 pt-2 shrink-0 border-t border-gray-100">
-        <div className={`border border-gray-200 rounded-2xl px-4 py-3 flex items-center gap-3 bg-white transition-all ${agent.accentRing} focus-within:ring-2 focus-within:shadow-sm`}>
-          <Paperclip size={15} className="text-gray-400 cursor-pointer hover:text-gray-600 shrink-0 transition-colors" />
-          <input
-            type="text"
-            value={input}
-            onChange={e => handleInputChange(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSend())}
-            placeholder={agent.placeholder}
-            disabled={isTyping}
-            className="flex-1 text-sm outline-none text-gray-700 placeholder-gray-400 bg-transparent disabled:opacity-50"
-          />
-          <Mic size={15} className="text-gray-400 cursor-pointer hover:text-gray-600 shrink-0 transition-colors" />
-          <button
-            onClick={() => handleSend()}
-            disabled={!input.trim() || isTyping}
-            className={`w-8 h-8 ${agent.sendBg} rounded-full flex items-center justify-center transition-all shrink-0 disabled:opacity-40 disabled:cursor-not-allowed`}
-          >
-            <Send size={13} className="text-white" />
-          </button>
+      <div className="px-6 pb-5 pt-3 shrink-0 border-t border-gray-100">
+        <div className="max-w-xl mx-auto">
+          <div className={`border border-gray-200 rounded-2xl px-4 py-3 flex items-center gap-3 bg-white transition-all ${agent.accentRing} focus-within:ring-2 focus-within:shadow-sm`}>
+            <Paperclip size={15} className="text-gray-400 cursor-pointer hover:text-gray-600 shrink-0 transition-colors" />
+            <input
+              type="text"
+              value={input}
+              onChange={e => handleInputChange(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSend())}
+              placeholder={agent.placeholder}
+              disabled={isTyping}
+              className="flex-1 text-sm outline-none text-gray-700 placeholder-gray-400 bg-transparent disabled:opacity-50"
+            />
+            <Mic size={15} className="text-gray-400 cursor-pointer hover:text-gray-600 shrink-0 transition-colors" />
+            <button
+              onClick={() => handleSend()}
+              disabled={!input.trim() || isTyping}
+              className={`w-8 h-8 ${agent.sendBg} rounded-full flex items-center justify-center transition-all shrink-0 disabled:opacity-40 disabled:cursor-not-allowed`}
+            >
+              <Send size={13} className="text-white" />
+            </button>
+          </div>
+          <p className="text-[10px] text-gray-400 text-center mt-1.5">
+            Enter 发送 · @ 引用单号 · 需要批量工作流？
+            <button className="text-violet-500 hover:underline ml-0.5">前往 Agent Workstation</button>
+          </p>
         </div>
-        <p className="text-[10px] text-gray-400 text-center mt-1.5">
-          Enter 发送 · @ 引用单号 · 需要批量工作流？
-          <button className="text-violet-500 hover:underline ml-0.5">前往 Agent Workstation</button>
-        </p>
       </div>
     </div>
   )
