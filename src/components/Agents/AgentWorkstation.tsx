@@ -604,9 +604,37 @@ function ChatView() {
 
             {/* Greeting */}
             <h2 className="text-2xl font-bold text-gray-900 mb-2">{agent.greeting}</h2>
-            <p className="text-sm text-gray-500 text-center max-w-sm leading-relaxed mb-6">
+            <p className="text-sm text-gray-500 text-center max-w-sm leading-relaxed mb-4">
               {agent.subtitleText}
             </p>
+
+            {/* ── Input box (above tabs) ── */}
+            <div className="w-full max-w-lg mb-5">
+              <div className={`border border-gray-200 rounded-2xl px-4 py-3 flex items-center gap-3 bg-white transition-all shadow-sm ${agent.accentRing} focus-within:ring-2 focus-within:shadow-md`}>
+                <Paperclip size={15} className="text-gray-400 cursor-pointer hover:text-gray-600 shrink-0 transition-colors" />
+                <input
+                  type="text"
+                  value={input}
+                  onChange={e => handleInputChange(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSend())}
+                  placeholder={agent.placeholder}
+                  disabled={isTyping}
+                  className="flex-1 text-sm outline-none text-gray-700 placeholder-gray-400 bg-transparent disabled:opacity-50"
+                />
+                <Mic size={15} className="text-gray-400 cursor-pointer hover:text-gray-600 shrink-0 transition-colors" />
+                <button
+                  onClick={() => handleSend()}
+                  disabled={!input.trim() || isTyping}
+                  className={`w-8 h-8 ${agent.sendBg} rounded-full flex items-center justify-center transition-all shrink-0 disabled:opacity-40 disabled:cursor-not-allowed`}
+                >
+                  <Send size={13} className="text-white" />
+                </button>
+              </div>
+              <p className="text-[10px] text-gray-400 text-center mt-1.5">
+                Enter 发送 · @ 引用单号 · 需要批量工作流？
+                <button className="text-violet-500 hover:underline ml-0.5">前往 Agent Workstation</button>
+              </p>
+            </div>
 
             {/* ── Tab bar (no card border, Kimi-style) ── */}
             <div className="w-full max-w-lg mb-1">
@@ -756,35 +784,37 @@ function ChatView() {
         </div>
       )}
 
-      {/* ── Input bar ── */}
-      <div className="px-6 pb-5 pt-3 shrink-0 border-t border-gray-100">
-        <div className="max-w-xl mx-auto">
-          <div className={`border border-gray-200 rounded-2xl px-4 py-3 flex items-center gap-3 bg-white transition-all ${agent.accentRing} focus-within:ring-2 focus-within:shadow-sm`}>
-            <Paperclip size={15} className="text-gray-400 cursor-pointer hover:text-gray-600 shrink-0 transition-colors" />
-            <input
-              type="text"
-              value={input}
-              onChange={e => handleInputChange(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSend())}
-              placeholder={agent.placeholder}
-              disabled={isTyping}
-              className="flex-1 text-sm outline-none text-gray-700 placeholder-gray-400 bg-transparent disabled:opacity-50"
-            />
-            <Mic size={15} className="text-gray-400 cursor-pointer hover:text-gray-600 shrink-0 transition-colors" />
-            <button
-              onClick={() => handleSend()}
-              disabled={!input.trim() || isTyping}
-              className={`w-8 h-8 ${agent.sendBg} rounded-full flex items-center justify-center transition-all shrink-0 disabled:opacity-40 disabled:cursor-not-allowed`}
-            >
-              <Send size={13} className="text-white" />
-            </button>
+      {/* ── Input bar (conversation mode only) ── */}
+      {inConversation && (
+        <div className="px-6 pb-5 pt-3 shrink-0 border-t border-gray-100">
+          <div className="max-w-xl mx-auto">
+            <div className={`border border-gray-200 rounded-2xl px-4 py-3 flex items-center gap-3 bg-white transition-all ${agent.accentRing} focus-within:ring-2 focus-within:shadow-sm`}>
+              <Paperclip size={15} className="text-gray-400 cursor-pointer hover:text-gray-600 shrink-0 transition-colors" />
+              <input
+                type="text"
+                value={input}
+                onChange={e => handleInputChange(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSend())}
+                placeholder={agent.placeholder}
+                disabled={isTyping}
+                className="flex-1 text-sm outline-none text-gray-700 placeholder-gray-400 bg-transparent disabled:opacity-50"
+              />
+              <Mic size={15} className="text-gray-400 cursor-pointer hover:text-gray-600 shrink-0 transition-colors" />
+              <button
+                onClick={() => handleSend()}
+                disabled={!input.trim() || isTyping}
+                className={`w-8 h-8 ${agent.sendBg} rounded-full flex items-center justify-center transition-all shrink-0 disabled:opacity-40 disabled:cursor-not-allowed`}
+              >
+                <Send size={13} className="text-white" />
+              </button>
+            </div>
+            <p className="text-[10px] text-gray-400 text-center mt-1.5">
+              Enter 发送 · @ 引用单号 · 需要批量工作流？
+              <button className="text-violet-500 hover:underline ml-0.5">前往 Agent Workstation</button>
+            </p>
           </div>
-          <p className="text-[10px] text-gray-400 text-center mt-1.5">
-            Enter 发送 · @ 引用单号 · 需要批量工作流？
-            <button className="text-violet-500 hover:underline ml-0.5">前往 Agent Workstation</button>
-          </p>
         </div>
-      </div>
+      )}
     </div>
   )
 }
