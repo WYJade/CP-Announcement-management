@@ -580,7 +580,7 @@ function NavSidebar() {
       <div className="w-56 bg-white border-r border-gray-200 h-screen fixed left-0 top-0 z-40 flex flex-col overflow-hidden">
         <div className="flex-1 overflow-y-auto py-4 px-3">
           {/* Logo */}
-          <div className="flex items-center gap-2 px-3 mb-4">
+          <div className="flex items-center gap-2 px-3 mb-3">
             <div className="w-7 h-7 bg-primary-600 rounded-lg flex items-center justify-center">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="white" />
@@ -589,6 +589,17 @@ function NavSidebar() {
               </svg>
             </div>
             <span className="text-sm font-bold text-gray-800">Client Portal</span>
+          </div>
+
+          {/* ← 返回工作台 — 顶部明显位置 */}
+          <div className="px-1 mb-4">
+            <button
+              onClick={() => { setAiMode(false); navigate('/') }}
+              className="w-full flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
+            >
+              <ChevronRight size={13} className="rotate-180 shrink-0 text-gray-400" />
+              <span className="font-medium">返回工作台</span>
+            </button>
           </div>
 
           {/* AI Agents header block */}
@@ -626,24 +637,27 @@ function NavSidebar() {
             <p className="text-[9px] font-semibold text-gray-400 uppercase px-3 mb-1.5 flex items-center gap-1">
               <Clock size={9} /> RECENTS
             </p>
-            <button
-              onClick={() => navigate('/agents?nav=chat')}
-              className="w-full text-left px-4 py-1.5 text-xs text-gray-500 hover:text-violet-700 hover:bg-violet-50 rounded-md transition-colors truncate"
-            >
-              查询下SH20260716 对应的出入库记录
-            </button>
+            {[
+              '查询下SH20260716 对应的出入库记录',
+            ].map((title, i) => (
+              <div key={i} className="relative group/tip">
+                <button
+                  onClick={() => navigate('/agents?nav=chat')}
+                  className="w-full text-left px-4 py-1.5 text-xs text-gray-500 hover:text-violet-700 hover:bg-violet-50 rounded-md transition-colors truncate"
+                >
+                  {title}
+                </button>
+                {/* Tooltip on hover */}
+                <div className="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50
+                  opacity-0 group-hover/tip:opacity-100 transition-opacity duration-150
+                  bg-gray-800 text-white text-[10px] leading-snug px-2.5 py-1.5 rounded-lg shadow-lg
+                  max-w-[200px] whitespace-normal w-max">
+                  {title}
+                  <span className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-gray-800" />
+                </div>
+              </div>
+            ))}
           </div>
-        </div>
-
-        {/* Back to full nav */}
-        <div className="px-3 pb-4 pt-2 bg-white shrink-0 border-t border-gray-100">
-          <button
-            onClick={() => { setAiMode(false); navigate('/') }}
-            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
-          >
-            <ChevronRight size={14} className="rotate-180 shrink-0" />
-            <span>Back to Navigation</span>
-          </button>
         </div>
       </div>
     )
