@@ -83,7 +83,7 @@ const COPILOT_TABS = [
     chips: [
       '帮我查一下进行中的RN有哪些？',
       '帮我查一下未完成且超过7天未更新状态的RN有哪些？',
-      '帮我查一下APP#：APPT-3763的当前状态。',
+      '帮我查一下APPT #：APPT-XXXX的当前状态。',
     ],
   },
   {
@@ -91,7 +91,7 @@ const COPILOT_TABS = [
     label: 'Inventory',
     color: 'bg-emerald-500',
     chips: [
-      '帮我查一下Item：SKU-A100在什么位置？现在什么状态？',
+      '帮我查一下Item：XXXXXX在什么位置？现在什么状态？',
       '帮我查一下在Ontario, CA facility中\'Goods Type\'为Expired的库存有多少？',
       '库存调整单提交后，发现数量填错了，能撤回或修改吗？',
     ],
@@ -101,9 +101,9 @@ const COPILOT_TABS = [
     label: 'Outbound',
     color: 'bg-amber-500',
     chips: [
-      '帮我查一下Order #：DN-8821001的订单状态',
+      '帮我查一下Order #：DN-XXXXXXX的订单状态',
       '出库单录入时，\'Order Type\'怎么选？Reference需要填什么？',
-      '帮我对目前在Ontario, CA facility中的出库单做一下汇总。',
+      '帮我对目前在XXX facility中的出库单做一下汇总。',
     ],
   },
 ]
@@ -148,8 +148,8 @@ const SIM_RESPONSES: Record<string, SimMsg[]> = {
       ],
     },
   ],
-  '帮我查一下APP#：APPT-3763的当前状态。': [
-    { role: 'user', text: '帮我查一下APP#：APPT-3763的当前状态。' },
+  '帮我查一下APPT #：APPT-XXXX的当前状态。': [
+    { role: 'user', text: '帮我查一下APPT #：APPT-XXXX的当前状态。' },
     {
       role: 'agent',
       text: '正在查询 APPT-3763 的状态...',
@@ -167,8 +167,8 @@ const SIM_RESPONSES: Record<string, SimMsg[]> = {
       ],
     },
   ],
-  '帮我查一下Item：SKU-A100在什么位置？现在什么状态？': [
-    { role: 'user', text: '帮我查一下Item：SKU-A100在什么位置？现在什么状态？' },
+  '帮我查一下Item：XXXXXX在什么位置？现在什么状态？': [
+    { role: 'user', text: '帮我查一下Item：XXXXXX在什么位置？现在什么状态？' },
     {
       role: 'agent',
       text: '正在定位 SKU-A100 的库存位置...',
@@ -221,8 +221,8 @@ const SIM_RESPONSES: Record<string, SimMsg[]> = {
       ],
     },
   ],
-  '帮我查一下Order #：DN-8821001的订单状态': [
-    { role: 'user', text: '帮我查一下Order #：DN-8821001的订单状态' },
+  '帮我查一下Order #：DN-XXXXXXX的订单状态': [
+    { role: 'user', text: '帮我查一下Order #：DN-XXXXXXX的订单状态' },
     {
       role: 'agent',
       text: '正在查询出库单 DN-8821001...',
@@ -268,8 +268,8 @@ const SIM_RESPONSES: Record<string, SimMsg[]> = {
       ],
     },
   ],
-  '帮我对目前在Ontario, CA facility中的出库单做一下汇总。': [
-    { role: 'user', text: '帮我对目前在Ontario, CA facility中的出库单做一下汇总。' },
+  '帮我对目前在XXX facility中的出库单做一下汇总。': [
+    { role: 'user', text: '帮我对目前在XXX facility中的出库单做一下汇总。' },
     {
       role: 'agent',
       text: '正在统计 Ontario, CA 的出库单数据...',
