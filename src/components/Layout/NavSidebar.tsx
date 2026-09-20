@@ -203,6 +203,17 @@ const menuItems: MenuItem[] = [
 
   // ── Finance ────────────────────────────────────────────────────────────────
   {
+    id: 'international',
+    label: 'International',
+    icon: <Navigation size={16} />,
+    expandable: true,
+    children: [
+      { id: 'shipment-tracking-intl', label: 'Shipment Tracking', path: '/international-new/tracking' },
+    ],
+  },
+
+  // ── Finance ────────────────────────────────────────────────────────────────
+  {
     id: 'finance',
     label: 'Finance',
     icon: <DollarSign size={16} />,
