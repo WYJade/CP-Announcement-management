@@ -593,17 +593,17 @@ function ChatView() {
                 onClick={() => setShowAgentDropdown(v => !v)}
                 className={`flex items-center gap-2.5 px-4 py-2 rounded-full border-2 transition-all text-sm font-medium shadow-sm
                   ${showAgentDropdown
-                    ? 'border-blue-400 bg-blue-50 text-blue-700'
-                    : 'border-gray-200 bg-white text-gray-700 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600'
+                    ? 'border-primary-400 bg-primary-50 text-primary-700'
+                    : 'border-gray-200 bg-white text-gray-700 hover:border-primary-300 hover:bg-primary-50 hover:text-primary-600'
                   }`}
               >
                 {/* switch icon */}
-                <ArrowLeftRight size={14} className={`shrink-0 transition-colors ${showAgentDropdown ? 'text-blue-500' : 'text-gray-400 group-hover:text-blue-400'}`} />
+                <ArrowLeftRight size={14} className={`shrink-0 transition-colors ${showAgentDropdown ? 'text-primary-500' : 'text-gray-400'}`} />
                 <span className="text-[11px] text-gray-400 font-normal">切换 Agent</span>
                 <span className="w-px h-3.5 bg-gray-200" />
                 <span className={`w-2 h-2 rounded-full ${agent.dot} shrink-0`} />
                 <span>{agent.name}</span>
-                <ChevronDown size={13} className={`text-gray-400 transition-transform shrink-0 ${showAgentDropdown ? 'rotate-180 text-blue-400' : ''}`} />
+                <ChevronDown size={13} className={`text-gray-400 transition-transform shrink-0 ${showAgentDropdown ? 'rotate-180 text-primary-400' : ''}`} />
               </button>
 
               {showAgentDropdown && (
@@ -614,12 +614,12 @@ function ChatView() {
                   </div>
                   {AGENTS.map(a => (
                     <button key={a.id} onClick={() => handleSelectAgent(a.id)}
-                      className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-blue-50 ${a.id === activeAgentId ? 'bg-blue-50' : ''}`}>
+                      className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-primary-50 ${a.id === activeAgentId ? 'bg-primary-50' : ''}`}>
                       <span className={`w-2 h-2 rounded-full ${a.dot} shrink-0`} />
-                      <span className={`text-sm ${a.id === activeAgentId ? 'font-semibold text-blue-700' : 'text-gray-600 font-medium'}`}>{a.name}</span>
+                      <span className={`text-sm ${a.id === activeAgentId ? 'font-semibold text-primary-700' : 'text-gray-600 font-medium'}`}>{a.name}</span>
                       {a.id === activeAgentId && (
-                        <span className="ml-auto flex items-center gap-1 text-[10px] text-blue-500 font-medium">
-                          <span className="w-1.5 h-1.5 rounded-full bg-blue-400" /> 当前
+                        <span className="ml-auto flex items-center gap-1 text-[10px] text-primary-500 font-medium">
+                          <span className="w-1.5 h-1.5 rounded-full bg-primary-400" /> 当前
                         </span>
                       )}
                     </button>
@@ -640,12 +640,12 @@ function ChatView() {
               {/* 三条提示文案 — 输入框上方 */}
               <div className="flex items-center justify-center gap-5 mb-3 flex-wrap">
                 {agent.hints.map(h => (
-                  <span key={h} className="text-[11px] text-gray-400 flex items-center gap-1">{h}</span>
+                  <span key={h} className="text-[11px] text-gray-500 flex items-center gap-1 font-medium">{h}</span>
                 ))}
               </div>
 
               {/* Kimi-style input card */}
-              <div className={`border border-gray-200 rounded-2xl bg-white shadow-sm transition-all ${agent.accentRing} focus-within:ring-2 focus-within:shadow-md overflow-hidden`}>
+              <div className="border border-gray-200 rounded-2xl bg-white shadow-sm transition-all focus-within:border-primary-400 focus-within:ring-2 focus-within:ring-primary-100 focus-within:shadow-md overflow-hidden">
 
                 {/* Textarea */}
                 <textarea
@@ -656,50 +656,41 @@ function ChatView() {
                   placeholder={agent.placeholder}
                   disabled={isTyping}
                   rows={2}
-                  className="w-full px-4 pt-4 pb-1 text-sm outline-none text-gray-700 placeholder-gray-400 bg-transparent resize-none disabled:opacity-50 leading-relaxed"
+                  className="w-full px-4 pt-4 pb-1 text-sm outline-none text-gray-800 placeholder-gray-400 bg-transparent resize-none disabled:opacity-50 leading-relaxed"
                   style={{ minHeight: '64px', maxHeight: '160px' }}
                 />
 
-                {/* Toolbar row */}
+                {/* Toolbar row — 高频按钮显性展示，低频收纳至更多 */}
                 <div className="flex items-center gap-1 px-3 pb-3 pt-1">
-                  {/* Left tools */}
                   <div className="flex items-center gap-0.5 flex-1">
                     <ToolBtn icon={<Paperclip size={14}/>} label="附件" />
-                    <ToolBtn icon={<CheckCircle2 size={14}/>} label="替我审批" hasDropdown
+                    <ToolBtn icon={<Mic size={14}/>} label="语音" />
+                    {/* 低频设置收纳 */}
+                    <ToolBtn icon={<CheckCircle2 size={14}/>} label="更多设置" hasDropdown
                       dropdownContent={
                         <div className="p-3 space-y-3 w-64">
+                          <p className="text-[10px] font-semibold text-gray-400 uppercase mb-1">权限模式</p>
                           <ToggleRow icon={<ArrowLeftRight size={13}/>} label="请求批准" desc="工具执行前请求确认，适合高风险或调试场景。" />
                           <ToggleRow icon={<CheckCircle2 size={13}/>} label="替我审批" desc="使用默认安全策略，推荐日常使用。" defaultOn />
                           <ToggleRow icon={<Shield size={13}/>} label="完全访问权限" desc="默认允许工具执行，适合可信会话。" />
-                        </div>
-                      }
-                    />
-                    <ToolBtn icon={<ArrowLeftRight size={14}/>} label="环境变量" hasDropdown
-                      dropdownContent={
-                        <div className="p-3 space-y-3 w-64">
-                          <div className="space-y-1">
-                            <p className="text-xs font-semibold text-gray-800">允许 Agent 自主修改环境变量</p>
-                            <p className="text-[11px] text-gray-500">开启后，Agent 可根据任务需要调整运行环境。</p>
-                          </div>
-                          <div className="flex items-center justify-between pt-1 border-t border-gray-100">
-                            <div>
-                              <p className="text-xs font-semibold text-gray-800">自定义环境变量</p>
-                              <p className="text-[11px] text-gray-500">为当前对话配置 Agent 运行所需的环境变量。</p>
+                          <div className="border-t border-gray-100 pt-2 mt-1">
+                            <p className="text-[10px] font-semibold text-gray-400 uppercase mb-2">环境变量</p>
+                            <div className="space-y-1">
+                              <ToggleRow icon={<ArrowLeftRight size={13}/>} label="允许 Agent 自主修改环境变量" desc="开启后，Agent 可根据任务需要调整运行环境。" />
                             </div>
-                            <button className="text-[11px] text-violet-600 border border-violet-200 rounded-lg px-2 py-1 hover:bg-violet-50">+ 添加</button>
+                            <button className="mt-2 text-[11px] text-primary-600 border border-primary-200 rounded-lg px-2 py-1 hover:bg-primary-50 w-full">+ 添加自定义环境变量</button>
                           </div>
                         </div>
                       }
                     />
-                    <ToolBtn icon={<Mic size={14}/>} label="语音" />
-                    <span className="text-[10px] text-gray-300 ml-1 select-none hidden sm:inline">Ctrl+M 语音 · Shift+Enter 换行</span>
+                    <span className="text-[10px] text-gray-300 ml-2 select-none hidden sm:inline">Shift+Enter 换行</span>
                   </div>
 
                   {/* Send button */}
                   <button
                     onClick={() => handleSend()}
                     disabled={!input.trim() || isTyping}
-                    className={`w-8 h-8 ${agent.sendBg} rounded-full flex items-center justify-center transition-all shrink-0 disabled:opacity-30 disabled:cursor-not-allowed ml-2`}
+                    className="w-8 h-8 bg-primary-600 hover:bg-primary-700 rounded-full flex items-center justify-center transition-all shrink-0 disabled:opacity-30 disabled:cursor-not-allowed ml-2"
                   >
                     <Send size={13} className="text-white" />
                   </button>
@@ -709,11 +700,11 @@ function ChatView() {
               {/* Bottom hint */}
               <p className="text-[10px] text-gray-400 text-center mt-2">
                 Enter 发送 · @ 引用单号 · 需要批量工作流？
-                <button className="text-violet-500 hover:underline ml-0.5">前往 Agent Workstation</button>
+                <button className="text-primary-500 hover:underline ml-0.5">前往 Agent Workstation</button>
               </p>
             </div>
 
-            {/* ── Tab bar (no card border, Kimi-style) ── */}
+            {/* ── Tab bar (Kimi-style, primary active) ── */}
             <div className="w-full max-w-lg mb-1">
               <div className="flex items-center gap-0 overflow-x-auto scrollbar-hide border-b border-gray-100">
                 {COPILOT_TABS.map(tab => (
@@ -722,8 +713,8 @@ function ChatView() {
                     onClick={() => handleTabClick(tab.id)}
                     className={`relative shrink-0 px-5 py-2.5 text-sm font-medium transition-colors whitespace-nowrap ${
                       tab.id === activeTabId
-                        ? 'text-gray-900'
-                        : 'text-gray-400 hover:text-gray-600'
+                        ? 'text-primary-700'
+                        : 'text-gray-400 hover:text-gray-700'
                     }`}
                   >
                     <span className="flex items-center gap-1.5">
@@ -731,24 +722,33 @@ function ChatView() {
                       {tab.label}
                     </span>
                     {tab.id === activeTabId && (
-                      <span className="absolute bottom-0 left-3 right-3 h-0.5 bg-gray-900 rounded-full" />
+                      <span className="absolute bottom-0 left-3 right-3 h-0.5 bg-primary-600 rounded-full" />
                     )}
                   </button>
                 ))}
               </div>
 
-              {/* ── Chip list (borderless rows) ── */}
-              <div className="mt-1">
-                {currentTab.chips.map((chip, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => handleChipClick(chip)}
-                    className="w-full flex items-center justify-between px-2 py-3 text-left hover:bg-gray-50 rounded-xl transition-colors group"
-                  >
-                    <span className="text-sm text-gray-700 leading-snug pr-4">{chip}</span>
-                    <span className="text-gray-300 group-hover:text-gray-500 text-base transition-colors shrink-0">↗</span>
-                  </button>
-                ))}
+              {/* ── Chip list — with hover lift + business icon ── */}
+              <div className="mt-2 space-y-1.5">
+                {currentTab.chips.map((chip, idx) => {
+                  const chipIcons: Record<string, string> = {
+                    inbound:   ['📋','📋','📅'][idx] ?? '📋',
+                    inventory: ['📦','🔍','📝'][idx] ?? '📦',
+                    outbound:  ['🚚','📋','📊'][idx] ?? '🚚',
+                  }
+                  const icon = chipIcons[activeTabId] ?? '💬'
+                  return (
+                    <button
+                      key={idx}
+                      onClick={() => handleChipClick(chip)}
+                      className="w-full flex items-center gap-3 px-4 py-3 text-left bg-white border border-gray-100 rounded-xl transition-all hover:border-primary-200 hover:bg-primary-50 hover:-translate-y-0.5 hover:shadow-sm group"
+                    >
+                      <span className="text-base shrink-0">{icon}</span>
+                      <span className="text-sm text-gray-700 group-hover:text-primary-800 leading-snug flex-1">{chip}</span>
+                      <span className="text-gray-300 group-hover:text-primary-400 text-sm transition-colors shrink-0">→</span>
+                    </button>
+                  )
+                })}
               </div>
             </div>
 
@@ -860,7 +860,7 @@ function ChatView() {
       {inConversation && (
         <div className="px-6 pb-5 pt-3 shrink-0 border-t border-gray-100">
           <div className="max-w-xl mx-auto">
-            <div className={`border border-gray-200 rounded-2xl bg-white shadow-sm transition-all ${agent.accentRing} focus-within:ring-2 focus-within:shadow-md overflow-hidden`}>
+            <div className="border border-gray-200 rounded-2xl bg-white shadow-sm transition-all focus-within:border-primary-400 focus-within:ring-2 focus-within:ring-primary-100 focus-within:shadow-md overflow-hidden">
               <textarea
                 value={input}
                 onChange={e => { handleInputChange(e.target.value); e.target.style.height = 'auto'; e.target.style.height = Math.min(e.target.scrollHeight, 160) + 'px' }}
@@ -868,21 +868,20 @@ function ChatView() {
                 placeholder={agent.placeholder}
                 disabled={isTyping}
                 rows={2}
-                className="w-full px-4 pt-4 pb-1 text-sm outline-none text-gray-700 placeholder-gray-400 bg-transparent resize-none disabled:opacity-50 leading-relaxed"
+                className="w-full px-4 pt-4 pb-1 text-sm outline-none text-gray-800 placeholder-gray-400 bg-transparent resize-none disabled:opacity-50 leading-relaxed"
                 style={{ minHeight: '60px', maxHeight: '160px' }}
               />
               <div className="flex items-center gap-1 px-3 pb-3 pt-1">
                 <div className="flex items-center gap-0.5 flex-1">
                   <ToolBtn icon={<Paperclip size={14}/>} label="附件" />
-                  <ToolBtn icon={<CheckCircle2 size={14}/>} label="替我审批" />
-                  <ToolBtn icon={<ArrowLeftRight size={14}/>} label="环境变量" />
                   <ToolBtn icon={<Mic size={14}/>} label="语音" />
-                  <span className="text-[10px] text-gray-300 ml-1 select-none hidden sm:inline">Ctrl+M 语音 · Shift+Enter 换行</span>
+                  <ToolBtn icon={<CheckCircle2 size={14}/>} label="更多设置" />
+                  <span className="text-[10px] text-gray-300 ml-1 select-none hidden sm:inline">Shift+Enter 换行</span>
                 </div>
                 <button
                   onClick={() => handleSend()}
                   disabled={!input.trim() || isTyping}
-                  className={`w-8 h-8 ${agent.sendBg} rounded-full flex items-center justify-center transition-all shrink-0 disabled:opacity-30 disabled:cursor-not-allowed ml-2`}
+                  className="w-8 h-8 bg-primary-600 hover:bg-primary-700 rounded-full flex items-center justify-center transition-all shrink-0 disabled:opacity-30 disabled:cursor-not-allowed ml-2"
                 >
                   <Send size={13} className="text-white" />
                 </button>
@@ -890,7 +889,7 @@ function ChatView() {
             </div>
             <p className="text-[10px] text-gray-400 text-center mt-1.5">
               Enter 发送 · @ 引用单号 · 需要批量工作流？
-              <button className="text-violet-500 hover:underline ml-0.5">前往 Agent Workstation</button>
+              <button className="text-primary-500 hover:underline ml-0.5">前往 Agent Workstation</button>
             </p>
           </div>
         </div>

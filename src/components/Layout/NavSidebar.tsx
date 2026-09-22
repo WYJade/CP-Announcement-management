@@ -469,6 +469,14 @@ function NavSidebar() {
   const [expandedItems, setExpandedItems] = useState<string[]>(['dashboards', 'support'])
   // aiMode: when true, sidebar shows only AI Agents view
   const [aiMode, setAiMode] = useState(false)
+  // RECENTS — mock history with time groups + context-menu state
+  const [recentItems] = useState([
+    { id:'r1', title:'查询下SH20260716 对应的出入库记录',  time:'2026-09-17 09:46', group:'今天' },
+    { id:'r2', title:'帮我查一下进行中的RN有哪些',          time:'2026-09-17 08:12', group:'今天' },
+    { id:'r3', title:'SKU-A100 当前可用库存查询',           time:'2026-09-16 15:30', group:'过去 7 天' },
+    { id:'r4', title:'帮我对Ontario CA facility出库单汇总', time:'2026-09-15 11:05', group:'过去 7 天' },
+  ])
+  const [activeMenu, setActiveMenu] = useState<string|null>(null)
   const [favShowAll, setFavShowAll] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
@@ -615,13 +623,13 @@ function NavSidebar() {
 
           {/* AI Agents header block */}
           <div className="px-1 mb-3">
-            <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-violet-50 border border-violet-200">
-              <div className="w-8 h-8 bg-violet-500 rounded-xl flex items-center justify-center shrink-0 shadow-sm">
+            <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-primary-50 border border-primary-200">
+              <div className="w-8 h-8 bg-primary-600 rounded-xl flex items-center justify-center shrink-0 shadow-sm">
                 <Bot size={16} className="text-white" />
               </div>
               <div className="flex-1 text-left min-w-0">
-                <p className="text-xs font-bold text-violet-700 leading-snug">AI Agents</p>
-                <p className="text-[9px] text-violet-400 leading-tight">Your AI agent</p>
+                <p className="text-xs font-bold text-primary-700 leading-snug">AI Agents</p>
+                <p className="text-[9px] text-primary-400 leading-tight">Your AI agent</p>
               </div>
             </div>
           </div>
@@ -634,8 +642,8 @@ function NavSidebar() {
                 onClick={() => navigate(item.path)}
                 className={`w-full text-left px-4 py-2 text-sm rounded-md transition-colors ${
                   location.pathname + location.search === item.path
-                    ? 'bg-violet-50 text-violet-700 font-medium'
-                    : 'text-gray-600 hover:bg-violet-50 hover:text-violet-700'
+                    ? 'bg-primary-50 text-primary-700 font-medium'
+                    : 'text-gray-600 hover:bg-primary-50 hover:text-primary-700'
                 }`}
               >
                 {item.label}
@@ -643,31 +651,73 @@ function NavSidebar() {
             ))}
           </nav>
 
-          {/* Recents */}
-          <div className="border-t border-gray-100 pt-3">
-            <p className="text-[9px] font-semibold text-gray-400 uppercase px-3 mb-1.5 flex items-center gap-1">
+          {/* ── RECENTS — time-grouped with context menu ── */}
+          <div className="border-t border-gray-100 pt-3" onClick={() => setActiveMenu(null)}>
+            <p className="text-[9px] font-semibold text-gray-400 uppercase px-3 mb-2 flex items-center gap-1">
               <Clock size={9} /> RECENTS
             </p>
-            {[
-              '查询下SH20260716 对应的出入库记录',
-            ].map((title, i) => (
-              <div key={i} className="relative group/tip">
-                <button
-                  onClick={() => navigate('/agents?nav=chat')}
-                  className="w-full text-left px-4 py-1.5 text-xs text-gray-500 hover:text-violet-700 hover:bg-violet-50 rounded-md transition-colors truncate"
-                >
-                  {title}
-                </button>
-                {/* Tooltip on hover */}
-                <div className="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 z-50
-                  opacity-0 group-hover/tip:opacity-100 transition-opacity duration-150
-                  bg-gray-800 text-white text-[10px] leading-snug px-2.5 py-1.5 rounded-lg shadow-lg
-                  max-w-[200px] whitespace-normal w-max">
-                  {title}
-                  <span className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-gray-800" />
+
+            {/* Group records */}
+            {(() => {
+              const groups: Record<string, typeof recentItems> = {}
+              recentItems.forEach(r => {
+                if (!groups[r.group]) groups[r.group] = []
+                groups[r.group].push(r)
+              })
+              return Object.entries(groups).map(([group, items]) => (
+                <div key={group} className="mb-2">
+                  <p className="text-[9px] text-gray-300 font-medium px-3 mb-1">{group}</p>
+                  {items.map(item => (
+                    <div key={item.id} className="relative group/rec">
+                      {/* Row */}
+                      <button
+                        onClick={() => navigate('/agents?nav=chat')}
+                        className="w-full text-left pl-3 pr-7 py-1.5 text-xs text-gray-500 hover:text-primary-700 hover:bg-primary-50 rounded-md transition-colors truncate"
+                      >
+                        {item.title}
+                      </button>
+
+                      {/* Three-dot trigger — visible on hover */}
+                      <button
+                        onClick={e => { e.stopPropagation(); setActiveMenu(activeMenu === item.id ? null : item.id) }}
+                        className="absolute right-1.5 top-1/2 -translate-y-1/2 p-0.5 rounded opacity-0 group-hover/rec:opacity-100 hover:bg-gray-200 transition-all"
+                      >
+                        <span className="flex flex-col gap-[2px] items-center">
+                          {[0,1,2].map(i => <span key={i} className="w-0.5 h-0.5 rounded-full bg-gray-500" />)}
+                        </span>
+                      </button>
+
+                      {/* Context menu — 截图风格 */}
+                      {activeMenu === item.id && (
+                        <div
+                          className="absolute left-full top-0 ml-1 z-[999] bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden w-48"
+                          onClick={e => e.stopPropagation()}
+                        >
+                          {/* Timestamp */}
+                          <div className="flex items-center gap-2 px-4 py-2.5 border-b border-gray-50 text-[11px] text-gray-400">
+                            <Clock size={11} className="shrink-0" />
+                            <span>{item.time}</span>
+                          </div>
+                          {/* Actions */}
+                          <button className="w-full flex items-center gap-2.5 px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors">
+                            <span className="text-gray-400">✏️</span> 重命名
+                          </button>
+                          <button className="w-full flex items-center gap-2.5 px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors">
+                            <span className="text-gray-400">🗂</span> 归档
+                          </button>
+                          <button className="w-full flex items-center gap-2.5 px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors border-b border-gray-50">
+                            <span className="text-gray-400">⬇️</span> 导出 Markdown
+                          </button>
+                          <button className="w-full flex items-center gap-2.5 px-4 py-2 text-xs text-red-500 hover:bg-red-50 transition-colors">
+                            <span>🗑</span> 删除
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 </div>
-              </div>
-            ))}
+              ))
+            })()}
           </div>
         </div>
       </div>
