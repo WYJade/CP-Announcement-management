@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import React from 'react'
+import React, { createPortal } from 'react'
 import { useLocation } from 'react-router-dom'
 import {
   MessageSquare, Zap, Settings, Store, Search, Clock,
@@ -908,9 +908,24 @@ function ToolBtn({ icon, label, hasDropdown, dropdownContent }: {
   icon: React.ReactNode; label: string; hasDropdown?: boolean; dropdownContent?: React.ReactNode
 }) {
   const [open, setOpen] = useState(false)
+  const btnRef = useRef<HTMLButtonElement>(null)
+  const [pos, setPos] = useState({ top: 0, left: 0 })
+
+  // 计算弹出位置（锚点正上方）
+  useEffect(() => {
+    if (open && btnRef.current) {
+      const r = btnRef.current.getBoundingClientRect()
+      setPos({
+        top: r.top + window.scrollY,   // 先用 top，由弹框自身用 transform 往上偏移
+        left: r.left + window.scrollX,
+      })
+    }
+  }, [open])
+
   return (
-    <div className="relative">
+    <div className="relative inline-flex">
       <button
+        ref={btnRef}
         onClick={() => hasDropdown && setOpen(v => !v)}
         title={label}
         className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors text-xs"
@@ -918,13 +933,26 @@ function ToolBtn({ icon, label, hasDropdown, dropdownContent }: {
         {icon}
         <span className="hidden md:inline text-[11px]">{label}</span>
       </button>
-      {hasDropdown && open && (
+
+      {hasDropdown && open && createPortal(
         <>
+          {/* 透明遮罩关闭 */}
           <div className="fixed inset-0 z-[9998]" onClick={() => setOpen(false)} />
-          <div className="absolute bottom-full left-0 mb-2 bg-white border border-gray-200 rounded-xl shadow-2xl z-[9999] min-w-[240px]">
+          {/* 浮层：绑定到 body，位置用 fixed + 计算偏移 */}
+          <div
+            className="fixed z-[9999] bg-white border border-gray-200 rounded-xl shadow-2xl min-w-[240px]"
+            style={{
+              top: pos.top,
+              left: pos.left,
+              // 向上弹出：用 transform 把弹框往上移
+              transform: 'translateY(calc(-100% - 8px))',
+            }}
+            onClick={e => e.stopPropagation()}
+          >
             {dropdownContent}
           </div>
-        </>
+        </>,
+        document.body
       )}
     </div>
   )
