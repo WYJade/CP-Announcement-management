@@ -664,26 +664,32 @@ function ChatView() {
                 <div className="flex items-center gap-1 px-3 pb-3 pt-1">
                   <div className="flex items-center gap-0.5 flex-1">
                     <ToolBtn icon={<Paperclip size={14}/>} label="附件" />
-                    <ToolBtn icon={<Mic size={14}/>} label="语音" />
-                    {/* 低频设置收纳 */}
-                    <ToolBtn icon={<CheckCircle2 size={14}/>} label="更多设置" hasDropdown
+                    <ToolBtn icon={<CheckCircle2 size={14}/>} label="替我审批" hasDropdown
                       dropdownContent={
                         <div className="p-3 space-y-3 w-64">
                           <p className="text-[10px] font-semibold text-gray-400 uppercase mb-1">权限模式</p>
                           <ToggleRow icon={<ArrowLeftRight size={13}/>} label="请求批准" desc="工具执行前请求确认，适合高风险或调试场景。" />
                           <ToggleRow icon={<CheckCircle2 size={13}/>} label="替我审批" desc="使用默认安全策略，推荐日常使用。" defaultOn />
                           <ToggleRow icon={<Shield size={13}/>} label="完全访问权限" desc="默认允许工具执行，适合可信会话。" />
-                          <div className="border-t border-gray-100 pt-2 mt-1">
-                            <p className="text-[10px] font-semibold text-gray-400 uppercase mb-2">环境变量</p>
-                            <div className="space-y-1">
-                              <ToggleRow icon={<ArrowLeftRight size={13}/>} label="允许 Agent 自主修改环境变量" desc="开启后，Agent 可根据任务需要调整运行环境。" />
-                            </div>
-                            <button className="mt-2 text-[11px] text-primary-600 border border-primary-200 rounded-lg px-2 py-1 hover:bg-primary-50 w-full">+ 添加自定义环境变量</button>
+                        </div>
+                      }
+                    />
+                    <ToolBtn icon={<ArrowLeftRight size={14}/>} label="环境变量" hasDropdown
+                      dropdownContent={
+                        <div className="p-3 space-y-3 w-64">
+                          <div className="space-y-1">
+                            <ToggleRow icon={<ArrowLeftRight size={13}/>} label="允许 Agent 自主修改环境变量" desc="开启后，Agent 可根据任务需要调整运行环境。" />
+                          </div>
+                          <div className="border-t border-gray-100 pt-2">
+                            <p className="text-xs font-semibold text-gray-800 mb-0.5">自定义环境变量</p>
+                            <p className="text-[11px] text-gray-500 mb-2">为当前对话配置 Agent 运行所需的环境变量。</p>
+                            <button className="text-[11px] text-primary-600 border border-primary-200 rounded-lg px-2 py-1 hover:bg-primary-50 w-full">+ 添加</button>
                           </div>
                         </div>
                       }
                     />
-                    <span className="text-[10px] text-gray-300 ml-2 select-none hidden sm:inline">Shift+Enter 换行</span>
+                    <ToolBtn icon={<Mic size={14}/>} label="语音" />
+                    <span className="text-[10px] text-gray-300 ml-2 select-none hidden sm:inline">Ctrl+M 语音 · Shift+Enter 换行</span>
                   </div>
 
                   {/* Send button */}
@@ -874,9 +880,10 @@ function ChatView() {
               <div className="flex items-center gap-1 px-3 pb-3 pt-1">
                 <div className="flex items-center gap-0.5 flex-1">
                   <ToolBtn icon={<Paperclip size={14}/>} label="附件" />
+                  <ToolBtn icon={<CheckCircle2 size={14}/>} label="替我审批" />
+                  <ToolBtn icon={<ArrowLeftRight size={14}/>} label="环境变量" />
                   <ToolBtn icon={<Mic size={14}/>} label="语音" />
-                  <ToolBtn icon={<CheckCircle2 size={14}/>} label="更多设置" />
-                  <span className="text-[10px] text-gray-300 ml-1 select-none hidden sm:inline">Shift+Enter 换行</span>
+                  <span className="text-[10px] text-gray-300 ml-1 select-none hidden sm:inline">Ctrl+M 语音 · Shift+Enter 换行</span>
                 </div>
                 <button
                   onClick={() => handleSend()}
@@ -916,8 +923,8 @@ function ToolBtn({ icon, label, hasDropdown, dropdownContent }: {
       </button>
       {hasDropdown && open && (
         <>
-          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute bottom-full left-0 mb-2 bg-white border border-gray-200 rounded-xl shadow-xl z-50 min-w-[240px]">
+          <div className="fixed inset-0 z-[9998]" onClick={() => setOpen(false)} />
+          <div className="absolute bottom-full left-0 mb-2 bg-white border border-gray-200 rounded-xl shadow-2xl z-[9999] min-w-[240px]">
             {dropdownContent}
           </div>
         </>

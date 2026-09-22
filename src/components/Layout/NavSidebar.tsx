@@ -687,10 +687,10 @@ function NavSidebar() {
                         </span>
                       </button>
 
-                      {/* Context menu — 截图风格 */}
+                      {/* Context menu — 截图风格，向下弹出避免溢出侧边栏 */}
                       {activeMenu === item.id && (
                         <div
-                          className="absolute left-full top-0 ml-1 z-[999] bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden w-48"
+                          className="absolute right-0 top-6 z-[9999] bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden w-48"
                           onClick={e => e.stopPropagation()}
                         >
                           {/* Timestamp */}
