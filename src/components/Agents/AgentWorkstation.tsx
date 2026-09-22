@@ -909,24 +909,22 @@ function ToolBtn({ icon, label, hasDropdown, dropdownContent }: {
 }) {
   const [open, setOpen] = useState(false)
   const btnRef = useRef<HTMLButtonElement>(null)
-  const [pos, setPos] = useState({ top: 0, left: 0 })
+  const [rect, setRect] = useState<DOMRect | null>(null)
 
-  // 计算弹出位置（锚点正上方）
-  useEffect(() => {
-    if (open && btnRef.current) {
-      const r = btnRef.current.getBoundingClientRect()
-      setPos({
-        top: r.top + window.scrollY,   // 先用 top，由弹框自身用 transform 往上偏移
-        left: r.left + window.scrollX,
-      })
+  const handleToggle = () => {
+    if (!hasDropdown) return
+    if (!open && btnRef.current) {
+      // 每次打开时重新计算位置，使用 viewport 坐标（fixed定位不需要加 scroll）
+      setRect(btnRef.current.getBoundingClientRect())
     }
-  }, [open])
+    setOpen(v => !v)
+  }
 
   return (
-    <div className="relative inline-flex">
+    <div className="inline-flex">
       <button
         ref={btnRef}
-        onClick={() => hasDropdown && setOpen(v => !v)}
+        onClick={handleToggle}
         title={label}
         className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors text-xs"
       >
@@ -934,18 +932,17 @@ function ToolBtn({ icon, label, hasDropdown, dropdownContent }: {
         <span className="hidden md:inline text-[11px]">{label}</span>
       </button>
 
-      {hasDropdown && open && createPortal(
+      {hasDropdown && open && rect && createPortal(
         <>
-          {/* 透明遮罩关闭 */}
+          {/* 遮罩 */}
           <div className="fixed inset-0 z-[9998]" onClick={() => setOpen(false)} />
-          {/* 浮层：绑定到 body，位置用 fixed + 计算偏移 */}
+          {/* 弹框：fixed + viewport 坐标，top 对齐按钮顶部再往上弹 */}
           <div
-            className="fixed z-[9999] bg-white border border-gray-200 rounded-xl shadow-2xl min-w-[240px]"
+            className="fixed z-[9999] bg-white border border-gray-200 rounded-xl shadow-2xl min-w-[260px]"
             style={{
-              top: pos.top,
-              left: pos.left,
-              // 向上弹出：用 transform 把弹框往上移
-              transform: 'translateY(calc(-100% - 8px))',
+              top: rect.top,
+              left: rect.left,
+              transform: 'translateY(calc(-100% - 6px))',
             }}
             onClick={e => e.stopPropagation()}
           >
