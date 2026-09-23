@@ -744,7 +744,7 @@ function ChatView() {
                     <button
                       key={idx}
                       onClick={() => handleChipClick(chip)}
-                      className="w-full flex items-center gap-3 px-4 py-3 text-left bg-white border border-gray-100 rounded-xl transition-all hover:border-primary-200 hover:bg-primary-50 hover:-translate-y-0.5 hover:shadow-sm group"
+                      className="w-full flex items-center gap-3 px-4 py-3 text-left bg-white border border-gray-100 rounded-xl transition-all hover:border-primary-200 hover:bg-primary-50 hover:shadow-sm group"
                     >
                       <span className="text-base shrink-0">{icon}</span>
                       <span className="text-sm text-gray-700 group-hover:text-primary-800 leading-snug flex-1">{chip}</span>
@@ -909,13 +909,19 @@ function ToolBtn({ icon, label, hasDropdown, dropdownContent }: {
 }) {
   const [open, setOpen] = useState(false)
   const btnRef = useRef<HTMLButtonElement>(null)
-  const [rect, setRect] = useState<DOMRect | null>(null)
+  const [style, setStyle] = useState<React.CSSProperties>({})
 
   const handleToggle = () => {
     if (!hasDropdown) return
     if (!open && btnRef.current) {
-      // 每次打开时重新计算位置，使用 viewport 坐标（fixed定位不需要加 scroll）
-      setRect(btnRef.current.getBoundingClientRect())
+      const r = btnRef.current.getBoundingClientRect()
+      setStyle({
+        // 弹框底部对齐按钮顶部（向上弹），左对齐按钮
+        position: 'fixed',
+        bottom: window.innerHeight - r.top + 6,
+        left: Math.max(4, r.left),
+        zIndex: 99999,
+      })
     }
     setOpen(v => !v)
   }
@@ -932,18 +938,12 @@ function ToolBtn({ icon, label, hasDropdown, dropdownContent }: {
         <span className="hidden md:inline text-[11px]">{label}</span>
       </button>
 
-      {hasDropdown && open && rect && createPortal(
+      {hasDropdown && open && createPortal(
         <>
-          {/* 遮罩 */}
-          <div className="fixed inset-0 z-[9998]" onClick={() => setOpen(false)} />
-          {/* 弹框：fixed + viewport 坐标，top 对齐按钮顶部再往上弹 */}
+          <div className="fixed inset-0" style={{ zIndex: 99998 }} onClick={() => setOpen(false)} />
           <div
-            className="fixed z-[9999] bg-white border border-gray-200 rounded-xl shadow-2xl min-w-[260px]"
-            style={{
-              top: rect.top,
-              left: rect.left,
-              transform: 'translateY(calc(-100% - 6px))',
-            }}
+            className="bg-white border border-gray-200 rounded-xl shadow-2xl min-w-[260px]"
+            style={style}
             onClick={e => e.stopPropagation()}
           >
             {dropdownContent}
