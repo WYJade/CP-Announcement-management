@@ -5,6 +5,9 @@ import {
   TrendingDown, Warehouse, Ship, DollarSign, Zap, RefreshCw,
   AlertCircle, Activity, MapPin, X, ArrowRight, ExternalLink,
   Calendar, FileText, Send, ChevronRight, BarChart2,
+  Sparkles, BookOpen, Users, Settings, PlayCircle, Star,
+  ChevronDown, ChevronUp, Circle, Globe, Phone, MessageSquare,
+  Layers, Target, TrendingUp, User2, LayoutDashboard,
 } from 'lucide-react'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -12,6 +15,8 @@ interface ModalState {
   type: 'stat' | 'exception' | 'task' | 'agent-action' | null
   data: Record<string, unknown> | null
 }
+
+type UserRole = 'new' | 'returning'
 
 // ─── Mock Data ────────────────────────────────────────────────────────────────
 const SUMMARY_STATS = [
@@ -153,6 +158,116 @@ const MODULES = [
   { title: 'Insights', sub: 'OTIF, KPI, Analytics', icon: <BarChart2 size={18} className="text-violet-500" />, path: '/insights', color: 'border-violet-100 hover:border-violet-300' },
 ]
 
+// ─── New-user onboarding checklist ────────────────────────────────────────────
+const ONBOARDING_STEPS = [
+  {
+    id: 'profile',
+    icon: <User2 size={16} />,
+    title: 'Complete your company profile',
+    desc: 'Add your company name, contact info, and billing details so our team can set up your account.',
+    cta: 'Set up profile',
+    path: '/system/accounts',
+    color: 'text-violet-600',
+    bg: 'bg-violet-50',
+    border: 'border-violet-200',
+    dot: 'bg-violet-500',
+  },
+  {
+    id: 'inbound',
+    icon: <Package size={16} />,
+    title: 'Create your first inbound receipt',
+    desc: 'Submit an RN to start tracking your incoming goods. Once submitted, you can track status in real time.',
+    cta: 'Create receipt',
+    path: '/inbound/inquiry',
+    color: 'text-blue-600',
+    bg: 'bg-blue-50',
+    border: 'border-blue-200',
+    dot: 'bg-blue-500',
+  },
+  {
+    id: 'inventory',
+    icon: <Warehouse size={16} />,
+    title: 'Review your inventory snapshot',
+    desc: 'Check current on-hand stock, locations, and any discrepancies across your facilities.',
+    cta: 'View inventory',
+    path: '/inventory/activity',
+    color: 'text-emerald-600',
+    bg: 'bg-emerald-50',
+    border: 'border-emerald-200',
+    dot: 'bg-emerald-500',
+  },
+  {
+    id: 'outbound',
+    icon: <Truck size={16} />,
+    title: 'Submit your first outbound order',
+    desc: 'Enter an outbound order to kick off the fulfillment process. Track every milestone from pick to ship.',
+    cta: 'Create order',
+    path: '/outbound/inquiry',
+    color: 'text-indigo-600',
+    bg: 'bg-indigo-50',
+    border: 'border-indigo-200',
+    dot: 'bg-indigo-500',
+  },
+  {
+    id: 'finance',
+    icon: <DollarSign size={16} />,
+    title: 'Connect billing & review invoices',
+    desc: 'Link your payment method and review any outstanding invoices or charge summaries.',
+    cta: 'View Finance',
+    path: '/finance/invoices',
+    color: 'text-amber-600',
+    bg: 'bg-amber-50',
+    border: 'border-amber-200',
+    dot: 'bg-amber-500',
+  },
+]
+
+// Feature overview for new users
+const FEATURES_OVERVIEW = [
+  {
+    icon: <Ship size={20} className="text-teal-600" />,
+    bg: 'bg-teal-50',
+    title: 'Shipment Tracking',
+    desc: 'End-to-end visibility across ocean, drayage, and warehouse — from origin to delivery.',
+    path: '/international-new/tracking',
+  },
+  {
+    icon: <Package size={20} className="text-blue-600" />,
+    bg: 'bg-blue-50',
+    title: 'Inbound Management',
+    desc: 'Manage receipts, appointments, and put-away reports across all facilities.',
+    path: '/inbound/inquiry',
+  },
+  {
+    icon: <Warehouse size={20} className="text-emerald-600" />,
+    bg: 'bg-emerald-50',
+    title: 'Inventory Control',
+    desc: 'Real-time on-hand inventory, cycle counts, adjustments, and activity history.',
+    path: '/inventory/activity',
+  },
+  {
+    icon: <Truck size={20} className="text-indigo-600" />,
+    bg: 'bg-indigo-50',
+    title: 'Outbound Orders',
+    desc: 'Create, track, and manage outbound orders. Export POD and shipping docs.',
+    path: '/outbound/inquiry',
+  },
+  {
+    icon: <BarChart2 size={20} className="text-violet-600" />,
+    bg: 'bg-violet-50',
+    title: 'OTIF & KPI Insights',
+    desc: 'Monitor On-Time In-Full performance, root cause analysis, and retailer scorecards.',
+    path: '/dashboard/otif',
+  },
+  {
+    icon: <DollarSign size={20} className="text-amber-600" />,
+    bg: 'bg-amber-50',
+    title: 'Finance & Invoicing',
+    desc: 'Review invoices, submit disputes, manage claims, and download billing reports.',
+    path: '/finance/invoices',
+  },
+]
+
 // ─── Modal Component ──────────────────────────────────────────────────────────
 function Modal({ onClose, children }: { onClose: () => void; children: React.ReactNode }) {
   return (
@@ -185,10 +300,8 @@ function StatDetailModal({ stat, onClose }: { stat: typeof SUMMARY_STATS[0]; onC
         ))}
       </div>
       <div className="px-5 pb-5">
-        <button
-          onClick={() => { navigate(stat.detail.cta.path); onClose() }}
-          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors"
-        >
+        <button onClick={() => { navigate(stat.detail.cta.path); onClose() }}
+          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors">
           <ExternalLink size={14} /> {stat.detail.cta.label}
         </button>
       </div>
@@ -202,7 +315,6 @@ function ExceptionModal({ ex, onClose }: { ex: typeof EXCEPTIONS[0]; onClose: ()
   const [step, setStep] = useState(0)
   const [notes, setNotes] = useState('')
   const [submitted, setSubmitted] = useState(false)
-
   return (
     <Modal onClose={onClose}>
       <div className="px-5 py-4 border-b flex items-center justify-between">
@@ -214,7 +326,6 @@ function ExceptionModal({ ex, onClose }: { ex: typeof EXCEPTIONS[0]; onClose: ()
       </div>
       <div className="p-5">
         <p className="text-sm text-gray-600 mb-4 leading-relaxed">{ex.detail}</p>
-
         {!submitted ? (
           <>
             <div className="mb-4">
@@ -253,7 +364,7 @@ function ExceptionModal({ ex, onClose }: { ex: typeof EXCEPTIONS[0]; onClose: ()
           <div className="text-center py-6">
             <CheckCircle2 size={36} className="text-green-500 mx-auto mb-3" />
             <p className="text-sm font-bold text-gray-800">Action Submitted</p>
-            <p className="text-xs text-gray-500 mt-1">The team has been notified. You can track progress in My Tasks.</p>
+            <p className="text-xs text-gray-500 mt-1">The team has been notified.</p>
             <button onClick={onClose} className="mt-4 px-4 py-2 bg-green-50 text-green-700 text-xs font-medium rounded-lg hover:bg-green-100 transition-colors">Done</button>
           </div>
         )}
@@ -282,14 +393,63 @@ function TaskModal({ task, onClose }: { task: typeof MY_TASKS[0]; onClose: () =>
         </div>
         <p className="text-sm text-gray-600 leading-relaxed mb-5">{task.detail}</p>
         <div className="flex gap-2">
-          <button onClick={onClose} className="flex-1 px-3 py-2 border border-gray-200 text-xs text-gray-600 rounded-lg hover:bg-gray-50 transition-colors">
-            Dismiss
-          </button>
+          <button onClick={onClose} className="flex-1 px-3 py-2 border border-gray-200 text-xs text-gray-600 rounded-lg hover:bg-gray-50 transition-colors">Dismiss</button>
           <button onClick={() => { navigate(task.path); onClose() }}
             className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-primary-600 text-white text-xs font-medium rounded-lg hover:bg-primary-700 transition-colors">
             <ArrowRight size={12} /> Go to {task.type}
           </button>
         </div>
+      </div>
+    </Modal>
+  )
+}
+
+// ─── Agent Action Modal ───────────────────────────────────────────────────────
+function AgentActionModal({ action, onClose }: { action: string; onClose: () => void }) {
+  const [done, setDone] = useState(false)
+  const steps: Record<string, string[]> = {
+    'Initiate dispatch': ['Select available trucker from panel', 'Set pickup time at Garden City Terminal', 'Confirm with warehouse (UNIS Seabrook)', 'System updates container status'],
+    'Review orders': ['Load OTIF risk report', 'Identify at-risk orders', 'Contact carrier for ETA confirmation', 'Update delivery forecast'],
+    'Check allocation': ['Review current stock levels', 'Check inbound shipment pipeline', 'Identify reallocation options', 'Submit reallocation request'],
+  }
+  const [step, setStep] = useState(0)
+  const stepList = steps[action] || ['Execute action', 'Confirm completion']
+  return (
+    <Modal onClose={onClose}>
+      <div className="px-5 py-4 border-b flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Bot size={14} className="text-violet-500" />
+          <h3 className="text-sm font-bold text-gray-900">AI-Assisted: {action}</h3>
+        </div>
+        <button onClick={onClose}><X size={16} className="text-gray-400 hover:text-gray-600" /></button>
+      </div>
+      <div className="p-5">
+        {!done ? (
+          <>
+            <p className="text-xs text-gray-500 mb-4">Follow the AI-recommended steps:</p>
+            <div className="space-y-2 mb-4">
+              {stepList.map((s, i) => (
+                <div key={i} className={`flex items-center gap-2.5 p-2.5 rounded-lg border cursor-pointer ${i <= step ? 'border-violet-200 bg-violet-50' : 'border-gray-100 bg-gray-50'}`}
+                  onClick={() => setStep(i)}>
+                  <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${i < step ? 'bg-green-500 text-white' : i === step ? 'bg-violet-600 text-white' : 'bg-gray-200 text-gray-500'}`}>
+                    {i < step ? '✓' : i + 1}
+                  </div>
+                  <span className={`text-xs ${i <= step ? 'text-gray-800' : 'text-gray-400'}`}>{s}</span>
+                </div>
+              ))}
+            </div>
+            <button onClick={() => { if (step < stepList.length - 1) setStep(s => s + 1); else setDone(true) }}
+              className="w-full py-2.5 bg-violet-600 text-white text-xs font-medium rounded-lg hover:bg-violet-700 transition-colors">
+              {step < stepList.length - 1 ? 'Next Step →' : 'Complete Action'}
+            </button>
+          </>
+        ) : (
+          <div className="text-center py-6">
+            <CheckCircle2 size={36} className="text-green-500 mx-auto mb-3" />
+            <p className="text-sm font-bold text-gray-800">Action Completed</p>
+            <button onClick={onClose} className="mt-4 px-4 py-2 bg-green-50 text-green-700 text-xs font-medium rounded-lg">Done</button>
+          </div>
+        )}
       </div>
     </Modal>
   )
@@ -351,16 +511,12 @@ function NetworkMap({ onLocClick }: { onLocClick: (loc: { name: string; type: st
         })}
       </svg>
       <div className="absolute bottom-2 left-2 flex items-center gap-3 bg-slate-900/80 rounded-lg px-2.5 py-1 backdrop-blur-sm">
-        {[['#6366f1','Origin'],['#14b8a6','Port/Terminal'],['#22c55e','Warehouse'],['#f97316','Alert']].map(([c,l]) => (
+        {[['#6366f1', 'Origin'], ['#14b8a6', 'Port/Terminal'], ['#22c55e', 'Warehouse'], ['#f97316', 'Alert']].map(([c, l]) => (
           <div key={l as string} className="flex items-center gap-1">
             <span className="w-2 h-2 rounded-full" style={{ backgroundColor: c as string }} />
             <span className="text-[9px] text-gray-300">{l}</span>
           </div>
         ))}
-      </div>
-      <div className="absolute top-2 right-2 bg-slate-900/80 rounded-lg px-2.5 py-1.5 backdrop-blur-sm">
-        <p className="text-xs font-bold text-white">1,248 <span className="text-[10px] font-normal text-gray-400">in transit</span></p>
-        <p className="text-xs font-bold text-orange-400">27 <span className="text-[10px] font-normal text-gray-400">exceptions</span></p>
       </div>
     </div>
   )
@@ -441,60 +597,314 @@ function AIAgentPanel({ onAction }: { onAction: (action: string) => void }) {
   )
 }
 
-// ─── Agent Action Modal ───────────────────────────────────────────────────────
-function AgentActionModal({ action, onClose }: { action: string; onClose: () => void }) {
-  const [done, setDone] = useState(false)
-  const steps: Record<string, string[]> = {
-    'Initiate dispatch': ['Select available trucker from panel', 'Set pickup time at Garden City Terminal', 'Confirm with warehouse (UNIS Seabrook)', 'System updates container status'],
-    'Review orders': ['Load OTIF risk report', 'Identify at-risk orders', 'Contact carrier for ETA confirmation', 'Update delivery forecast'],
-    'Check allocation': ['Review current stock levels', 'Check inbound shipment pipeline', 'Identify reallocation options', 'Submit reallocation request'],
+// ═══════════════════════════════════════════════════════════════════════════════
+// NEW USER VIEW
+// ═══════════════════════════════════════════════════════════════════════════════
+function NewUserHome({ onSwitch }: { onSwitch: () => void }) {
+  const navigate = useNavigate()
+  const [completedSteps, setCompletedSteps] = useState<string[]>([])
+  const [expandedStep, setExpandedStep] = useState<string | null>('profile')
+
+  const toggleStep = (id: string) => {
+    setCompletedSteps(prev =>
+      prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]
+    )
   }
-  const [step, setStep] = useState(0)
-  const stepList = steps[action] || ['Execute action', 'Confirm completion']
+
+  const progress = Math.round((completedSteps.length / ONBOARDING_STEPS.length) * 100)
+  const allDone = completedSteps.length === ONBOARDING_STEPS.length
+
   return (
-    <Modal onClose={onClose}>
-      <div className="px-5 py-4 border-b flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Bot size={14} className="text-violet-500" />
-          <h3 className="text-sm font-bold text-gray-900">AI-Assisted: {action}</h3>
+    <div className="space-y-6 pb-8">
+
+      {/* ── Welcome Hero ── */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-primary-600 via-primary-700 to-indigo-700 px-8 py-8">
+        {/* Background decoration */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute -top-8 -right-8 w-48 h-48 bg-white/5 rounded-full" />
+          <div className="absolute top-4 right-24 w-24 h-24 bg-white/5 rounded-full" />
+          <div className="absolute -bottom-6 right-12 w-36 h-36 bg-white/5 rounded-full" />
         </div>
-        <button onClick={onClose}><X size={16} className="text-gray-400 hover:text-gray-600" /></button>
+
+        <div className="relative flex items-start justify-between gap-6">
+          <div className="flex-1">
+            <div className="inline-flex items-center gap-1.5 bg-white/20 text-white text-xs font-medium px-3 py-1 rounded-full mb-3">
+              <Sparkles size={12} /> Welcome to Client Portal 3.0
+            </div>
+            <h1 className="text-2xl font-bold text-white mb-2 leading-tight">
+              Hello, Sarah 👋<br />
+              <span className="text-white/80 text-lg font-medium">Let's get your account ready</span>
+            </h1>
+            <p className="text-white/75 text-sm leading-relaxed max-w-lg">
+              Client Portal 3.0 is your unified supply chain command center — track shipments, manage inventory, submit orders, and collaborate with our team, all in one place.
+            </p>
+            <div className="flex items-center gap-3 mt-4">
+              <button
+                onClick={() => navigate('/agents?nav=chat')}
+                className="flex items-center gap-2 px-4 py-2 bg-white text-primary-700 text-sm font-semibold rounded-xl hover:bg-white/90 transition-colors shadow-sm"
+              >
+                <Bot size={15} /> Ask AI Copilot
+              </button>
+              <button
+                className="flex items-center gap-2 px-4 py-2 bg-white/15 text-white text-sm font-medium rounded-xl hover:bg-white/25 transition-colors border border-white/20"
+              >
+                <PlayCircle size={15} /> Watch intro (2 min)
+              </button>
+            </div>
+          </div>
+
+          {/* Progress summary */}
+          <div className="hidden lg:block shrink-0 bg-white/15 backdrop-blur-sm rounded-xl px-5 py-4 border border-white/20 min-w-[180px]">
+            <p className="text-white/60 text-xs font-medium mb-2">Setup progress</p>
+            <div className="flex items-end gap-2 mb-2">
+              <span className="text-3xl font-bold text-white">{progress}%</span>
+              <span className="text-white/60 text-xs mb-1">complete</span>
+            </div>
+            <div className="w-full bg-white/20 rounded-full h-1.5 mb-3">
+              <div
+                className="bg-white rounded-full h-1.5 transition-all duration-500"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+            <p className="text-white/70 text-[11px]">
+              {allDone ? '🎉 All set! You\'re ready to go.' : `${ONBOARDING_STEPS.length - completedSteps.length} steps remaining`}
+            </p>
+            {allDone && (
+              <button
+                onClick={onSwitch}
+                className="mt-2 w-full py-1.5 bg-white/20 text-white text-xs font-medium rounded-lg hover:bg-white/30 transition-colors"
+              >
+                Go to dashboard →
+              </button>
+            )}
+          </div>
+        </div>
       </div>
-      <div className="p-5">
-        {!done ? (
-          <>
-            <p className="text-xs text-gray-500 mb-4">Follow the AI-recommended steps to complete this action:</p>
-            <div className="space-y-2 mb-4">
-              {stepList.map((s, i) => (
-                <div key={i} className={`flex items-center gap-2.5 p-2.5 rounded-lg border cursor-pointer ${i <= step ? 'border-violet-200 bg-violet-50' : 'border-gray-100 bg-gray-50'}`}
-                  onClick={() => setStep(i)}>
-                  <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${i < step ? 'bg-green-500 text-white' : i === step ? 'bg-violet-600 text-white' : 'bg-gray-200 text-gray-500'}`}>
-                    {i < step ? '✓' : i + 1}
+
+      {/* ── Main content grid ── */}
+      <div className="grid grid-cols-5 gap-5">
+
+        {/* ── Left: Onboarding Checklist (3 cols) ── */}
+        <div className="col-span-3 space-y-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-base font-bold text-gray-900">Getting Started Checklist</h2>
+              <p className="text-xs text-gray-500 mt-0.5">Complete these steps to activate your full account capabilities</p>
+            </div>
+            <div className="flex items-center gap-1.5 text-xs text-gray-500">
+              <span className="font-semibold text-primary-600">{completedSteps.length}</span>
+              <span>/ {ONBOARDING_STEPS.length} done</span>
+            </div>
+          </div>
+
+          {/* Progress bar */}
+          <div className="w-full bg-gray-100 rounded-full h-1.5">
+            <div
+              className="bg-primary-600 rounded-full h-1.5 transition-all duration-500"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+
+          {/* Steps */}
+          <div className="space-y-2">
+            {ONBOARDING_STEPS.map((step) => {
+              const done = completedSteps.includes(step.id)
+              const expanded = expandedStep === step.id
+              return (
+                <div
+                  key={step.id}
+                  className={`bg-white border rounded-xl overflow-hidden transition-all ${done ? 'border-green-200 opacity-75' : expanded ? `${step.border} shadow-sm` : 'border-gray-200 hover:border-gray-300'}`}
+                >
+                  {/* Header row */}
+                  <div
+                    className="flex items-center gap-3 px-4 py-3 cursor-pointer"
+                    onClick={() => setExpandedStep(expanded ? null : step.id)}
+                  >
+                    {/* Checkbox */}
+                    <button
+                      onClick={e => { e.stopPropagation(); toggleStep(step.id) }}
+                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${done ? 'bg-green-500 border-green-500' : `border-gray-300 hover:${step.border}`}`}
+                    >
+                      {done && <CheckCircle2 size={12} className="text-white" />}
+                    </button>
+
+                    {/* Icon */}
+                    <div className={`w-7 h-7 ${step.bg} rounded-lg flex items-center justify-center shrink-0 ${step.color}`}>
+                      {step.icon}
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <p className={`text-sm font-semibold ${done ? 'text-gray-400 line-through' : 'text-gray-800'}`}>
+                        {step.title}
+                      </p>
+                    </div>
+
+                    {done ? (
+                      <span className="text-[10px] text-green-600 font-medium bg-green-50 px-2 py-0.5 rounded-full shrink-0">Done</span>
+                    ) : (
+                      expanded
+                        ? <ChevronUp size={14} className="text-gray-400 shrink-0" />
+                        : <ChevronDown size={14} className="text-gray-400 shrink-0" />
+                    )}
                   </div>
-                  <span className={`text-xs ${i <= step ? 'text-gray-800' : 'text-gray-400'}`}>{s}</span>
+
+                  {/* Expanded content */}
+                  {expanded && !done && (
+                    <div className={`px-4 pb-4 border-t ${step.border} ${step.bg}`}>
+                      <p className="text-xs text-gray-600 leading-relaxed mt-3 mb-3">{step.desc}</p>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => navigate(step.path)}
+                          className={`flex items-center gap-1.5 px-3 py-1.5 ${step.bg} ${step.color} border ${step.border} text-xs font-semibold rounded-lg hover:shadow-sm transition-all`}
+                        >
+                          {step.cta} <ArrowRight size={12} />
+                        </button>
+                        <button
+                          onClick={() => { toggleStep(step.id); setExpandedStep(null) }}
+                          className="px-3 py-1.5 text-xs text-gray-400 hover:text-gray-600 transition-colors"
+                        >
+                          Mark as done
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+
+          {/* All done CTA */}
+          {allDone && (
+            <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4 flex items-center gap-3">
+              <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center shrink-0">
+                <CheckCircle2 size={20} className="text-green-600" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-bold text-green-800">Setup complete! 🎉</p>
+                <p className="text-xs text-green-600">You're ready to use Client Portal 3.0 to its full potential.</p>
+              </div>
+              <button
+                onClick={onSwitch}
+                className="px-4 py-2 bg-green-600 text-white text-xs font-semibold rounded-lg hover:bg-green-700 transition-colors shrink-0"
+              >
+                Go to Dashboard
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* ── Right: Side panels (2 cols) ── */}
+        <div className="col-span-2 space-y-4">
+
+          {/* Quick contact */}
+          <div className="bg-white border border-gray-200 rounded-xl p-4">
+            <h3 className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
+              <MessageSquare size={14} className="text-primary-500" /> Need Help?
+            </h3>
+            <div className="space-y-2.5">
+              <div className="flex items-center gap-3 p-2.5 rounded-lg bg-gray-50 hover:bg-primary-50 cursor-pointer transition-colors group">
+                <div className="w-7 h-7 bg-primary-100 rounded-lg flex items-center justify-center">
+                  <Bot size={14} className="text-primary-600" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-xs font-semibold text-gray-800">Ask AI Copilot</p>
+                  <p className="text-[10px] text-gray-400">Instant answers, 24/7</p>
+                </div>
+                <ArrowRight size={12} className="text-gray-300 group-hover:text-primary-400" />
+              </div>
+              <div className="flex items-center gap-3 p-2.5 rounded-lg bg-gray-50 hover:bg-blue-50 cursor-pointer transition-colors group">
+                <div className="w-7 h-7 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <FileText size={14} className="text-blue-600" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-xs font-semibold text-gray-800">Documentation</p>
+                  <p className="text-[10px] text-gray-400">User guides & tutorials</p>
+                </div>
+                <ArrowRight size={12} className="text-gray-300 group-hover:text-blue-400" />
+              </div>
+              <div className="flex items-center gap-3 p-2.5 rounded-lg bg-gray-50 hover:bg-emerald-50 cursor-pointer transition-colors group">
+                <div className="w-7 h-7 bg-emerald-100 rounded-lg flex items-center justify-center">
+                  <Phone size={14} className="text-emerald-600" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-xs font-semibold text-gray-800">Contact Support</p>
+                  <p className="text-[10px] text-gray-400">Mon–Fri, 8am–6pm PST</p>
+                </div>
+                <ArrowRight size={12} className="text-gray-300 group-hover:text-emerald-400" />
+              </div>
+            </div>
+          </div>
+
+          {/* What can I do here? */}
+          <div className="bg-white border border-gray-200 rounded-xl p-4">
+            <h3 className="text-sm font-bold text-gray-800 mb-1">What can I do here?</h3>
+            <p className="text-[11px] text-gray-400 mb-3">Core capabilities of Client Portal 3.0</p>
+            <div className="space-y-2">
+              {[
+                { icon: '📦', text: 'Track shipments end-to-end, from origin to delivery' },
+                { icon: '🏭', text: 'Manage inbound receipts, appointments & yard entries' },
+                { icon: '📊', text: 'View real-time inventory and exception alerts' },
+                { icon: '🚛', text: 'Submit and track outbound orders' },
+                { icon: '💰', text: 'Review invoices, claims, and billing reports' },
+                { icon: '🤖', text: 'Get AI-powered insights and guided actions' },
+              ].map((item, i) => (
+                <div key={i} className="flex items-center gap-2.5 text-xs text-gray-600">
+                  <span className="text-base leading-none">{item.icon}</span>
+                  <span>{item.text}</span>
                 </div>
               ))}
             </div>
-            <button onClick={() => { if (step < stepList.length - 1) setStep(s => s + 1); else setDone(true) }}
-              className="w-full py-2.5 bg-violet-600 text-white text-xs font-medium rounded-lg hover:bg-violet-700 transition-colors">
-              {step < stepList.length - 1 ? 'Next Step →' : 'Complete Action'}
-            </button>
-          </>
-        ) : (
-          <div className="text-center py-6">
-            <CheckCircle2 size={36} className="text-green-500 mx-auto mb-3" />
-            <p className="text-sm font-bold text-gray-800">Action Completed</p>
-            <p className="text-xs text-gray-500 mt-1">All steps executed. The system has been updated.</p>
-            <button onClick={onClose} className="mt-4 px-4 py-2 bg-green-50 text-green-700 text-xs font-medium rounded-lg">Done</button>
           </div>
-        )}
+
+          {/* Announcement */}
+          <div className="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Star size={13} className="text-amber-500" />
+              <p className="text-xs font-bold text-amber-800">New in v3.0</p>
+            </div>
+            <p className="text-xs text-amber-700 leading-relaxed">
+              AI Copilot is now available across all modules — ask questions, get insights, and take guided actions. <button className="underline font-medium">Learn more →</button>
+            </p>
+          </div>
+        </div>
       </div>
-    </Modal>
+
+      {/* ── Feature Overview (full width) ── */}
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="text-base font-bold text-gray-900">Explore Key Features</h2>
+            <p className="text-xs text-gray-500 mt-0.5">Click any module to get started</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-3 gap-3">
+          {FEATURES_OVERVIEW.map((f, i) => (
+            <button
+              key={i}
+              onClick={() => navigate(f.path)}
+              className="bg-white border border-gray-200 rounded-xl p-4 text-left hover:border-primary-200 hover:shadow-sm transition-all group"
+            >
+              <div className={`w-10 h-10 ${f.bg} rounded-xl flex items-center justify-center mb-3`}>
+                {f.icon}
+              </div>
+              <p className="text-sm font-semibold text-gray-800 mb-1 group-hover:text-primary-700 transition-colors">{f.title}</p>
+              <p className="text-xs text-gray-500 leading-relaxed">{f.desc}</p>
+              <div className="flex items-center gap-1 mt-3 text-[11px] text-primary-600 opacity-0 group-hover:opacity-100 transition-opacity font-medium">
+                Open module <ArrowRight size={11} />
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+
+    </div>
   )
 }
 
-// ─── Main HomePage ────────────────────────────────────────────────────────────
-export default function HomePage() {
+// ═══════════════════════════════════════════════════════════════════════════════
+// RETURNING USER VIEW  (existing layout, preserved entirely)
+// ═══════════════════════════════════════════════════════════════════════════════
+function ReturningUserHome() {
   const navigate = useNavigate()
   const [taskFilter, setTaskFilter] = useState<'all' | 'overdue' | 'today'>('all')
   const [modal, setModal] = useState<ModalState>({ type: null, data: null })
@@ -515,11 +925,11 @@ export default function HomePage() {
 
   return (
     <div className="space-y-4 pb-6">
-      {/* Summary Stats — clickable */}
+      {/* Summary Stats */}
       <div className="grid grid-cols-6 gap-3">
         {SUMMARY_STATS.map((s, i) => (
           <div key={i} onClick={() => openStat(s)}
-            className={`${s.bg} rounded-xl px-4 py-3 border border-white cursor-pointer hover:shadow-md hover:scale-[1.02] transition-all`}>
+            className={`${s.bg} rounded-xl px-4 py-3 border border-white cursor-pointer hover:shadow-md transition-all`}>
             <p className="text-[10px] text-gray-500 font-medium mb-1">{s.label}</p>
             <p className={`text-2xl font-bold ${s.color} underline decoration-dotted`}>{s.value}</p>
             <p className="text-[9px] text-gray-400 mt-0.5">{s.sub}</p>
@@ -529,25 +939,24 @@ export default function HomePage() {
 
       {/* Middle Row */}
       <div className="grid grid-cols-5 gap-4">
-        <div className="col-span-3 bg-white border border-gray-200 rounded-xl p-4" data-tour="network-map">
+        <div className="col-span-3 bg-white border border-gray-200 rounded-xl p-4">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <MapPin size={14} className="text-indigo-500" />
-              <p className="text-sm font-bold text-gray-800">网络地图 / 仓库与运输态势</p>
+              <p className="text-sm font-bold text-gray-800">Supply Chain Network</p>
             </div>
             <div className="flex items-center gap-2 text-[10px] text-gray-400">
               <span className="flex items-center gap-1"><Activity size={10} className="text-green-500" /> Live</span>
-              <span className="text-[9px] text-gray-400">Click locations to view details</span>
             </div>
           </div>
           <NetworkMap onLocClick={openLocModal} />
         </div>
 
-        <div className="col-span-2 bg-white border border-gray-200 rounded-xl p-4" data-tour="exceptions">
+        <div className="col-span-2 bg-white border border-gray-200 rounded-xl p-4">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <AlertCircle size={14} className="text-red-500" />
-              <p className="text-sm font-bold text-gray-800">异常与下一步行动</p>
+              <p className="text-sm font-bold text-gray-800">Exceptions & Actions</p>
             </div>
             <button onClick={() => navigate('/international-new/tracking')} className="text-[10px] text-primary-600 hover:underline font-medium">View all</button>
           </div>
@@ -570,15 +979,15 @@ export default function HomePage() {
 
       {/* Bottom Row */}
       <div className="grid grid-cols-5 gap-4">
-        <div className="col-span-3 bg-white border border-gray-200 rounded-xl p-4" data-tour="my-tasks">
+        <div className="col-span-3 bg-white border border-gray-200 rounded-xl p-4">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <CheckCircle2 size={14} className="text-violet-500" />
-              <p className="text-sm font-bold text-gray-800">我的任务</p>
+              <p className="text-sm font-bold text-gray-800">My Tasks</p>
               <span className="text-[10px] bg-red-100 text-red-600 font-semibold px-1.5 py-0.5 rounded-full">18 overdue</span>
             </div>
             <div className="flex items-center gap-1">
-              {(['all','overdue','today'] as const).map(f => (
+              {(['all', 'overdue', 'today'] as const).map(f => (
                 <button key={f} onClick={() => setTaskFilter(f)}
                   className={`text-[10px] px-2 py-1 rounded-md font-medium ${taskFilter === f ? 'bg-violet-100 text-violet-700' : 'text-gray-500 hover:bg-gray-100'}`}>
                   {f === 'all' ? 'All' : f === 'overdue' ? 'Overdue' : 'Today'}
@@ -605,9 +1014,7 @@ export default function HomePage() {
         </div>
 
         <div className="col-span-2 space-y-3">
-          <div data-tour="ai-agent">
-            <AIAgentPanel onAction={openAgentAction} />
-          </div>
+          <AIAgentPanel onAction={openAgentAction} />
           <div className="grid grid-cols-2 gap-2">
             {MODULES.map(m => (
               <button key={m.title} onClick={() => navigate(m.path)}
@@ -639,6 +1046,77 @@ export default function HomePage() {
       {modal.type === 'agent-action' && modal.data && (
         <AgentActionModal action={(modal.data as { action: string }).action} onClose={closeModal} />
       )}
+    </div>
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// MAIN HomePage  — role switcher lives here
+// ═══════════════════════════════════════════════════════════════════════════════
+const LS_KEY = 'cp_home_role'
+
+export default function HomePage() {
+  const [role, setRole] = useState<UserRole>(() => {
+    try {
+      const saved = localStorage.getItem(LS_KEY)
+      return (saved === 'new' || saved === 'returning') ? saved : 'returning'
+    } catch {
+      return 'returning'
+    }
+  })
+
+  const switchRole = (r: UserRole) => {
+    setRole(r)
+    try { localStorage.setItem(LS_KEY, r) } catch { /* ignore */ }
+  }
+
+  return (
+    <div>
+      {/* ── Role switcher bar ── */}
+      <div className="flex items-center justify-between mb-5">
+        <div>
+          <h1 className="text-lg font-bold text-gray-900">
+            {role === 'new' ? 'Welcome to Client Portal 3.0' : 'Dashboard'}
+          </h1>
+          <p className="text-xs text-gray-500 mt-0.5">
+            {role === 'new'
+              ? 'Follow the steps below to get your account ready'
+              : 'Your supply chain at a glance — updated in real time'}
+          </p>
+        </div>
+
+        {/* Toggle pill */}
+        <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-xl">
+          <button
+            onClick={() => switchRole('new')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+              role === 'new'
+                ? 'bg-white shadow-sm text-primary-700'
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            <Sparkles size={12} />
+            New User View
+          </button>
+          <button
+            onClick={() => switchRole('returning')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+              role === 'returning'
+                ? 'bg-white shadow-sm text-primary-700'
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            <LayoutDashboard size={12} />
+            Returning User View
+          </button>
+        </div>
+      </div>
+
+      {/* ── View ── */}
+      {role === 'new'
+        ? <NewUserHome onSwitch={() => switchRole('returning')} />
+        : <ReturningUserHome />
+      }
     </div>
   )
 }
