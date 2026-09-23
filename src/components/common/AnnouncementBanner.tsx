@@ -151,7 +151,7 @@ function BannerPopupItem({
   return (
     <div
       className={`${styles.bg} border ${styles.border} rounded-lg px-4 py-3 flex items-start gap-3 shadow-sm transition-all duration-200 ${
-        isExiting ? 'opacity-0 -translate-y-2' : 'opacity-100 translate-y-0 animate-banner-enter'
+        isExiting ? 'opacity-0 pointer-events-none' : 'opacity-100 animate-banner-enter'
       }`}
       role="alert"
       aria-live={banner.tier === 'critical' ? 'assertive' : 'polite'}

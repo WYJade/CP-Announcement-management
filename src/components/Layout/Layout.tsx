@@ -55,7 +55,7 @@ function LayoutInner() {
       <NavSidebar />
       <Header />
       <main
-        className="ml-56 mt-14 p-4 overflow-auto transition-all duration-200"
+        className="ml-56 mt-14 p-4 overflow-visible transition-all duration-200"
         style={{ marginRight: mainRight }}
       >
         <AnnouncementBanner />
