@@ -113,7 +113,7 @@ const PLATFORM_CAPABILITIES = [
   { icon: '🏭', title: 'Inventory Control', desc: 'Real-time on-hand, cycle counts, SN lookup, and adjustment reports. Always know what you have.' },
   { icon: '🚛', title: 'Outbound Fulfillment', desc: 'Create orders, assign carriers, track to delivery. Export BOL and POD with one click.' },
   { icon: '📊', title: 'OTIF & KPI Analytics', desc: 'Monitor On-Time In-Full, retailer scorecards, root cause analysis, and penalty forecasts.' },
-  { icon: '🤖', title: 'AI-Powered Copilot', desc: 'Ask questions, get guided actions, and resolve exceptions faster with AI across every module.' },
+  { icon: '💰', title: 'Finance & Billing', desc: 'Review invoices, submit claims, manage deductions, and download billing reports — all in one place.' },
 ]
 
 // ─── Shared Modals ────────────────────────────────────────────────────────────
@@ -472,9 +472,6 @@ function NewUserHome({ onSwitch }: { onSwitch: () => void }) {
               <button className="flex items-center gap-2 px-4 py-2 bg-white/15 text-white text-sm font-medium rounded-xl hover:bg-white/25 border border-white/20">
                 <PlayCircle size={14} /> Quick tour (2 min)
               </button>
-              <button className="flex items-center gap-2 px-4 py-2 bg-white/15 text-white text-sm font-medium rounded-xl hover:bg-white/25 border border-white/20">
-                <BookOpen size={14} /> Documentation
-              </button>
             </div>
           </div>
 
@@ -621,10 +618,10 @@ function NewUserHome({ onSwitch }: { onSwitch: () => void }) {
             <h3 className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2"><MessageSquare size={14} className="text-primary-500" /> Need Help?</h3>
             <div className="space-y-2">
               {[
-                { icon: <Bot size={14} className="text-primary-600" />, bg: 'bg-primary-50', title: 'Ask AI Copilot', sub: 'Instant answers, 24/7', hover: 'hover:bg-primary-50', path: '/agents?nav=chat' },
-                { icon: <BookOpen size={14} className="text-blue-600" />, bg: 'bg-blue-50', title: 'User Guides', sub: 'Step-by-step tutorials', hover: 'hover:bg-blue-50', path: '#' },
+                { icon: <BookOpen size={14} className="text-blue-600" />, bg: 'bg-blue-50', title: 'Documentation', sub: 'User guides & tutorials', hover: 'hover:bg-blue-50', path: '#' },
                 { icon: <Phone size={14} className="text-emerald-600" />, bg: 'bg-emerald-50', title: 'Contact Support', sub: 'Mon–Fri, 8am–6pm PST', hover: 'hover:bg-emerald-50', path: '#' },
                 { icon: <MessageSquare size={14} className="text-violet-600" />, bg: 'bg-violet-50', title: 'Live Chat', sub: 'Chat with our team', hover: 'hover:bg-violet-50', path: '#' },
+                { icon: <FileText size={14} className="text-amber-600" />, bg: 'bg-amber-50', title: 'Release Notes', sub: "What's new in v3.0", hover: 'hover:bg-amber-50', path: '#' },
               ].map((item, i) => (
                 <button key={i} onClick={() => item.path !== '#' && navigate(item.path)}
                   className={`w-full flex items-center gap-3 p-2.5 rounded-lg bg-gray-50 ${item.hover} cursor-pointer transition-colors group text-left`}>
@@ -668,7 +665,7 @@ function NewUserHome({ onSwitch }: { onSwitch: () => void }) {
         </div>
         <div className="grid grid-cols-3 gap-3">
           {PLATFORM_CAPABILITIES.map((cap, i) => {
-            const paths = ['/international-new/tracking', '/inbound/inquiry', '/inventory/activity', '/outbound/inquiry', '/dashboard/otif', '/agents?nav=chat']
+            const paths = ['/international-new/tracking', '/inbound/inquiry', '/inventory/activity', '/outbound/inquiry', '/dashboard/otif', '/finance/invoices']
             return (
               <button key={i} onClick={() => navigate(paths[i])}
                 className="bg-white border border-gray-200 rounded-xl p-5 text-left hover:border-primary-200 hover:shadow-sm transition-all group">
