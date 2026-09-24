@@ -1,13 +1,13 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   AlertTriangle, Package, Truck, Bot, CheckCircle2, Clock,
   TrendingDown, Warehouse, Ship, DollarSign, Zap, RefreshCw,
   AlertCircle, Activity, MapPin, X, ArrowRight, ExternalLink,
-  Calendar, FileText, Send, ChevronRight, BarChart2,
-  Sparkles, BookOpen, Users, Settings, PlayCircle, Star,
-  ChevronDown, ChevronUp, Circle, Globe, Phone, MessageSquare,
-  Layers, Target, TrendingUp, User2, LayoutDashboard,
+  FileText, Send, ChevronRight, BarChart2, ChevronDown, ChevronUp,
+  Sparkles, BookOpen, Phone, MessageSquare, Star, PlayCircle,
+  LayoutDashboard, User2, Globe, Bell, Search, TrendingUp,
+  History, Layers, Target, Hash,
 } from 'lucide-react'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -15,260 +15,108 @@ interface ModalState {
   type: 'stat' | 'exception' | 'task' | 'agent-action' | null
   data: Record<string, unknown> | null
 }
-
 type UserRole = 'new' | 'returning'
+const LS_KEY = 'cp_home_role'
 
 // ─── Mock Data ────────────────────────────────────────────────────────────────
 const SUMMARY_STATS = [
-  {
-    label: 'In-Transit Shipments', value: '1,248', sub: '+12 today',
-    color: 'text-blue-600', bg: 'bg-blue-50',
-    detail: {
-      title: 'In-Transit Shipments',
-      items: [
-        { label: 'Ocean — Asia to US West Coast', count: 542, status: 'normal' },
-        { label: 'Ocean — Asia to US East Coast', count: 398, status: 'normal' },
-        { label: 'Drayage — Enroute to Warehouse', count: 187, status: 'warning' },
-        { label: 'Available at Terminal', count: 121, status: 'alert' },
-      ],
-      cta: { label: 'View Shipment Tracking', path: '/international-new/tracking' },
-    },
-  },
-  {
-    label: "Today's Appointments", value: '86', sub: '14 pending confirm',
-    color: 'text-violet-600', bg: 'bg-violet-50',
-    detail: {
-      title: "Today's Warehouse Appointments",
-      items: [
-        { label: 'Confirmed', count: 52, status: 'normal' },
-        { label: 'Pending Confirmation', count: 14, status: 'alert' },
-        { label: 'At Risk (vehicle en route)', count: 8, status: 'warning' },
-        { label: 'Completed', count: 12, status: 'normal' },
-      ],
-      cta: { label: 'Manage Appointments', path: '/inbound/inquiry' },
-    },
-  },
-  {
-    label: 'High-Risk Exceptions', value: '27', sub: '5 new since yesterday',
-    color: 'text-red-600', bg: 'bg-red-50',
-    detail: {
-      title: 'High-Risk Exceptions Breakdown',
-      items: [
-        { label: 'Container DEM/DET Risk', count: 9, status: 'alert' },
-        { label: 'Customs Hold', count: 3, status: 'alert' },
-        { label: 'Appointment Unconfirmed', count: 6, status: 'warning' },
-        { label: 'Inventory Shortage', count: 5, status: 'warning' },
-        { label: 'OTIF Penalty Risk', count: 4, status: 'warning' },
-      ],
-      cta: { label: 'View All Exceptions', path: '/international-new/tracking' },
-    },
-  },
-  {
-    label: 'OTIF Risk', value: '14', sub: 'P1: 3 / P2: 11',
-    color: 'text-orange-600', bg: 'bg-orange-50',
-    detail: {
-      title: 'OTIF At-Risk Orders',
-      items: [
-        { label: 'P1 — Below 95% threshold', count: 3, status: 'alert' },
-        { label: 'P2 — 95–97% (approaching)', count: 11, status: 'warning' },
-      ],
-      cta: { label: 'Open OTIF Dashboard', path: '/dashboard/otif' },
-    },
-  },
-  {
-    label: 'Demurrage / Detention', value: '9', sub: 'Containers at risk',
-    color: 'text-amber-600', bg: 'bg-amber-50',
-    detail: {
-      title: 'Demurrage / Detention At-Risk',
-      items: [
-        { label: 'LFD Exceeded — Immediate action', count: 3, status: 'alert' },
-        { label: 'LFD Within 24 hrs', count: 4, status: 'warning' },
-        { label: 'LFD Within 48 hrs', count: 2, status: 'normal' },
-      ],
-      cta: { label: 'View Container List', path: '/international-new/tracking' },
-    },
-  },
-  {
-    label: 'Pending Tasks', value: '43', sub: '18 overdue',
-    color: 'text-emerald-600', bg: 'bg-emerald-50',
-    detail: {
-      title: 'Pending Tasks Summary',
-      items: [
-        { label: 'Overdue', count: 18, status: 'alert' },
-        { label: 'Due Today', count: 9, status: 'warning' },
-        { label: 'Due This Week', count: 16, status: 'normal' },
-      ],
-      cta: { label: 'View All Tasks', path: '/' },
-    },
-  },
+  { label: 'In-Transit Shipments', value: '1,248', sub: '+12 today', color: 'text-blue-600', bg: 'bg-blue-50',
+    detail: { title: 'In-Transit Shipments', items: [
+      { label: 'Ocean — Asia to US West Coast', count: 542, status: 'normal' },
+      { label: 'Ocean — Asia to US East Coast', count: 398, status: 'normal' },
+      { label: 'Drayage — Enroute to Warehouse', count: 187, status: 'warning' },
+      { label: 'Available at Terminal', count: 121, status: 'alert' },
+    ], cta: { label: 'View Shipment Tracking', path: '/international-new/tracking' } } },
+  { label: "Today's Appointments", value: '86', sub: '14 pending confirm', color: 'text-violet-600', bg: 'bg-violet-50',
+    detail: { title: "Today's Warehouse Appointments", items: [
+      { label: 'Confirmed', count: 52, status: 'normal' },
+      { label: 'Pending Confirmation', count: 14, status: 'alert' },
+      { label: 'At Risk (vehicle en route)', count: 8, status: 'warning' },
+      { label: 'Completed', count: 12, status: 'normal' },
+    ], cta: { label: 'Manage Appointments', path: '/inbound/inquiry' } } },
+  { label: 'High-Risk Exceptions', value: '27', sub: '5 new since yesterday', color: 'text-red-600', bg: 'bg-red-50',
+    detail: { title: 'High-Risk Exceptions Breakdown', items: [
+      { label: 'Container DEM/DET Risk', count: 9, status: 'alert' },
+      { label: 'Customs Hold', count: 3, status: 'alert' },
+      { label: 'Appointment Unconfirmed', count: 6, status: 'warning' },
+      { label: 'Inventory Shortage', count: 5, status: 'warning' },
+      { label: 'OTIF Penalty Risk', count: 4, status: 'warning' },
+    ], cta: { label: 'View All Exceptions', path: '/international-new/tracking' } } },
+  { label: 'OTIF Risk', value: '14', sub: 'P1: 3 / P2: 11', color: 'text-orange-600', bg: 'bg-orange-50',
+    detail: { title: 'OTIF At-Risk Orders', items: [
+      { label: 'P1 — Below 95% threshold', count: 3, status: 'alert' },
+      { label: 'P2 — 95–97% (approaching)', count: 11, status: 'warning' },
+    ], cta: { label: 'Open OTIF Dashboard', path: '/dashboard/otif' } } },
+  { label: 'Demurrage / Detention', value: '9', sub: 'Containers at risk', color: 'text-amber-600', bg: 'bg-amber-50',
+    detail: { title: 'Demurrage / Detention At-Risk', items: [
+      { label: 'LFD Exceeded — Immediate action', count: 3, status: 'alert' },
+      { label: 'LFD Within 24 hrs', count: 4, status: 'warning' },
+      { label: 'LFD Within 48 hrs', count: 2, status: 'normal' },
+    ], cta: { label: 'View Container List', path: '/international-new/tracking' } } },
+  { label: 'Pending Tasks', value: '43', sub: '18 overdue', color: 'text-emerald-600', bg: 'bg-emerald-50',
+    detail: { title: 'Pending Tasks Summary', items: [
+      { label: 'Overdue', count: 18, status: 'alert' },
+      { label: 'Due Today', count: 9, status: 'warning' },
+      { label: 'Due This Week', count: 16, status: 'normal' },
+    ], cta: { label: 'View All Tasks', path: '/' } } },
 ]
 
 const MY_TASKS = [
-  { id: 1, title: 'Confirm receiving appointment for SSHAS2608270', type: 'Appointment', priority: 'P1', due: 'Today 14:00', status: 'Overdue', path: '/international-new/tracking', detail: 'SSHAS2608270 is scheduled for Jun 19 warehouse receiving at UNIS Seabrook. Appointment APPT-6007808 has not been confirmed by the warehouse team.' },
+  { id: 1, title: 'Confirm receiving appointment for SSHAS2608270', type: 'Appointment', priority: 'P1', due: 'Today 14:00', status: 'Overdue', path: '/international-new/tracking', detail: 'SSHAS2608270 is scheduled for Jun 19 warehouse receiving at UNIS Seabrook. Appointment APPT-6007808 has not been confirmed.' },
   { id: 2, title: 'Resolve customs hold on SSHAS2608135', type: 'Customs', priority: 'P1', due: 'Today 17:00', status: 'Urgent', path: '/international-new/tracking', detail: 'Customs entry 82G-0101679-0 is on hold awaiting additional documentation. Container is at Savannah port. LFD is Jun 20.' },
-  { id: 3, title: 'Review invoice dispute INV-20260601', type: 'Finance', priority: 'P2', due: 'Aug 5', status: 'Pending', path: '/finance/invoices', detail: 'Customer THE ONLY BEAN LLC has disputed INV-20260601 for $3,240. Dispute reason: quantity mismatch on shipment SSHAS2608135.' },
-  { id: 4, title: 'Update freight quote for ADOORN LLC', type: 'Outbound', priority: 'P2', due: 'Aug 5', status: 'Pending', path: '/outbound/freight-quote', detail: 'ADOORN LLC requested a revised freight quote for 2x40HC from Shenzhen to Savannah. Quote valid window expires Aug 6.' },
-  { id: 5, title: 'Cycle count discrepancy in Inventory', type: 'Inventory', priority: 'P3', due: 'Aug 6', status: 'In Progress', path: '/inventory/activity', detail: 'SKU ADPOST-SMALL-RED shows a variance of -2 units in cycle count at Long Beach DC. Investigation in progress.' },
+  { id: 3, title: 'Review invoice dispute INV-20260601', type: 'Finance', priority: 'P2', due: 'Aug 5', status: 'Pending', path: '/finance/invoices', detail: 'Customer THE ONLY BEAN LLC has disputed INV-20260601 for $3,240. Reason: quantity mismatch.' },
+  { id: 4, title: 'Update freight quote for ADOORN LLC', type: 'Outbound', priority: 'P2', due: 'Aug 5', status: 'Pending', path: '/outbound/freight-quote', detail: 'ADOORN LLC requested a revised freight quote for 2x40HC from Shenzhen to Savannah.' },
+  { id: 5, title: 'Cycle count discrepancy in Inventory', type: 'Inventory', priority: 'P3', due: 'Aug 6', status: 'In Progress', path: '/inventory/activity', detail: 'SKU ADPOST-SMALL-RED shows a variance of -2 units in cycle count at Long Beach DC.' },
 ]
 
 const EXCEPTIONS = [
-  {
-    priority: 'P1', label: 'Container DEM Risk', desc: '3 containers past LFD at Garden City Terminal',
-    action: 'Review & assign', color: 'bg-red-500', path: '/international-new/tracking',
-    actionType: 'dispatch',
-    detail: 'Containers WHSU8555505, XYLU8225020, SELU4350353 are past last free day. Daily demurrage rate: $150/container/day.',
-    steps: ['Select trucker', 'Confirm pickup appointment', 'Notify warehouse', 'Track dispatch'],
-  },
-  {
-    priority: 'P1', label: 'Appointment at risk', desc: 'Jun 19 appointment for SSHAS2608270 not confirmed',
-    action: 'Reschedule', color: 'bg-red-500', path: '/international-new/tracking',
-    actionType: 'reschedule',
-    detail: 'Warehouse appointment APPT-6007808 for Jun 19, 10:00 at UNIS Seabrook has not been confirmed. Vehicle is OFD.',
-    steps: ['Select new appointment slot', 'Notify carrier', 'Update warehouse system'],
-  },
-  {
-    priority: 'P2', label: 'Inventory shortage', desc: 'SKU ADPOST-SMALL-RED below safety stock',
-    action: 'Check allocation', color: 'bg-orange-400', path: '/inventory/activity',
-    actionType: 'allocation',
-    detail: 'Current stock: 68 units. Safety stock level: 80 units. Incoming shipment expected Jun 21 (SSHAS2608270).',
-    steps: ['Review current allocation', 'Check inbound pipeline', 'Reallocate from alternate DC'],
-  },
-  {
-    priority: 'P2', label: 'OTIF penalty risk', desc: '5 orders approaching 97% OTIF threshold',
-    action: 'Open RCA', color: 'bg-orange-400', path: '/dashboard/otif',
-    actionType: 'rca',
-    detail: 'Orders for VITA COCO and ORGAIN LLC are at 95.8% OTIF. Any additional delay this week triggers penalty clause.',
-    steps: ['Identify root cause', 'Document RCA', 'Submit corrective action plan'],
-  },
-  {
-    priority: 'P3', label: 'Invoice dispute', desc: 'INV-20260601 disputed by THE ONLY BEAN LLC',
-    action: 'Review documents', color: 'bg-blue-400', path: '/finance/invoices',
-    actionType: 'document',
-    detail: 'Dispute filed Aug 1. Amount: $3,240. Reason: quantity mismatch. POD and packing list attached.',
-    steps: ['Review POD', 'Compare packing list', 'Respond to customer within 3 business days'],
-  },
+  { priority: 'P1', label: 'Container DEM Risk', desc: '3 containers past LFD at Garden City Terminal', action: 'Review & assign', color: 'bg-red-500', path: '/international-new/tracking', actionType: 'dispatch', detail: 'Containers WHSU8555505, XYLU8225020, SELU4350353 are past last free day. Daily demurrage rate: $150/container/day.', steps: ['Select trucker', 'Confirm pickup appointment', 'Notify warehouse', 'Track dispatch'] },
+  { priority: 'P1', label: 'Appointment at risk', desc: 'Jun 19 appointment for SSHAS2608270 not confirmed', action: 'Reschedule', color: 'bg-red-500', path: '/international-new/tracking', actionType: 'reschedule', detail: 'Warehouse appointment APPT-6007808 for Jun 19, 10:00 at UNIS Seabrook has not been confirmed. Vehicle is OFD.', steps: ['Select new appointment slot', 'Notify carrier', 'Update warehouse system'] },
+  { priority: 'P2', label: 'Inventory shortage', desc: 'SKU ADPOST-SMALL-RED below safety stock', action: 'Check allocation', color: 'bg-orange-400', path: '/inventory/activity', actionType: 'allocation', detail: 'Current stock: 68 units. Safety stock level: 80 units. Incoming shipment expected Jun 21.', steps: ['Review current allocation', 'Check inbound pipeline', 'Reallocate from alternate DC'] },
+  { priority: 'P2', label: 'OTIF penalty risk', desc: '5 orders approaching 97% OTIF threshold', action: 'Open RCA', color: 'bg-orange-400', path: '/dashboard/otif', actionType: 'rca', detail: 'Orders for VITA COCO and ORGAIN LLC are at 95.8% OTIF. Any additional delay triggers penalty clause.', steps: ['Identify root cause', 'Document RCA', 'Submit corrective action plan'] },
+  { priority: 'P3', label: 'Invoice dispute', desc: 'INV-20260601 disputed by THE ONLY BEAN LLC', action: 'Review documents', color: 'bg-blue-400', path: '/finance/invoices', actionType: 'document', detail: 'Dispute filed Aug 1. Amount: $3,240. Reason: quantity mismatch. POD and packing list attached.', steps: ['Review POD', 'Compare packing list', 'Respond to customer within 3 business days'] },
 ]
 
 const MODULES = [
-  { title: 'Inbound & Yard', sub: 'Appointments, Gate, Receipt variance', icon: <Package size={18} className="text-blue-500" />, path: '/inbound/inquiry', color: 'border-blue-100 hover:border-blue-300' },
+  { title: 'Inbound & Yard', sub: 'Appointments, Gate, Receipt', icon: <Package size={18} className="text-blue-500" />, path: '/inbound/inquiry', color: 'border-blue-100 hover:border-blue-300' },
   { title: 'Outbound', sub: 'Orders, Carrier, Tracking', icon: <Truck size={18} className="text-indigo-500" />, path: '/outbound/inquiry', color: 'border-indigo-100 hover:border-indigo-300' },
-  { title: 'Shipment Tracking', sub: 'International containers & milestones', icon: <Ship size={18} className="text-teal-500" />, path: '/international-new/tracking', color: 'border-teal-100 hover:border-teal-300' },
+  { title: 'Shipment Tracking', sub: 'International containers', icon: <Ship size={18} className="text-teal-500" />, path: '/international-new/tracking', color: 'border-teal-100 hover:border-teal-300' },
   { title: 'Inventory', sub: 'Exceptions, SN, Adjustments', icon: <Warehouse size={18} className="text-emerald-500" />, path: '/inventory/activity', color: 'border-emerald-100 hover:border-emerald-300' },
   { title: 'Finance', sub: 'Invoice, Claim, Deduction', icon: <DollarSign size={18} className="text-amber-500" />, path: '/finance/invoices', color: 'border-amber-100 hover:border-amber-300' },
   { title: 'Insights', sub: 'OTIF, KPI, Analytics', icon: <BarChart2 size={18} className="text-violet-500" />, path: '/insights', color: 'border-violet-100 hover:border-violet-300' },
 ]
 
-// ─── New-user onboarding checklist ────────────────────────────────────────────
+const RECENT_PAGES = [
+  { label: 'Shipment Tracking', path: '/international-new/tracking', icon: <Ship size={12} />, time: '2 min ago' },
+  { label: 'Outbound Inquiry', path: '/outbound/inquiry', icon: <Truck size={12} />, time: '1 hr ago' },
+  { label: 'Finance / Invoice', path: '/finance/invoices', icon: <DollarSign size={12} />, time: 'Yesterday' },
+  { label: 'Inbound Inquiry', path: '/inbound/inquiry', icon: <Package size={12} />, time: 'Yesterday' },
+]
+
+const ANNOUNCEMENTS = [
+  { type: 'feature', badge: '🆕 New', title: 'AI Copilot now in all modules', desc: 'Ask questions, get data summaries, and take guided actions across Inbound, Inventory, and Outbound.', date: 'Sep 15' },
+  { type: 'maintenance', badge: '🔧 Scheduled', title: 'Maintenance window: Sep 28, 2–4 AM PST', desc: 'Brief downtime expected for platform upgrades. Reports and exports will be unavailable during this window.', date: 'Sep 20' },
+  { type: 'update', badge: '📦 Updated', title: 'Outbound Order Entry redesigned', desc: 'Faster form flow, auto-fill from previous orders, and inline carrier rate comparison.', date: 'Sep 10' },
+]
+
 const ONBOARDING_STEPS = [
-  {
-    id: 'profile',
-    icon: <User2 size={16} />,
-    title: 'Complete your company profile',
-    desc: 'Add your company name, contact info, and billing details so our team can set up your account.',
-    cta: 'Set up profile',
-    path: '/system/accounts',
-    color: 'text-violet-600',
-    bg: 'bg-violet-50',
-    border: 'border-violet-200',
-    dot: 'bg-violet-500',
-  },
-  {
-    id: 'inbound',
-    icon: <Package size={16} />,
-    title: 'Create your first inbound receipt',
-    desc: 'Submit an RN to start tracking your incoming goods. Once submitted, you can track status in real time.',
-    cta: 'Create receipt',
-    path: '/inbound/inquiry',
-    color: 'text-blue-600',
-    bg: 'bg-blue-50',
-    border: 'border-blue-200',
-    dot: 'bg-blue-500',
-  },
-  {
-    id: 'inventory',
-    icon: <Warehouse size={16} />,
-    title: 'Review your inventory snapshot',
-    desc: 'Check current on-hand stock, locations, and any discrepancies across your facilities.',
-    cta: 'View inventory',
-    path: '/inventory/activity',
-    color: 'text-emerald-600',
-    bg: 'bg-emerald-50',
-    border: 'border-emerald-200',
-    dot: 'bg-emerald-500',
-  },
-  {
-    id: 'outbound',
-    icon: <Truck size={16} />,
-    title: 'Submit your first outbound order',
-    desc: 'Enter an outbound order to kick off the fulfillment process. Track every milestone from pick to ship.',
-    cta: 'Create order',
-    path: '/outbound/inquiry',
-    color: 'text-indigo-600',
-    bg: 'bg-indigo-50',
-    border: 'border-indigo-200',
-    dot: 'bg-indigo-500',
-  },
-  {
-    id: 'finance',
-    icon: <DollarSign size={16} />,
-    title: 'Connect billing & review invoices',
-    desc: 'Link your payment method and review any outstanding invoices or charge summaries.',
-    cta: 'View Finance',
-    path: '/finance/invoices',
-    color: 'text-amber-600',
-    bg: 'bg-amber-50',
-    border: 'border-amber-200',
-    dot: 'bg-amber-500',
-  },
+  { id: 'profile', icon: <User2 size={15} />, title: 'Complete your company profile', desc: 'Add your company name, contact info, and billing details so our team can set up your account.', cta: 'Set up profile', path: '/system/accounts', color: 'text-violet-700', bg: 'bg-violet-50', border: 'border-violet-200', dot: 'bg-violet-500', accent: '#7c3aed' },
+  { id: 'inbound', icon: <Package size={15} />, title: 'Submit your first inbound receipt', desc: 'Create an RN to start tracking your incoming goods. Track status, exceptions, and put-away in real time.', cta: 'Create receipt', path: '/inbound/inquiry', color: 'text-blue-700', bg: 'bg-blue-50', border: 'border-blue-200', dot: 'bg-blue-500', accent: '#2563eb' },
+  { id: 'inventory', icon: <Warehouse size={15} />, title: 'Review your inventory snapshot', desc: 'Check on-hand stock, locations, and any discrepancies across your facilities.', cta: 'View inventory', path: '/inventory/activity', color: 'text-emerald-700', bg: 'bg-emerald-50', border: 'border-emerald-200', dot: 'bg-emerald-500', accent: '#059669' },
+  { id: 'outbound', icon: <Truck size={15} />, title: 'Submit your first outbound order', desc: 'Enter an outbound order to kick off the fulfillment process. Track every milestone from pick to ship.', cta: 'Create order', path: '/outbound/inquiry', color: 'text-indigo-700', bg: 'bg-indigo-50', border: 'border-indigo-200', dot: 'bg-indigo-500', accent: '#4f46e5' },
+  { id: 'finance', icon: <DollarSign size={15} />, title: 'Connect billing & review invoices', desc: 'Link your payment method and review any outstanding invoices or charge summaries.', cta: 'View Finance', path: '/finance/invoices', color: 'text-amber-700', bg: 'bg-amber-50', border: 'border-amber-200', dot: 'bg-amber-500', accent: '#d97706' },
 ]
 
-// Feature overview for new users
-const FEATURES_OVERVIEW = [
-  {
-    icon: <Ship size={20} className="text-teal-600" />,
-    bg: 'bg-teal-50',
-    title: 'Shipment Tracking',
-    desc: 'End-to-end visibility across ocean, drayage, and warehouse — from origin to delivery.',
-    path: '/international-new/tracking',
-  },
-  {
-    icon: <Package size={20} className="text-blue-600" />,
-    bg: 'bg-blue-50',
-    title: 'Inbound Management',
-    desc: 'Manage receipts, appointments, and put-away reports across all facilities.',
-    path: '/inbound/inquiry',
-  },
-  {
-    icon: <Warehouse size={20} className="text-emerald-600" />,
-    bg: 'bg-emerald-50',
-    title: 'Inventory Control',
-    desc: 'Real-time on-hand inventory, cycle counts, adjustments, and activity history.',
-    path: '/inventory/activity',
-  },
-  {
-    icon: <Truck size={20} className="text-indigo-600" />,
-    bg: 'bg-indigo-50',
-    title: 'Outbound Orders',
-    desc: 'Create, track, and manage outbound orders. Export POD and shipping docs.',
-    path: '/outbound/inquiry',
-  },
-  {
-    icon: <BarChart2 size={20} className="text-violet-600" />,
-    bg: 'bg-violet-50',
-    title: 'OTIF & KPI Insights',
-    desc: 'Monitor On-Time In-Full performance, root cause analysis, and retailer scorecards.',
-    path: '/dashboard/otif',
-  },
-  {
-    icon: <DollarSign size={20} className="text-amber-600" />,
-    bg: 'bg-amber-50',
-    title: 'Finance & Invoicing',
-    desc: 'Review invoices, submit disputes, manage claims, and download billing reports.',
-    path: '/finance/invoices',
-  },
+const PLATFORM_CAPABILITIES = [
+  { icon: '🚢', title: 'End-to-End Visibility', desc: 'Track shipments from origin port to your warehouse door. Live milestones, LFD alerts, and delay forecasts.' },
+  { icon: '📦', title: 'Inbound & Receiving', desc: 'Manage receipts, appointments, and put-away across all facilities. Resolve discrepancies online.' },
+  { icon: '🏭', title: 'Inventory Control', desc: 'Real-time on-hand, cycle counts, SN lookup, and adjustment reports. Always know what you have.' },
+  { icon: '🚛', title: 'Outbound Fulfillment', desc: 'Create orders, assign carriers, track to delivery. Export BOL and POD with one click.' },
+  { icon: '📊', title: 'OTIF & KPI Analytics', desc: 'Monitor On-Time In-Full, retailer scorecards, root cause analysis, and penalty forecasts.' },
+  { icon: '🤖', title: 'AI-Powered Copilot', desc: 'Ask questions, get guided actions, and resolve exceptions faster with AI across every module.' },
 ]
 
-// ─── Modal Component ──────────────────────────────────────────────────────────
+// ─── Shared Modals ────────────────────────────────────────────────────────────
 function Modal({ onClose, children }: { onClose: () => void; children: React.ReactNode }) {
   return (
     <div className="fixed inset-0 bg-black/40 z-50 flex items-start justify-center pt-16 px-4" onClick={onClose}>
@@ -279,20 +127,19 @@ function Modal({ onClose, children }: { onClose: () => void; children: React.Rea
   )
 }
 
-// ─── Stat Detail Modal ────────────────────────────────────────────────────────
 function StatDetailModal({ stat, onClose }: { stat: typeof SUMMARY_STATS[0]; onClose: () => void }) {
   const navigate = useNavigate()
   return (
     <Modal onClose={onClose}>
       <div className="px-5 py-4 border-b flex items-center justify-between">
         <h3 className="text-sm font-bold text-gray-900">{stat.detail.title}</h3>
-        <button onClick={onClose}><X size={16} className="text-gray-400 hover:text-gray-600" /></button>
+        <button onClick={onClose}><X size={16} className="text-gray-400" /></button>
       </div>
-      <div className="p-5 space-y-2.5">
+      <div className="p-5 space-y-2">
         {stat.detail.items.map((item, i) => (
           <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-gray-50">
             <div className="flex items-center gap-2">
-              <span className={`w-2 h-2 rounded-full shrink-0 ${item.status === 'alert' ? 'bg-red-500' : item.status === 'warning' ? 'bg-orange-400' : 'bg-green-400'}`} />
+              <span className={`w-2 h-2 rounded-full ${item.status === 'alert' ? 'bg-red-500' : item.status === 'warning' ? 'bg-orange-400' : 'bg-green-400'}`} />
               <span className="text-sm text-gray-700">{item.label}</span>
             </div>
             <span className={`text-sm font-bold ${item.status === 'alert' ? 'text-red-600' : item.status === 'warning' ? 'text-orange-600' : 'text-gray-700'}`}>{item.count}</span>
@@ -301,7 +148,7 @@ function StatDetailModal({ stat, onClose }: { stat: typeof SUMMARY_STATS[0]; onC
       </div>
       <div className="px-5 pb-5">
         <button onClick={() => { navigate(stat.detail.cta.path); onClose() }}
-          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors">
+          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700">
           <ExternalLink size={14} /> {stat.detail.cta.label}
         </button>
       </div>
@@ -309,11 +156,9 @@ function StatDetailModal({ stat, onClose }: { stat: typeof SUMMARY_STATS[0]; onC
   )
 }
 
-// ─── Exception Action Modal ───────────────────────────────────────────────────
 function ExceptionModal({ ex, onClose }: { ex: typeof EXCEPTIONS[0]; onClose: () => void }) {
   const navigate = useNavigate()
   const [step, setStep] = useState(0)
-  const [notes, setNotes] = useState('')
   const [submitted, setSubmitted] = useState(false)
   return (
     <Modal onClose={onClose}>
@@ -322,40 +167,26 @@ function ExceptionModal({ ex, onClose }: { ex: typeof EXCEPTIONS[0]; onClose: ()
           <span className={`text-[10px] font-bold text-white px-1.5 py-0.5 rounded ${ex.color}`}>{ex.priority}</span>
           <h3 className="text-sm font-bold text-gray-900">{ex.label}</h3>
         </div>
-        <button onClick={onClose}><X size={16} className="text-gray-400 hover:text-gray-600" /></button>
+        <button onClick={onClose}><X size={16} className="text-gray-400" /></button>
       </div>
       <div className="p-5">
-        <p className="text-sm text-gray-600 mb-4 leading-relaxed">{ex.detail}</p>
+        <p className="text-sm text-gray-600 mb-4">{ex.detail}</p>
         {!submitted ? (
           <>
-            <div className="mb-4">
-              <p className="text-xs font-semibold text-gray-700 mb-2">Action Steps:</p>
-              <div className="space-y-2">
-                {ex.steps.map((s, i) => (
-                  <div key={i} className={`flex items-center gap-2.5 p-2.5 rounded-lg border transition-colors cursor-pointer ${i <= step ? 'border-primary-200 bg-primary-50' : 'border-gray-200 bg-white'}`}
-                    onClick={() => setStep(i)}>
-                    <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${i < step ? 'bg-green-500 text-white' : i === step ? 'bg-primary-600 text-white' : 'bg-gray-200 text-gray-500'}`}>
-                      {i < step ? '✓' : i + 1}
-                    </div>
-                    <span className={`text-xs ${i <= step ? 'text-gray-800 font-medium' : 'text-gray-500'}`}>{s}</span>
-                    {i === step && <ChevronRight size={12} className="text-primary-500 ml-auto" />}
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="mb-4">
-              <label className="text-xs font-semibold text-gray-700 block mb-1">Notes / Action taken</label>
-              <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={2}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-700 resize-none focus:outline-none focus:border-primary-400"
-                placeholder="Add notes about this action..." />
+            <div className="space-y-2 mb-4">
+              {ex.steps.map((s, i) => (
+                <div key={i} className={`flex items-center gap-2.5 p-2.5 rounded-lg border cursor-pointer ${i <= step ? 'border-primary-200 bg-primary-50' : 'border-gray-200'}`} onClick={() => setStep(i)}>
+                  <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${i < step ? 'bg-green-500 text-white' : i === step ? 'bg-primary-600 text-white' : 'bg-gray-200 text-gray-500'}`}>{i < step ? '✓' : i + 1}</div>
+                  <span className={`text-xs ${i <= step ? 'text-gray-800 font-medium' : 'text-gray-500'}`}>{s}</span>
+                </div>
+              ))}
             </div>
             <div className="flex gap-2">
-              <button onClick={() => { navigate(ex.path); onClose() }}
-                className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 border border-gray-200 text-xs text-gray-600 rounded-lg hover:bg-gray-50 transition-colors">
+              <button onClick={() => { navigate(ex.path); onClose() }} className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 border border-gray-200 text-xs text-gray-600 rounded-lg hover:bg-gray-50">
                 <ExternalLink size={12} /> View Details
               </button>
               <button onClick={() => { if (step < ex.steps.length - 1) setStep(s => s + 1); else setSubmitted(true) }}
-                className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-primary-600 text-white text-xs font-medium rounded-lg hover:bg-primary-700 transition-colors">
+                className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-primary-600 text-white text-xs font-medium rounded-lg hover:bg-primary-700">
                 <Send size={12} /> {step < ex.steps.length - 1 ? 'Next Step' : 'Submit Action'}
               </button>
             </div>
@@ -364,8 +195,7 @@ function ExceptionModal({ ex, onClose }: { ex: typeof EXCEPTIONS[0]; onClose: ()
           <div className="text-center py-6">
             <CheckCircle2 size={36} className="text-green-500 mx-auto mb-3" />
             <p className="text-sm font-bold text-gray-800">Action Submitted</p>
-            <p className="text-xs text-gray-500 mt-1">The team has been notified.</p>
-            <button onClick={onClose} className="mt-4 px-4 py-2 bg-green-50 text-green-700 text-xs font-medium rounded-lg hover:bg-green-100 transition-colors">Done</button>
+            <button onClick={onClose} className="mt-4 px-4 py-2 bg-green-50 text-green-700 text-xs rounded-lg">Done</button>
           </div>
         )}
       </div>
@@ -373,7 +203,6 @@ function ExceptionModal({ ex, onClose }: { ex: typeof EXCEPTIONS[0]; onClose: ()
   )
 }
 
-// ─── Task Detail Modal ────────────────────────────────────────────────────────
 function TaskModal({ task, onClose }: { task: typeof MY_TASKS[0]; onClose: () => void }) {
   const navigate = useNavigate()
   return (
@@ -383,7 +212,7 @@ function TaskModal({ task, onClose }: { task: typeof MY_TASKS[0]; onClose: () =>
           <span className={`text-[9px] font-bold text-white px-1.5 py-0.5 rounded ${task.priority === 'P1' ? 'bg-red-500' : task.priority === 'P2' ? 'bg-orange-400' : 'bg-gray-400'}`}>{task.priority}</span>
           <h3 className="text-sm font-bold text-gray-900 truncate">{task.title}</h3>
         </div>
-        <button onClick={onClose}><X size={16} className="text-gray-400 hover:text-gray-600" /></button>
+        <button onClick={onClose}><X size={16} className="text-gray-400" /></button>
       </div>
       <div className="p-5">
         <div className="flex flex-wrap gap-2 mb-4">
@@ -393,9 +222,9 @@ function TaskModal({ task, onClose }: { task: typeof MY_TASKS[0]; onClose: () =>
         </div>
         <p className="text-sm text-gray-600 leading-relaxed mb-5">{task.detail}</p>
         <div className="flex gap-2">
-          <button onClick={onClose} className="flex-1 px-3 py-2 border border-gray-200 text-xs text-gray-600 rounded-lg hover:bg-gray-50 transition-colors">Dismiss</button>
+          <button onClick={onClose} className="flex-1 px-3 py-2 border border-gray-200 text-xs text-gray-600 rounded-lg hover:bg-gray-50">Dismiss</button>
           <button onClick={() => { navigate(task.path); onClose() }}
-            className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-primary-600 text-white text-xs font-medium rounded-lg hover:bg-primary-700 transition-colors">
+            className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-primary-600 text-white text-xs font-medium rounded-lg hover:bg-primary-700">
             <ArrowRight size={12} /> Go to {task.type}
           </button>
         </div>
@@ -404,7 +233,6 @@ function TaskModal({ task, onClose }: { task: typeof MY_TASKS[0]; onClose: () =>
   )
 }
 
-// ─── Agent Action Modal ───────────────────────────────────────────────────────
 function AgentActionModal({ action, onClose }: { action: string; onClose: () => void }) {
   const [done, setDone] = useState(false)
   const steps: Record<string, string[]> = {
@@ -421,25 +249,21 @@ function AgentActionModal({ action, onClose }: { action: string; onClose: () => 
           <Bot size={14} className="text-violet-500" />
           <h3 className="text-sm font-bold text-gray-900">AI-Assisted: {action}</h3>
         </div>
-        <button onClick={onClose}><X size={16} className="text-gray-400 hover:text-gray-600" /></button>
+        <button onClick={onClose}><X size={16} className="text-gray-400" /></button>
       </div>
       <div className="p-5">
         {!done ? (
           <>
-            <p className="text-xs text-gray-500 mb-4">Follow the AI-recommended steps:</p>
             <div className="space-y-2 mb-4">
               {stepList.map((s, i) => (
-                <div key={i} className={`flex items-center gap-2.5 p-2.5 rounded-lg border cursor-pointer ${i <= step ? 'border-violet-200 bg-violet-50' : 'border-gray-100 bg-gray-50'}`}
-                  onClick={() => setStep(i)}>
-                  <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${i < step ? 'bg-green-500 text-white' : i === step ? 'bg-violet-600 text-white' : 'bg-gray-200 text-gray-500'}`}>
-                    {i < step ? '✓' : i + 1}
-                  </div>
+                <div key={i} className={`flex items-center gap-2.5 p-2.5 rounded-lg border cursor-pointer ${i <= step ? 'border-violet-200 bg-violet-50' : 'border-gray-100 bg-gray-50'}`} onClick={() => setStep(i)}>
+                  <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${i < step ? 'bg-green-500 text-white' : i === step ? 'bg-violet-600 text-white' : 'bg-gray-200 text-gray-500'}`}>{i < step ? '✓' : i + 1}</div>
                   <span className={`text-xs ${i <= step ? 'text-gray-800' : 'text-gray-400'}`}>{s}</span>
                 </div>
               ))}
             </div>
             <button onClick={() => { if (step < stepList.length - 1) setStep(s => s + 1); else setDone(true) }}
-              className="w-full py-2.5 bg-violet-600 text-white text-xs font-medium rounded-lg hover:bg-violet-700 transition-colors">
+              className="w-full py-2.5 bg-violet-600 text-white text-xs font-medium rounded-lg hover:bg-violet-700">
               {step < stepList.length - 1 ? 'Next Step →' : 'Complete Action'}
             </button>
           </>
@@ -447,7 +271,7 @@ function AgentActionModal({ action, onClose }: { action: string; onClose: () => 
           <div className="text-center py-6">
             <CheckCircle2 size={36} className="text-green-500 mx-auto mb-3" />
             <p className="text-sm font-bold text-gray-800">Action Completed</p>
-            <button onClick={onClose} className="mt-4 px-4 py-2 bg-green-50 text-green-700 text-xs font-medium rounded-lg">Done</button>
+            <button onClick={onClose} className="mt-4 px-4 py-2 bg-green-50 text-green-700 text-xs rounded-lg">Done</button>
           </div>
         )}
       </div>
@@ -474,22 +298,17 @@ function NetworkMap({ onLocClick }: { onLocClick: (loc: { name: string; type: st
     { from: { x: 68, y: 52 }, to: { x: 24, y: 32 }, status: 'alert' },
   ]
   return (
-    <div className="relative w-full rounded-xl overflow-hidden" style={{ height: '260px' }}>
-      <svg viewBox="0 0 100 70" className="w-full h-full cursor-pointer" preserveAspectRatio="xMidYMid slice">
+    <div className="relative w-full rounded-xl overflow-hidden" style={{ height: '240px' }}>
+      <svg viewBox="0 0 100 70" className="w-full h-full" preserveAspectRatio="xMidYMid slice">
         <rect x="0" y="0" width="100" height="70" fill="#0f172a" />
         <ellipse cx="48" cy="45" rx="25" ry="18" fill="#1e3a5f" opacity="0.4" />
         <path d="M 60 20 Q 75 15 85 22 Q 90 30 88 45 Q 82 60 75 65 L 65 65 Q 58 58 60 45 Q 58 35 60 20 Z" fill="#1e293b" stroke="#334155" strokeWidth="0.3" />
         <path d="M 0 15 Q 15 10 28 18 Q 35 25 33 40 Q 30 55 20 62 Q 10 65 2 60 Q 0 50 0 35 Z" fill="#1e293b" stroke="#334155" strokeWidth="0.3" />
         {routes.map((r, i) => (
-          <path key={i} d={`M ${r.from.x} ${r.from.y} Q 48 ${r.from.y - 8} ${r.to.x} ${r.to.y}`}
-            fill="none" stroke={r.status === 'alert' ? '#f97316' : '#6366f1'} strokeWidth="0.5" strokeDasharray="2 1" opacity="0.7" />
+          <path key={i} d={`M ${r.from.x} ${r.from.y} Q 48 ${r.from.y - 8} ${r.to.x} ${r.to.y}`} fill="none" stroke={r.status === 'alert' ? '#f97316' : '#6366f1'} strokeWidth="0.5" strokeDasharray="2 1" opacity="0.7" />
         ))}
-        <circle cx="48" cy="35" r="1" fill="#818cf8" opacity="0.9">
-          <animateMotion dur="6s" repeatCount="indefinite" path="M 72 38 Q 48 30 22 40" />
-        </circle>
-        <circle cx="48" cy="38" r="1" fill="#818cf8" opacity="0.7">
-          <animateMotion dur="8s" repeatCount="indefinite" path="M 74 44 Q 48 36 8 42" />
-        </circle>
+        <circle cx="48" cy="35" r="1" fill="#818cf8" opacity="0.9"><animateMotion dur="6s" repeatCount="indefinite" path="M 72 38 Q 48 30 22 40" /></circle>
+        <circle cx="48" cy="38" r="1" fill="#818cf8" opacity="0.7"><animateMotion dur="8s" repeatCount="indefinite" path="M 74 44 Q 48 36 8 42" /></circle>
         {locations.map(loc => {
           const color = loc.status === 'alert' ? '#f97316' : loc.type === 'warehouse' ? '#22c55e' : loc.type === 'origin' ? '#6366f1' : '#14b8a6'
           const size = loc.type === 'warehouse' || loc.type === 'pod' ? 1.8 : 1.3
@@ -498,19 +317,13 @@ function NetworkMap({ onLocClick }: { onLocClick: (loc: { name: string; type: st
               <circle cx={loc.x} cy={loc.y} r={size + 2} fill="transparent" />
               <circle cx={loc.x} cy={loc.y} r={size + 0.8} fill={color} opacity="0.2" />
               <circle cx={loc.x} cy={loc.y} r={size} fill={color} stroke="white" strokeWidth="0.3" />
-              {loc.count > 5 && (
-                <circle cx={loc.x} cy={loc.y} r={size + 1.5} fill={color} opacity="0.15">
-                  <animate attributeName="r" values={`${size};${size + 2};${size}`} dur="2s" repeatCount="indefinite" />
-                  <animate attributeName="opacity" values="0.2;0;0.2" dur="2s" repeatCount="indefinite" />
-                </circle>
-              )}
               <text x={loc.x + 1.5} y={loc.y + 0.5} fill="white" fontSize="2.2" fontWeight="600" opacity="0.9">{loc.name}</text>
               <text x={loc.x + 1.5} y={loc.y + 2.8} fill={color} fontSize="1.8" opacity="0.8">{loc.count} {loc.type === 'warehouse' ? 'receiving' : loc.type === 'origin' ? 'vessels' : 'containers'}</text>
             </g>
           )
         })}
       </svg>
-      <div className="absolute bottom-2 left-2 flex items-center gap-3 bg-slate-900/80 rounded-lg px-2.5 py-1 backdrop-blur-sm">
+      <div className="absolute bottom-2 left-2 flex items-center gap-3 bg-slate-900/80 rounded-lg px-2.5 py-1">
         {[['#6366f1', 'Origin'], ['#14b8a6', 'Port/Terminal'], ['#22c55e', 'Warehouse'], ['#f97316', 'Alert']].map(([c, l]) => (
           <div key={l as string} className="flex items-center gap-1">
             <span className="w-2 h-2 rounded-full" style={{ backgroundColor: c as string }} />
@@ -522,7 +335,6 @@ function NetworkMap({ onLocClick }: { onLocClick: (loc: { name: string; type: st
   )
 }
 
-// ─── Location Detail Modal ────────────────────────────────────────────────────
 function LocationModal({ loc, onClose }: { loc: { name: string; type: string; count: number; status: string } | null; onClose: () => void }) {
   const navigate = useNavigate()
   if (!loc) return null
@@ -533,17 +345,17 @@ function LocationModal({ loc, onClose }: { loc: { name: string; type: string; co
         <div className="flex items-center gap-2">
           <MapPin size={14} className={isAlert ? 'text-orange-500' : 'text-indigo-500'} />
           <h3 className="text-sm font-bold text-gray-900">{loc.name}</h3>
-          <span className={`text-[9px] px-1.5 py-0.5 rounded font-medium ${isAlert ? 'bg-orange-100 text-orange-600' : 'bg-gray-100 text-gray-500'}`}>{loc.type}</span>
+          <span className={`text-[9px] px-1.5 py-0.5 rounded ${isAlert ? 'bg-orange-100 text-orange-600' : 'bg-gray-100 text-gray-500'}`}>{loc.type}</span>
         </div>
-        <button onClick={onClose}><X size={16} className="text-gray-400 hover:text-gray-600" /></button>
+        <button onClick={onClose}><X size={16} className="text-gray-400" /></button>
       </div>
       <div className="p-5">
         <div className={`rounded-lg p-3 mb-4 ${isAlert ? 'bg-orange-50 border border-orange-200' : 'bg-gray-50'}`}>
-          <p className="text-xs text-gray-600">Active {loc.type === 'warehouse' ? 'receiving' : loc.type === 'origin' ? 'vessel departures' : 'containers'}: <span className="font-bold text-gray-900">{loc.count}</span></p>
+          <p className="text-xs text-gray-600">Active {loc.type === 'warehouse' ? 'receiving' : loc.type === 'origin' ? 'vessel departures' : 'containers'}: <span className="font-bold">{loc.count}</span></p>
           {isAlert && <p className="text-xs text-orange-600 mt-1 font-medium">⚠ Exception detected — action may be required</p>}
         </div>
         <button onClick={() => { navigate('/international-new/tracking'); onClose() }}
-          className="w-full flex items-center justify-center gap-1.5 px-4 py-2.5 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors">
+          className="w-full flex items-center justify-center gap-1.5 px-4 py-2.5 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700">
           <ExternalLink size={14} /> View Shipments at {loc.name}
         </button>
       </div>
@@ -551,7 +363,6 @@ function LocationModal({ loc, onClose }: { loc: { name: string; type: string; co
   )
 }
 
-// ─── AI Agent Panel ───────────────────────────────────────────────────────────
 function AIAgentPanel({ onAction }: { onAction: (action: string) => void }) {
   const [expanded, setExpanded] = useState(false)
   const suggestions = [
@@ -563,17 +374,13 @@ function AIAgentPanel({ onAction }: { onAction: (action: string) => void }) {
     <div className="bg-gradient-to-br from-violet-50 to-indigo-50 border border-violet-200 rounded-xl p-4">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <div className="w-6 h-6 bg-violet-500 rounded-full flex items-center justify-center">
-            <Bot size={13} className="text-white" />
-          </div>
+          <div className="w-6 h-6 bg-violet-500 rounded-full flex items-center justify-center"><Bot size={13} className="text-white" /></div>
           <div>
             <p className="text-xs font-bold text-gray-800">AI Agent Analysis</p>
             <p className="text-[10px] text-gray-500">Recommended actions based on current exceptions</p>
           </div>
         </div>
-        <button onClick={() => setExpanded(v => !v)} className="text-[10px] text-violet-600 hover:underline font-medium">
-          {expanded ? 'Show less' : 'Show all'}
-        </button>
+        <button onClick={() => setExpanded(v => !v)} className="text-[10px] text-violet-600 hover:underline font-medium">{expanded ? 'Show less' : 'Show all'}</button>
       </div>
       <div className="space-y-2.5">
         {suggestions.slice(0, expanded ? 3 : 2).map((s, i) => (
@@ -584,9 +391,7 @@ function AIAgentPanel({ onAction }: { onAction: (action: string) => void }) {
                 <p className="text-[11px] text-gray-700 leading-relaxed">{s.text}</p>
                 <div className="flex items-center gap-2 mt-2">
                   <span className={`text-[9px] px-1.5 py-0.5 rounded font-semibold ${s.priority === 'P1' ? 'bg-red-100 text-red-600' : 'bg-orange-100 text-orange-600'}`}>{s.priority}</span>
-                  <button onClick={() => onAction(s.action)} className="flex items-center gap-1 text-[10px] text-violet-600 hover:text-violet-800 font-medium">
-                    <Zap size={9} />{s.action}
-                  </button>
+                  <button onClick={() => onAction(s.action)} className="flex items-center gap-1 text-[10px] text-violet-600 hover:text-violet-800 font-medium"><Zap size={9} />{s.action}</button>
                 </div>
               </div>
             </div>
@@ -598,302 +403,282 @@ function AIAgentPanel({ onAction }: { onAction: (action: string) => void }) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// NEW USER VIEW
+// A: NEW USER HOME
 // ═══════════════════════════════════════════════════════════════════════════════
 function NewUserHome({ onSwitch }: { onSwitch: () => void }) {
   const navigate = useNavigate()
   const [completedSteps, setCompletedSteps] = useState<string[]>([])
-  const [expandedStep, setExpandedStep] = useState<string | null>('profile')
-
-  const toggleStep = (id: string) => {
-    setCompletedSteps(prev =>
-      prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]
-    )
-  }
+  const [expandedStep, setExpandedStep] = useState<string>('profile')
+  const [showConfetti, setShowConfetti] = useState(false)
+  const [announcementDismissed, setAnnouncementDismissed] = useState(false)
 
   const progress = Math.round((completedSteps.length / ONBOARDING_STEPS.length) * 100)
   const allDone = completedSteps.length === ONBOARDING_STEPS.length
 
+  const toggleStep = (id: string) => {
+    const next = completedSteps.includes(id)
+      ? completedSteps.filter(s => s !== id)
+      : [...completedSteps, id]
+    setCompletedSteps(next)
+    if (next.length === ONBOARDING_STEPS.length) {
+      setShowConfetti(true)
+      setTimeout(() => setShowConfetti(false), 4000)
+    }
+  }
+
   return (
-    <div className="space-y-6 pb-8">
+    <div className="space-y-5 pb-10">
 
-      {/* ── Welcome Hero ── */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-primary-600 via-primary-700 to-indigo-700 px-8 py-8">
-        {/* Background decoration */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute -top-8 -right-8 w-48 h-48 bg-white/5 rounded-full" />
-          <div className="absolute top-4 right-24 w-24 h-24 bg-white/5 rounded-full" />
-          <div className="absolute -bottom-6 right-12 w-36 h-36 bg-white/5 rounded-full" />
-        </div>
-
-        <div className="relative flex items-start justify-between gap-6">
-          <div className="flex-1">
-            <div className="inline-flex items-center gap-1.5 bg-white/20 text-white text-xs font-medium px-3 py-1 rounded-full mb-3">
-              <Sparkles size={12} /> Welcome to Client Portal 3.0
+      {/* ── Confetti overlay ── */}
+      {showConfetti && (
+        <div className="fixed inset-0 pointer-events-none z-[9999] flex items-start justify-center pt-24">
+          <div className="text-center animate-bounce">
+            <div className="text-6xl mb-2">🎉</div>
+            <div className="bg-white/95 shadow-xl rounded-2xl px-8 py-5 border border-green-200">
+              <p className="text-xl font-bold text-green-700">Setup Complete!</p>
+              <p className="text-sm text-gray-500 mt-1">You're all set. Your Client Portal is ready.</p>
             </div>
-            <h1 className="text-2xl font-bold text-white mb-2 leading-tight">
-              Hello, Sarah 👋<br />
-              <span className="text-white/80 text-lg font-medium">Let's get your account ready</span>
+          </div>
+        </div>
+      )}
+
+      {/* ── Hero Banner ── */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary-600 via-primary-700 to-indigo-800">
+        {/* Decorative circles */}
+        <div className="absolute -top-10 -right-10 w-56 h-56 bg-white/5 rounded-full" />
+        <div className="absolute top-6 right-28 w-28 h-28 bg-white/5 rounded-full" />
+        <div className="absolute -bottom-8 -left-6 w-40 h-40 bg-white/5 rounded-full" />
+        {/* Grid texture */}
+        <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
+
+        <div className="relative px-8 py-8 flex items-start justify-between gap-6">
+          {/* Left */}
+          <div className="flex-1 min-w-0">
+            <div className="inline-flex items-center gap-1.5 bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full mb-4">
+              <Sparkles size={11} /> Welcome to Client Portal 3.0
+            </div>
+            <h1 className="text-[26px] font-bold text-white leading-tight mb-2">
+              Hello, Sarah 👋
+              <span className="block text-white/75 text-lg font-normal mt-0.5">Let's get your account ready to go.</span>
             </h1>
-            <p className="text-white/75 text-sm leading-relaxed max-w-lg">
-              Client Portal 3.0 is your unified supply chain command center — track shipments, manage inventory, submit orders, and collaborate with our team, all in one place.
+            <p className="text-white/70 text-sm leading-relaxed max-w-xl mb-5">
+              Client Portal 3.0 is your unified supply chain command center — track shipments, manage inventory, submit orders, resolve exceptions, and collaborate with our operations team, all in one place.
             </p>
-            <div className="flex items-center gap-3 mt-4">
-              <button
-                onClick={() => navigate('/agents?nav=chat')}
-                className="flex items-center gap-2 px-4 py-2 bg-white text-primary-700 text-sm font-semibold rounded-xl hover:bg-white/90 transition-colors shadow-sm"
-              >
-                <Bot size={15} /> Ask AI Copilot
+            <div className="flex flex-wrap items-center gap-2.5">
+              <button onClick={() => navigate('/agents?nav=chat')}
+                className="flex items-center gap-2 px-4 py-2 bg-white text-primary-700 text-sm font-bold rounded-xl hover:bg-white/90 shadow-sm">
+                <Bot size={14} /> Ask AI Copilot
               </button>
-              <button
-                className="flex items-center gap-2 px-4 py-2 bg-white/15 text-white text-sm font-medium rounded-xl hover:bg-white/25 transition-colors border border-white/20"
-              >
-                <PlayCircle size={15} /> Watch intro (2 min)
+              <button className="flex items-center gap-2 px-4 py-2 bg-white/15 text-white text-sm font-medium rounded-xl hover:bg-white/25 border border-white/20">
+                <PlayCircle size={14} /> Quick tour (2 min)
+              </button>
+              <button className="flex items-center gap-2 px-4 py-2 bg-white/15 text-white text-sm font-medium rounded-xl hover:bg-white/25 border border-white/20">
+                <BookOpen size={14} /> Documentation
               </button>
             </div>
           </div>
 
-          {/* Progress summary */}
-          <div className="hidden lg:block shrink-0 bg-white/15 backdrop-blur-sm rounded-xl px-5 py-4 border border-white/20 min-w-[180px]">
-            <p className="text-white/60 text-xs font-medium mb-2">Setup progress</p>
-            <div className="flex items-end gap-2 mb-2">
-              <span className="text-3xl font-bold text-white">{progress}%</span>
-              <span className="text-white/60 text-xs mb-1">complete</span>
+          {/* Right: progress card */}
+          <div className="hidden lg:flex flex-col items-center bg-white/10 backdrop-blur-sm rounded-2xl px-6 py-5 border border-white/20 min-w-[200px]">
+            {/* Ring progress */}
+            <div className="relative w-20 h-20 mb-3">
+              <svg viewBox="0 0 80 80" className="w-20 h-20 -rotate-90">
+                <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="8" />
+                <circle cx="40" cy="40" r="32" fill="none" stroke="white" strokeWidth="8"
+                  strokeDasharray={`${2 * Math.PI * 32}`}
+                  strokeDashoffset={`${2 * Math.PI * 32 * (1 - progress / 100)}`}
+                  strokeLinecap="round" style={{ transition: 'stroke-dashoffset 0.5s ease' }} />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-xl font-bold text-white">{progress}%</span>
+              </div>
             </div>
-            <div className="w-full bg-white/20 rounded-full h-1.5 mb-3">
-              <div
-                className="bg-white rounded-full h-1.5 transition-all duration-500"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-            <p className="text-white/70 text-[11px]">
-              {allDone ? '🎉 All set! You\'re ready to go.' : `${ONBOARDING_STEPS.length - completedSteps.length} steps remaining`}
+            <p className="text-white font-semibold text-sm mb-0.5">Setup Progress</p>
+            <p className="text-white/60 text-[11px] text-center">
+              {allDone ? 'All steps complete! 🎉' : `${ONBOARDING_STEPS.length - completedSteps.length} of ${ONBOARDING_STEPS.length} remaining`}
             </p>
             {allDone && (
-              <button
-                onClick={onSwitch}
-                className="mt-2 w-full py-1.5 bg-white/20 text-white text-xs font-medium rounded-lg hover:bg-white/30 transition-colors"
-              >
-                Go to dashboard →
+              <button onClick={onSwitch} className="mt-3 px-3 py-1.5 bg-white/20 hover:bg-white/30 text-white text-xs font-medium rounded-lg">
+                Open Dashboard →
               </button>
             )}
           </div>
         </div>
       </div>
 
-      {/* ── Main content grid ── */}
+      {/* ── Announcement banner ── */}
+      {!announcementDismissed && (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 flex items-start gap-3">
+          <Star size={14} className="text-amber-500 shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="text-xs font-bold text-amber-800">New in v3.0 — AI Copilot is now available across all modules</p>
+            <p className="text-[11px] text-amber-600 mt-0.5">Ask questions, get data summaries, and take guided actions in Inbound, Inventory, Outbound, and Finance.
+              <button className="underline font-medium ml-1" onClick={() => navigate('/agents?nav=chat')}>Try it now →</button>
+            </p>
+          </div>
+          <button onClick={() => setAnnouncementDismissed(true)} className="text-amber-400 hover:text-amber-600 shrink-0">
+            <X size={14} />
+          </button>
+        </div>
+      )}
+
+      {/* ── Main content: Checklist + Side ── */}
       <div className="grid grid-cols-5 gap-5">
 
-        {/* ── Left: Onboarding Checklist (3 cols) ── */}
+        {/* Checklist — 3 cols */}
         <div className="col-span-3 space-y-3">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-base font-bold text-gray-900">Getting Started Checklist</h2>
-              <p className="text-xs text-gray-500 mt-0.5">Complete these steps to activate your full account capabilities</p>
+              <h2 className="text-[15px] font-bold text-gray-900">Getting Started Checklist</h2>
+              <p className="text-xs text-gray-500">Complete these 5 steps to unlock your full account capabilities</p>
             </div>
-            <div className="flex items-center gap-1.5 text-xs text-gray-500">
-              <span className="font-semibold text-primary-600">{completedSteps.length}</span>
-              <span>/ {ONBOARDING_STEPS.length} done</span>
-            </div>
+            <span className="text-xs font-semibold text-primary-600 bg-primary-50 px-2.5 py-1 rounded-full">
+              {completedSteps.length}/{ONBOARDING_STEPS.length} done
+            </span>
           </div>
 
           {/* Progress bar */}
-          <div className="w-full bg-gray-100 rounded-full h-1.5">
-            <div
-              className="bg-primary-600 rounded-full h-1.5 transition-all duration-500"
-              style={{ width: `${progress}%` }}
-            />
+          <div className="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
+            <div className="bg-primary-600 h-1.5 rounded-full transition-all duration-500" style={{ width: `${progress}%` }} />
           </div>
 
-          {/* Steps */}
-          <div className="space-y-2">
-            {ONBOARDING_STEPS.map((step) => {
+          {/* Steps as timeline */}
+          <div className="space-y-0">
+            {ONBOARDING_STEPS.map((step, idx) => {
               const done = completedSteps.includes(step.id)
-              const expanded = expandedStep === step.id
+              const isExpanded = expandedStep === step.id
+              const isLast = idx === ONBOARDING_STEPS.length - 1
               return (
-                <div
-                  key={step.id}
-                  className={`bg-white border rounded-xl overflow-hidden transition-all ${done ? 'border-green-200 opacity-75' : expanded ? `${step.border} shadow-sm` : 'border-gray-200 hover:border-gray-300'}`}
-                >
-                  {/* Header row */}
-                  <div
-                    className="flex items-center gap-3 px-4 py-3 cursor-pointer"
-                    onClick={() => setExpandedStep(expanded ? null : step.id)}
-                  >
-                    {/* Checkbox */}
+                <div key={step.id} className="flex gap-3">
+                  {/* Timeline spine */}
+                  <div className="flex flex-col items-center shrink-0 pt-3">
                     <button
-                      onClick={e => { e.stopPropagation(); toggleStep(step.id) }}
-                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${done ? 'bg-green-500 border-green-500' : `border-gray-300 hover:${step.border}`}`}
+                      onClick={() => toggleStep(step.id)}
+                      className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-all z-10 ${done ? 'bg-green-500 border-green-500' : `border-gray-300 bg-white hover:border-primary-400`}`}
                     >
-                      {done && <CheckCircle2 size={12} className="text-white" />}
+                      {done ? <CheckCircle2 size={13} className="text-white" /> : <span className="w-2 h-2 rounded-full" style={{ background: done ? '#fff' : step.accent }} />}
                     </button>
-
-                    {/* Icon */}
-                    <div className={`w-7 h-7 ${step.bg} rounded-lg flex items-center justify-center shrink-0 ${step.color}`}>
-                      {step.icon}
-                    </div>
-
-                    <div className="flex-1 min-w-0">
-                      <p className={`text-sm font-semibold ${done ? 'text-gray-400 line-through' : 'text-gray-800'}`}>
-                        {step.title}
-                      </p>
-                    </div>
-
-                    {done ? (
-                      <span className="text-[10px] text-green-600 font-medium bg-green-50 px-2 py-0.5 rounded-full shrink-0">Done</span>
-                    ) : (
-                      expanded
-                        ? <ChevronUp size={14} className="text-gray-400 shrink-0" />
-                        : <ChevronDown size={14} className="text-gray-400 shrink-0" />
-                    )}
+                    {!isLast && <div className={`w-0.5 flex-1 mt-1 ${done ? 'bg-green-200' : 'bg-gray-100'}`} style={{ minHeight: '24px' }} />}
                   </div>
 
-                  {/* Expanded content */}
-                  {expanded && !done && (
-                    <div className={`px-4 pb-4 border-t ${step.border} ${step.bg}`}>
-                      <p className="text-xs text-gray-600 leading-relaxed mt-3 mb-3">{step.desc}</p>
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => navigate(step.path)}
-                          className={`flex items-center gap-1.5 px-3 py-1.5 ${step.bg} ${step.color} border ${step.border} text-xs font-semibold rounded-lg hover:shadow-sm transition-all`}
-                        >
-                          {step.cta} <ArrowRight size={12} />
-                        </button>
-                        <button
-                          onClick={() => { toggleStep(step.id); setExpandedStep(null) }}
-                          className="px-3 py-1.5 text-xs text-gray-400 hover:text-gray-600 transition-colors"
-                        >
-                          Mark as done
-                        </button>
+                  {/* Card */}
+                  <div className={`flex-1 mb-2 bg-white border rounded-xl overflow-hidden transition-all ${done ? 'border-green-200 opacity-70' : isExpanded ? `${step.border} shadow-sm` : 'border-gray-200 hover:border-gray-300'}`}>
+                    <div className="flex items-center gap-3 px-4 py-3 cursor-pointer" onClick={() => setExpandedStep(isExpanded ? '' : step.id)}>
+                      <div className={`w-8 h-8 ${step.bg} rounded-xl flex items-center justify-center shrink-0 ${step.color}`}>
+                        {step.icon}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className={`text-sm font-semibold ${done ? 'text-gray-400 line-through' : 'text-gray-800'}`}>{step.title}</p>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        {done
+                          ? <span className="text-[10px] text-green-600 font-semibold bg-green-50 px-2 py-0.5 rounded-full">✓ Done</span>
+                          : isExpanded ? <ChevronUp size={14} className="text-gray-400" /> : <ChevronDown size={14} className="text-gray-400" />
+                        }
                       </div>
                     </div>
-                  )}
+                    {isExpanded && !done && (
+                      <div className={`px-4 pb-4 pt-1 border-t ${step.border} ${step.bg}`}>
+                        <p className="text-xs text-gray-600 leading-relaxed mb-3">{step.desc}</p>
+                        <div className="flex items-center gap-2">
+                          <button onClick={() => navigate(step.path)}
+                            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border ${step.border} ${step.color} ${step.bg} hover:shadow-sm`}>
+                            {step.cta} <ArrowRight size={11} />
+                          </button>
+                          <button onClick={() => { toggleStep(step.id); setExpandedStep('') }}
+                            className="px-3 py-1.5 text-xs text-gray-400 hover:text-gray-600">Mark as done</button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )
             })}
           </div>
 
-          {/* All done CTA */}
+          {/* All-done CTA */}
           {allDone && (
             <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4 flex items-center gap-3">
-              <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
                 <CheckCircle2 size={20} className="text-green-600" />
               </div>
               <div className="flex-1">
-                <p className="text-sm font-bold text-green-800">Setup complete! 🎉</p>
-                <p className="text-xs text-green-600">You're ready to use Client Portal 3.0 to its full potential.</p>
+                <p className="text-sm font-bold text-green-800">🎉 You're all set!</p>
+                <p className="text-xs text-green-600 mt-0.5">Your account is fully configured. Head to the dashboard to start working.</p>
               </div>
-              <button
-                onClick={onSwitch}
-                className="px-4 py-2 bg-green-600 text-white text-xs font-semibold rounded-lg hover:bg-green-700 transition-colors shrink-0"
-              >
-                Go to Dashboard
+              <button onClick={onSwitch} className="px-4 py-2 bg-green-600 text-white text-xs font-bold rounded-lg hover:bg-green-700 shrink-0">
+                Go to Dashboard →
               </button>
             </div>
           )}
         </div>
 
-        {/* ── Right: Side panels (2 cols) ── */}
+        {/* Right panels — 2 cols */}
         <div className="col-span-2 space-y-4">
 
-          {/* Quick contact */}
+          {/* Help & Support */}
           <div className="bg-white border border-gray-200 rounded-xl p-4">
-            <h3 className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
-              <MessageSquare size={14} className="text-primary-500" /> Need Help?
-            </h3>
-            <div className="space-y-2.5">
-              <div className="flex items-center gap-3 p-2.5 rounded-lg bg-gray-50 hover:bg-primary-50 cursor-pointer transition-colors group">
-                <div className="w-7 h-7 bg-primary-100 rounded-lg flex items-center justify-center">
-                  <Bot size={14} className="text-primary-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-xs font-semibold text-gray-800">Ask AI Copilot</p>
-                  <p className="text-[10px] text-gray-400">Instant answers, 24/7</p>
-                </div>
-                <ArrowRight size={12} className="text-gray-300 group-hover:text-primary-400" />
-              </div>
-              <div className="flex items-center gap-3 p-2.5 rounded-lg bg-gray-50 hover:bg-blue-50 cursor-pointer transition-colors group">
-                <div className="w-7 h-7 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <FileText size={14} className="text-blue-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-xs font-semibold text-gray-800">Documentation</p>
-                  <p className="text-[10px] text-gray-400">User guides & tutorials</p>
-                </div>
-                <ArrowRight size={12} className="text-gray-300 group-hover:text-blue-400" />
-              </div>
-              <div className="flex items-center gap-3 p-2.5 rounded-lg bg-gray-50 hover:bg-emerald-50 cursor-pointer transition-colors group">
-                <div className="w-7 h-7 bg-emerald-100 rounded-lg flex items-center justify-center">
-                  <Phone size={14} className="text-emerald-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-xs font-semibold text-gray-800">Contact Support</p>
-                  <p className="text-[10px] text-gray-400">Mon–Fri, 8am–6pm PST</p>
-                </div>
-                <ArrowRight size={12} className="text-gray-300 group-hover:text-emerald-400" />
-              </div>
-            </div>
-          </div>
-
-          {/* What can I do here? */}
-          <div className="bg-white border border-gray-200 rounded-xl p-4">
-            <h3 className="text-sm font-bold text-gray-800 mb-1">What can I do here?</h3>
-            <p className="text-[11px] text-gray-400 mb-3">Core capabilities of Client Portal 3.0</p>
+            <h3 className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2"><MessageSquare size={14} className="text-primary-500" /> Need Help?</h3>
             <div className="space-y-2">
               {[
-                { icon: '📦', text: 'Track shipments end-to-end, from origin to delivery' },
-                { icon: '🏭', text: 'Manage inbound receipts, appointments & yard entries' },
-                { icon: '📊', text: 'View real-time inventory and exception alerts' },
-                { icon: '🚛', text: 'Submit and track outbound orders' },
-                { icon: '💰', text: 'Review invoices, claims, and billing reports' },
-                { icon: '🤖', text: 'Get AI-powered insights and guided actions' },
+                { icon: <Bot size={14} className="text-primary-600" />, bg: 'bg-primary-50', title: 'Ask AI Copilot', sub: 'Instant answers, 24/7', hover: 'hover:bg-primary-50', path: '/agents?nav=chat' },
+                { icon: <BookOpen size={14} className="text-blue-600" />, bg: 'bg-blue-50', title: 'User Guides', sub: 'Step-by-step tutorials', hover: 'hover:bg-blue-50', path: '#' },
+                { icon: <Phone size={14} className="text-emerald-600" />, bg: 'bg-emerald-50', title: 'Contact Support', sub: 'Mon–Fri, 8am–6pm PST', hover: 'hover:bg-emerald-50', path: '#' },
+                { icon: <MessageSquare size={14} className="text-violet-600" />, bg: 'bg-violet-50', title: 'Live Chat', sub: 'Chat with our team', hover: 'hover:bg-violet-50', path: '#' },
               ].map((item, i) => (
-                <div key={i} className="flex items-center gap-2.5 text-xs text-gray-600">
-                  <span className="text-base leading-none">{item.icon}</span>
-                  <span>{item.text}</span>
-                </div>
+                <button key={i} onClick={() => item.path !== '#' && navigate(item.path)}
+                  className={`w-full flex items-center gap-3 p-2.5 rounded-lg bg-gray-50 ${item.hover} cursor-pointer transition-colors group text-left`}>
+                  <div className={`w-7 h-7 ${item.bg} rounded-lg flex items-center justify-center shrink-0`}>{item.icon}</div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-semibold text-gray-800">{item.title}</p>
+                    <p className="text-[10px] text-gray-400">{item.sub}</p>
+                  </div>
+                  <ChevronRight size={12} className="text-gray-300 group-hover:text-gray-500" />
+                </button>
               ))}
             </div>
           </div>
 
-          {/* Announcement */}
-          <div className="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <Star size={13} className="text-amber-500" />
-              <p className="text-xs font-bold text-amber-800">New in v3.0</p>
+          {/* Announcements */}
+          <div className="bg-white border border-gray-200 rounded-xl p-4">
+            <h3 className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2"><Bell size={14} className="text-gray-500" /> Announcements</h3>
+            <div className="space-y-3">
+              {ANNOUNCEMENTS.map((a, i) => (
+                <div key={i} className={`rounded-lg p-3 border ${i === 0 ? 'bg-primary-50 border-primary-100' : 'bg-gray-50 border-gray-100'}`}>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-[10px] font-semibold text-gray-600">{a.badge}</span>
+                    <span className="text-[10px] text-gray-400">{a.date}</span>
+                  </div>
+                  <p className={`text-xs font-semibold mb-0.5 ${i === 0 ? 'text-primary-700' : 'text-gray-700'}`}>{a.title}</p>
+                  <p className="text-[11px] text-gray-500 leading-snug">{a.desc}</p>
+                </div>
+              ))}
             </div>
-            <p className="text-xs text-amber-700 leading-relaxed">
-              AI Copilot is now available across all modules — ask questions, get insights, and take guided actions. <button className="underline font-medium">Learn more →</button>
-            </p>
           </div>
         </div>
       </div>
 
-      {/* ── Feature Overview (full width) ── */}
+      {/* ── Platform capabilities grid ── */}
       <div>
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-base font-bold text-gray-900">Explore Key Features</h2>
-            <p className="text-xs text-gray-500 mt-0.5">Click any module to get started</p>
+            <h2 className="text-[15px] font-bold text-gray-900">What you can do with Client Portal 3.0</h2>
+            <p className="text-xs text-gray-500 mt-0.5">Six core capabilities — click to explore</p>
           </div>
         </div>
         <div className="grid grid-cols-3 gap-3">
-          {FEATURES_OVERVIEW.map((f, i) => (
-            <button
-              key={i}
-              onClick={() => navigate(f.path)}
-              className="bg-white border border-gray-200 rounded-xl p-4 text-left hover:border-primary-200 hover:shadow-sm transition-all group"
-            >
-              <div className={`w-10 h-10 ${f.bg} rounded-xl flex items-center justify-center mb-3`}>
-                {f.icon}
-              </div>
-              <p className="text-sm font-semibold text-gray-800 mb-1 group-hover:text-primary-700 transition-colors">{f.title}</p>
-              <p className="text-xs text-gray-500 leading-relaxed">{f.desc}</p>
-              <div className="flex items-center gap-1 mt-3 text-[11px] text-primary-600 opacity-0 group-hover:opacity-100 transition-opacity font-medium">
-                Open module <ArrowRight size={11} />
-              </div>
-            </button>
-          ))}
+          {PLATFORM_CAPABILITIES.map((cap, i) => {
+            const paths = ['/international-new/tracking', '/inbound/inquiry', '/inventory/activity', '/outbound/inquiry', '/dashboard/otif', '/agents?nav=chat']
+            return (
+              <button key={i} onClick={() => navigate(paths[i])}
+                className="bg-white border border-gray-200 rounded-xl p-5 text-left hover:border-primary-200 hover:shadow-sm transition-all group">
+                <span className="text-3xl mb-3 block">{cap.icon}</span>
+                <p className="text-sm font-bold text-gray-800 mb-1.5 group-hover:text-primary-700">{cap.title}</p>
+                <p className="text-xs text-gray-500 leading-relaxed">{cap.desc}</p>
+                <div className="flex items-center gap-1 mt-3 text-[11px] text-primary-600 opacity-0 group-hover:opacity-100 font-medium">Open <ArrowRight size={10} /></div>
+              </button>
+            )
+          })}
         </div>
       </div>
 
@@ -902,12 +687,21 @@ function NewUserHome({ onSwitch }: { onSwitch: () => void }) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// RETURNING USER VIEW  (existing layout, preserved entirely)
+// B: RETURNING USER HOME
 // ═══════════════════════════════════════════════════════════════════════════════
 function ReturningUserHome() {
   const navigate = useNavigate()
   const [taskFilter, setTaskFilter] = useState<'all' | 'overdue' | 'today'>('all')
   const [modal, setModal] = useState<ModalState>({ type: null, data: null })
+  const [search, setSearch] = useState('')
+  const [showSearch, setShowSearch] = useState(false)
+  const [msgCount] = useState(3)
+  const [now, setNow] = useState(new Date())
+
+  useEffect(() => {
+    const t = setInterval(() => setNow(new Date()), 60000)
+    return () => clearInterval(t)
+  }, [])
 
   const openStat = (stat: typeof SUMMARY_STATS[0]) => setModal({ type: 'stat', data: stat as unknown as Record<string, unknown> })
   const openException = (ex: typeof EXCEPTIONS[0]) => setModal({ type: 'exception', data: ex as unknown as Record<string, unknown> })
@@ -923,9 +717,93 @@ function ReturningUserHome() {
     return true
   })
 
+  const greeting = now.getHours() < 12 ? 'Good morning' : now.getHours() < 18 ? 'Good afternoon' : 'Good evening'
+  const dateStr = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
+
+  // Search results mock
+  const SEARCH_ITEMS = [
+    { label: 'Shipment Tracking', path: '/international-new/tracking', type: 'Module' },
+    { label: 'Inbound Inquiry', path: '/inbound/inquiry', type: 'Module' },
+    { label: 'Outbound Inquiry', path: '/outbound/inquiry', type: 'Module' },
+    { label: 'OTIF Dashboard', path: '/dashboard/otif', type: 'Dashboard' },
+    { label: 'Finance / Invoice', path: '/finance/invoices', type: 'Module' },
+    { label: 'Inventory Activity', path: '/inventory/activity', type: 'Module' },
+  ]
+  const searchResults = search.length > 1
+    ? SEARCH_ITEMS.filter(i => i.label.toLowerCase().includes(search.toLowerCase()))
+    : []
+
   return (
     <div className="space-y-4 pb-6">
-      {/* Summary Stats */}
+
+      {/* ── Today Banner ── */}
+      <div className="bg-gradient-to-r from-gray-900 to-slate-800 rounded-2xl px-6 py-5 flex items-center justify-between gap-6">
+        <div>
+          <p className="text-gray-400 text-xs font-medium">{dateStr}</p>
+          <h1 className="text-white font-bold text-lg mt-0.5">{greeting}, Sarah 👋</h1>
+          <div className="flex items-center gap-3 mt-2">
+            <span className="flex items-center gap-1.5 text-xs text-red-300 font-semibold bg-red-900/40 px-2.5 py-1 rounded-full">
+              <AlertCircle size={11} /> 2 P1 exceptions need attention
+            </span>
+            <span className="flex items-center gap-1.5 text-xs text-amber-300 bg-amber-900/40 px-2.5 py-1 rounded-full">
+              <Clock size={11} /> 18 overdue tasks
+            </span>
+            <span className="flex items-center gap-1.5 text-xs text-blue-300 bg-blue-900/40 px-2.5 py-1 rounded-full">
+              <Activity size={11} /> 1,248 shipments in transit
+            </span>
+          </div>
+        </div>
+
+        {/* Quick search */}
+        <div className="relative shrink-0">
+          <div className="flex items-center gap-2 bg-white/10 border border-white/20 rounded-xl px-3 py-2 min-w-[280px] focus-within:border-primary-400 focus-within:bg-white/15">
+            <Search size={14} className="text-gray-400 shrink-0" />
+            <input
+              value={search}
+              onChange={e => { setSearch(e.target.value); setShowSearch(true) }}
+              onFocus={() => setShowSearch(true)}
+              onBlur={() => setTimeout(() => setShowSearch(false), 150)}
+              placeholder="Search modules, orders, shipments..."
+              className="bg-transparent text-white placeholder-gray-400 text-sm outline-none flex-1"
+            />
+          </div>
+          {showSearch && searchResults.length > 0 && (
+            <div className="absolute top-full left-0 right-0 mt-1.5 bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden">
+              {searchResults.map((r, i) => (
+                <button key={i} onClick={() => { navigate(r.path); setSearch(''); setShowSearch(false) }}
+                  className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-primary-50 text-left text-sm text-gray-700 border-b border-gray-50 last:border-0">
+                  {r.label}
+                  <span className="text-[10px] text-gray-400">{r.type}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Notifications */}
+        <div className="relative shrink-0">
+          <button className="w-10 h-10 bg-white/10 border border-white/20 rounded-xl flex items-center justify-center hover:bg-white/20">
+            <Bell size={16} className="text-gray-300" />
+          </button>
+          {msgCount > 0 && (
+            <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">{msgCount}</span>
+          )}
+        </div>
+      </div>
+
+      {/* ── Recent pages ── */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-0.5">
+        <span className="text-[10px] text-gray-400 font-semibold uppercase shrink-0 flex items-center gap-1"><History size={10} /> Recent:</span>
+        {RECENT_PAGES.map((p, i) => (
+          <button key={i} onClick={() => navigate(p.path)}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 rounded-full text-xs text-gray-600 hover:border-primary-300 hover:text-primary-700 hover:bg-primary-50 transition-all shrink-0">
+            {p.icon} {p.label}
+            <span className="text-[10px] text-gray-300">{p.time}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* ── KPI Stats ── */}
       <div className="grid grid-cols-6 gap-3">
         {SUMMARY_STATS.map((s, i) => (
           <div key={i} onClick={() => openStat(s)}
@@ -937,59 +815,48 @@ function ReturningUserHome() {
         ))}
       </div>
 
-      {/* Middle Row */}
-      <div className="grid grid-cols-5 gap-4">
-        <div className="col-span-3 bg-white border border-gray-200 rounded-xl p-4">
+      {/* ── Priority row: Exceptions + Tasks ── */}
+      <div className="grid grid-cols-2 gap-4">
+        {/* Exceptions */}
+        <div className="bg-white border border-red-100 rounded-xl p-4">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <MapPin size={14} className="text-indigo-500" />
-              <p className="text-sm font-bold text-gray-800">Supply Chain Network</p>
-            </div>
-            <div className="flex items-center gap-2 text-[10px] text-gray-400">
-              <span className="flex items-center gap-1"><Activity size={10} className="text-green-500" /> Live</span>
-            </div>
-          </div>
-          <NetworkMap onLocClick={openLocModal} />
-        </div>
-
-        <div className="col-span-2 bg-white border border-gray-200 rounded-xl p-4">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <AlertCircle size={14} className="text-red-500" />
+              <div className="w-6 h-6 bg-red-100 rounded-lg flex items-center justify-center">
+                <AlertCircle size={13} className="text-red-500" />
+              </div>
               <p className="text-sm font-bold text-gray-800">Exceptions & Actions</p>
+              <span className="text-[10px] bg-red-100 text-red-600 px-1.5 py-0.5 rounded-full font-semibold">2 P1</span>
             </div>
             <button onClick={() => navigate('/international-new/tracking')} className="text-[10px] text-primary-600 hover:underline font-medium">View all</button>
           </div>
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             {EXCEPTIONS.map((ex, i) => (
-              <div key={i} className="flex items-start gap-2.5 p-2.5 rounded-lg hover:bg-gray-50 transition-colors group cursor-pointer" onClick={() => openException(ex)}>
+              <div key={i} className={`flex items-start gap-2.5 p-2.5 rounded-lg transition-colors group cursor-pointer ${ex.priority === 'P1' ? 'bg-red-50/60 hover:bg-red-50' : 'hover:bg-gray-50'}`} onClick={() => openException(ex)}>
                 <span className={`text-[9px] font-bold text-white px-1.5 py-0.5 rounded shrink-0 mt-0.5 ${ex.color}`}>{ex.priority}</span>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-semibold text-gray-800">{ex.label}</p>
                   <p className="text-[10px] text-gray-400 truncate">{ex.desc}</p>
                 </div>
-                <button className="text-[10px] text-violet-600 hover:text-violet-800 font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-                  {ex.action} →
-                </button>
+                <button className="text-[10px] text-primary-600 font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 shrink-0">{ex.action} →</button>
               </div>
             ))}
           </div>
         </div>
-      </div>
 
-      {/* Bottom Row */}
-      <div className="grid grid-cols-5 gap-4">
-        <div className="col-span-3 bg-white border border-gray-200 rounded-xl p-4">
+        {/* Tasks */}
+        <div className="bg-white border border-amber-100 rounded-xl p-4">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <CheckCircle2 size={14} className="text-violet-500" />
+              <div className="w-6 h-6 bg-amber-100 rounded-lg flex items-center justify-center">
+                <CheckCircle2 size={13} className="text-amber-500" />
+              </div>
               <p className="text-sm font-bold text-gray-800">My Tasks</p>
-              <span className="text-[10px] bg-red-100 text-red-600 font-semibold px-1.5 py-0.5 rounded-full">18 overdue</span>
+              <span className="text-[10px] bg-red-100 text-red-600 px-1.5 py-0.5 rounded-full font-semibold">18 overdue</span>
             </div>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-0.5">
               {(['all', 'overdue', 'today'] as const).map(f => (
                 <button key={f} onClick={() => setTaskFilter(f)}
-                  className={`text-[10px] px-2 py-1 rounded-md font-medium ${taskFilter === f ? 'bg-violet-100 text-violet-700' : 'text-gray-500 hover:bg-gray-100'}`}>
+                  className={`text-[10px] px-2 py-1 rounded-md font-medium ${taskFilter === f ? 'bg-primary-100 text-primary-700' : 'text-gray-500 hover:bg-gray-100'}`}>
                   {f === 'all' ? 'All' : f === 'overdue' ? 'Overdue' : 'Today'}
                 </button>
               ))}
@@ -997,7 +864,7 @@ function ReturningUserHome() {
           </div>
           <div className="space-y-1.5">
             {filteredTasks.map(task => (
-              <div key={task.id} className="flex items-start gap-3 p-2.5 rounded-lg hover:bg-gray-50 transition-colors group cursor-pointer" onClick={() => openTask(task)}>
+              <div key={task.id} className={`flex items-start gap-3 p-2.5 rounded-lg transition-colors group cursor-pointer ${task.status === 'Overdue' ? 'bg-red-50/50 hover:bg-red-50' : 'hover:bg-gray-50'}`} onClick={() => openTask(task)}>
                 <div className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${task.status === 'Overdue' ? 'bg-red-500' : task.status === 'Urgent' ? 'bg-orange-500' : task.status === 'In Progress' ? 'bg-blue-500' : 'bg-gray-300'}`} />
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-medium text-gray-800 group-hover:text-primary-700 truncate">{task.title}</p>
@@ -1011,6 +878,20 @@ function ReturningUserHome() {
               </div>
             ))}
           </div>
+        </div>
+      </div>
+
+      {/* ── Map + AI + Quick links ── */}
+      <div className="grid grid-cols-5 gap-4">
+        <div className="col-span-3 bg-white border border-gray-200 rounded-xl p-4">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <MapPin size={14} className="text-indigo-500" />
+              <p className="text-sm font-bold text-gray-800">Supply Chain Network</p>
+            </div>
+            <span className="flex items-center gap-1 text-[10px] text-gray-400"><Activity size={10} className="text-green-500" /> Live</span>
+          </div>
+          <NetworkMap onLocClick={openLocModal} />
         </div>
 
         <div className="col-span-2 space-y-3">
@@ -1031,38 +912,21 @@ function ReturningUserHome() {
       </div>
 
       {/* Modals */}
-      {modal.type === 'stat' && modal.data && !('isLoc' in modal.data) && (
-        <StatDetailModal stat={modal.data as unknown as typeof SUMMARY_STATS[0]} onClose={closeModal} />
-      )}
-      {modal.type === 'stat' && modal.data && 'isLoc' in modal.data && (
-        <LocationModal loc={(modal.data as { isLoc: boolean; loc: { name: string; type: string; count: number; status: string } }).loc} onClose={closeModal} />
-      )}
-      {modal.type === 'exception' && modal.data && (
-        <ExceptionModal ex={modal.data as unknown as typeof EXCEPTIONS[0]} onClose={closeModal} />
-      )}
-      {modal.type === 'task' && modal.data && (
-        <TaskModal task={modal.data as unknown as typeof MY_TASKS[0]} onClose={closeModal} />
-      )}
-      {modal.type === 'agent-action' && modal.data && (
-        <AgentActionModal action={(modal.data as { action: string }).action} onClose={closeModal} />
-      )}
+      {modal.type === 'stat' && modal.data && !('isLoc' in modal.data) && <StatDetailModal stat={modal.data as unknown as typeof SUMMARY_STATS[0]} onClose={closeModal} />}
+      {modal.type === 'stat' && modal.data && 'isLoc' in modal.data && <LocationModal loc={(modal.data as { isLoc: boolean; loc: { name: string; type: string; count: number; status: string } }).loc} onClose={closeModal} />}
+      {modal.type === 'exception' && modal.data && <ExceptionModal ex={modal.data as unknown as typeof EXCEPTIONS[0]} onClose={closeModal} />}
+      {modal.type === 'task' && modal.data && <TaskModal task={modal.data as unknown as typeof MY_TASKS[0]} onClose={closeModal} />}
+      {modal.type === 'agent-action' && modal.data && <AgentActionModal action={(modal.data as { action: string }).action} onClose={closeModal} />}
     </div>
   )
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// MAIN HomePage  — role switcher lives here
+// MAIN — role switcher
 // ═══════════════════════════════════════════════════════════════════════════════
-const LS_KEY = 'cp_home_role'
-
 export default function HomePage() {
   const [role, setRole] = useState<UserRole>(() => {
-    try {
-      const saved = localStorage.getItem(LS_KEY)
-      return (saved === 'new' || saved === 'returning') ? saved : 'returning'
-    } catch {
-      return 'returning'
-    }
+    try { const s = localStorage.getItem(LS_KEY); return s === 'new' || s === 'returning' ? s : 'returning' } catch { return 'returning' }
   })
 
   const switchRole = (r: UserRole) => {
@@ -1072,51 +936,31 @@ export default function HomePage() {
 
   return (
     <div>
-      {/* ── Role switcher bar ── */}
-      <div className="flex items-center justify-between mb-5">
+      {/* ── Role switcher ── */}
+      <div className="flex items-center justify-between mb-4">
         <div>
           <h1 className="text-lg font-bold text-gray-900">
-            {role === 'new' ? 'Welcome to Client Portal 3.0' : 'Dashboard'}
+            {role === 'new' ? 'Welcome to Client Portal 3.0' : 'Home'}
           </h1>
           <p className="text-xs text-gray-500 mt-0.5">
-            {role === 'new'
-              ? 'Follow the steps below to get your account ready'
-              : 'Your supply chain at a glance — updated in real time'}
+            {role === 'new' ? 'Follow the steps below to set up your account' : 'Your supply chain operations at a glance'}
           </p>
         </div>
 
-        {/* Toggle pill */}
-        <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-xl">
-          <button
-            onClick={() => switchRole('new')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-              role === 'new'
-                ? 'bg-white shadow-sm text-primary-700'
-                : 'text-gray-500 hover:text-gray-700'
-            }`}
-          >
-            <Sparkles size={12} />
-            New User View
+        {/* Toggle */}
+        <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-xl border border-gray-200">
+          <button onClick={() => switchRole('new')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${role === 'new' ? 'bg-white shadow-sm text-primary-700' : 'text-gray-500 hover:text-gray-700'}`}>
+            <Sparkles size={12} /> New User
           </button>
-          <button
-            onClick={() => switchRole('returning')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-              role === 'returning'
-                ? 'bg-white shadow-sm text-primary-700'
-                : 'text-gray-500 hover:text-gray-700'
-            }`}
-          >
-            <LayoutDashboard size={12} />
-            Returning User View
+          <button onClick={() => switchRole('returning')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${role === 'returning' ? 'bg-white shadow-sm text-primary-700' : 'text-gray-500 hover:text-gray-700'}`}>
+            <LayoutDashboard size={12} /> Returning User
           </button>
         </div>
       </div>
 
-      {/* ── View ── */}
-      {role === 'new'
-        ? <NewUserHome onSwitch={() => switchRole('returning')} />
-        : <ReturningUserHome />
-      }
+      {role === 'new' ? <NewUserHome onSwitch={() => switchRole('returning')} /> : <ReturningUserHome />}
     </div>
   )
 }
