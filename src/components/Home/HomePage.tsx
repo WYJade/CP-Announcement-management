@@ -16,21 +16,27 @@ const LS_KEY = 'cp_home_view'
 
 // ─── Mock Data ────────────────────────────────────────────────────────────────
 const KPI_CARDS = [
-  { label: 'Shipments In Transit', value: '1,248', sub: '+12 today', color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-100' },
-  { label: "Today's Appointments", value: '86',    sub: '14 unconfirmed', color: 'text-violet-600', bg: 'bg-violet-50', border: 'border-violet-100' },
-  { label: 'Open Exceptions',      value: '27',    sub: '2 need P1 action', color: 'text-red-600', bg: 'bg-red-50', border: 'border-red-100' },
-  { label: 'Pending Tasks',        value: '43',    sub: '18 overdue', color: 'text-amber-600', bg: 'bg-amber-50', border: 'border-amber-100' },
-  { label: 'OTIF Score (WTD)',     value: '93.2%', sub: 'Target: 97%', color: 'text-orange-600', bg: 'bg-orange-50', border: 'border-orange-100' },
-  { label: 'Open Invoices',        value: '$284K', sub: '23 pending', color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-100' },
+  { label: 'Inbound today',        value: '12', sub: '3 late',          subColor: 'text-red-500',    color: 'text-gray-900', bg: 'bg-white',  border: 'border-gray-100' },
+  { label: 'Inventory exceptions', value: '8',  sub: '2 stockout risk', subColor: 'text-orange-500', color: 'text-gray-900', bg: 'bg-white',  border: 'border-gray-100' },
+  { label: 'Orders to ship',       value: '46', sub: '7 due today',     subColor: 'text-violet-500', color: 'text-gray-900', bg: 'bg-white',  border: 'border-gray-100' },
+  { label: 'Shipping exceptions',  value: '5',  sub: '2 severe',        subColor: 'text-red-500',    color: 'text-gray-900', bg: 'bg-white',  border: 'border-gray-100' },
 ]
 
-const PRIORITY_ITEMS = [
-  { type: 'exception', priority: 'P1', label: 'Container DEM Risk', desc: '3 containers past LFD at Garden City Terminal. $150/day accruing.', action: 'Dispatch now', path: '/international-new/tracking', color: 'bg-red-500' },
-  { type: 'exception', priority: 'P1', label: 'Appointment unconfirmed', desc: '14 warehouse appointments today still pending carrier confirmation.', action: 'Confirm', path: '/inbound/inquiry', color: 'bg-red-500' },
-  { type: 'task',      priority: 'P1', label: 'Resolve customs hold', desc: 'Entry 82G-0101679-0 on hold. LFD Jun 20. Submit revised invoice.', action: 'View details', path: '/international-new/tracking', color: 'bg-red-500' },
-  { type: 'exception', priority: 'P2', label: 'OTIF penalty risk', desc: '5 orders at VITA COCO and ORGAIN LLC approaching 97% threshold.', action: 'Review', path: '/dashboard/otif', color: 'bg-orange-400' },
-  { type: 'task',      priority: 'P2', label: 'Invoice dispute response', desc: 'INV-20260601 ($3,240) — response due within 3 business days.', action: 'Respond', path: '/finance/invoices', color: 'bg-orange-400' },
-  { type: 'exception', priority: 'P2', label: 'Low stock alert', desc: 'SKU ADPOST-SMALL-RED: 68 units, below safety stock of 80.', action: 'Check', path: '/inventory/activity', color: 'bg-orange-400' },
+// Needs Attention rows — ref / module / issue / action / path
+const ATTENTION_ITEMS = [
+  { level: 'High',   module: 'Inbound',   ref: 'RN-252810',    issue: 'Appointment missed',      action: 'Review', path: '/inbound/inquiry' },
+  { level: 'High',   module: 'Shipping',  ref: 'PRO-78492',    issue: 'ETA slipped 18h',         action: 'Track',  path: '/international-new/tracking' },
+  { level: 'Med',    module: 'Inventory', ref: 'SKU 48102',    issue: 'Below safety stock',       action: 'View',   path: '/inventory/activity' },
+  { level: 'Med',    module: 'Finance',   ref: 'INV-8821',     issue: 'Overdue 7 days',           action: 'Open',   path: '/finance/invoices' },
+  { level: 'Low',    module: 'Outbound',  ref: 'DN-20260901',  issue: 'Carrier not assigned',     action: 'Assign', path: '/outbound/inquiry' },
+]
+
+// Today & next 48 hours
+const TIMELINE_ITEMS = [
+  { time: '09:30',    module: 'Inbound',  label: '2 appointments arriving',   detail: 'Ontario, CA',    path: '/inbound/inquiry' },
+  { time: '11:00',    module: 'Outbound', label: '18 orders carrier cutoff',  detail: 'Fontana, CA',    path: '/outbound/inquiry' },
+  { time: '14:00',    module: 'Yard',     label: 'Trailer appointment',        detail: 'Garden City, NY', path: '/yard/entry-list' },
+  { time: 'Tomorrow', module: 'Shipping', label: '7 LTL pickups scheduled',   detail: '3 facilities',   path: '/international-new/tracking' },
 ]
 
 const QUICK_ACTIONS = [
@@ -167,22 +173,30 @@ function PriorityModal({ item, onClose }: { item: typeof PRIORITY_ITEMS[0]; onCl
 // ═══════════════════════════════════════════════════════════════════════════════
 function ReturningView() {
   const navigate = useNavigate()
-  const [selectedItem, setSelectedItem] = useState<typeof PRIORITY_ITEMS[0] | null>(null)
-  const [filter, setFilter] = useState<'all' | 'p1' | 'p2'>('all')
-  const [agentOpen, setAgentOpen] = useState(false)
 
-  const filtered = PRIORITY_ITEMS.filter(i => filter === 'all' ? true : filter === 'p1' ? i.priority === 'P1' : i.priority === 'P2')
+  const levelStyle: Record<string, { badge: string; dot: string }> = {
+    High: { badge: 'bg-red-100 text-red-600',    dot: 'bg-red-500' },
+    Med:  { badge: 'bg-amber-100 text-amber-700', dot: 'bg-amber-400' },
+    Low:  { badge: 'bg-gray-100 text-gray-500',   dot: 'bg-gray-400' },
+  }
+
+  const moduleColor: Record<string, string> = {
+    Inbound: 'text-blue-600', Shipping: 'text-teal-600', Inventory: 'text-emerald-600',
+    Finance: 'text-amber-600', Outbound: 'text-indigo-600', Yard: 'text-orange-500',
+  }
 
   return (
     <div className="space-y-5 pb-8">
 
-      {/* ── KPI Strip ── */}
-      <div className="grid grid-cols-6 gap-3">
+      {/* ── KPI Strip — 4 cards, clean ── */}
+      <div className="grid grid-cols-4 gap-4">
         {KPI_CARDS.map((k, i) => (
-          <div key={i} className={`${k.bg} border ${k.border} rounded-2xl px-4 py-4 cursor-default hover:shadow-sm transition-shadow`}>
-            <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wide mb-2">{k.label}</p>
-            <p className={`text-2xl font-bold ${k.color} leading-none`}>{k.value}</p>
-            <p className="text-[10px] text-gray-400 mt-1.5">{k.sub}</p>
+          <div key={i} className={`${k.bg} border ${k.border} rounded-2xl px-5 py-4 shadow-sm`}>
+            <p className="text-xs text-gray-400 font-medium mb-2">{k.label}</p>
+            <div className="flex items-baseline gap-3">
+              <p className={`text-3xl font-bold ${k.color} leading-none`}>{k.value}</p>
+              <p className={`text-xs font-semibold ${k.subColor}`}>{k.sub}</p>
+            </div>
           </div>
         ))}
       </div>
@@ -190,61 +204,110 @@ function ReturningView() {
       {/* ── Main two-column ── */}
       <div className="grid grid-cols-5 gap-5">
 
-        {/* Left — Priority list */}
-        <div className="col-span-3 bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-gray-50">
-            <div className="flex items-center gap-2">
-              <AlertOctagon size={15} className="text-red-500" />
-              <h2 className="text-sm font-bold text-gray-900">Priority Actions</h2>
+        {/* Left col — Needs Attention + Timeline */}
+        <div className="col-span-3 space-y-4">
+
+          {/* Needs Attention */}
+          <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-50">
+              <h2 className="text-sm font-bold text-gray-900">Needs attention</h2>
+              <button onClick={() => navigate('/international-new/tracking')}
+                className="text-xs text-primary-600 font-semibold hover:underline">View all →</button>
             </div>
-            <div className="flex items-center gap-1 bg-gray-50 rounded-lg p-0.5">
-              {(['all','p1','p2'] as const).map(f => (
-                <button key={f} onClick={() => setFilter(f)}
-                  className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors ${filter === f ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>
-                  {f === 'all' ? 'All' : f.toUpperCase()}
-                </button>
+
+            {/* Table header */}
+            <div className="grid grid-cols-[72px_80px_1fr_auto] gap-x-4 px-5 py-2 bg-gray-50 border-b border-gray-50">
+              {['Priority','Module','Details',''].map((h, i) => (
+                <p key={i} className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">{h}</p>
+              ))}
+            </div>
+
+            {/* Rows */}
+            <div className="divide-y divide-gray-50">
+              {ATTENTION_ITEMS.map((item, i) => (
+                <div key={i} className="grid grid-cols-[72px_80px_1fr_auto] gap-x-4 items-center px-5 py-3 hover:bg-gray-50/70 transition-colors">
+                  {/* Level badge */}
+                  <span className={`inline-flex items-center justify-center text-[10px] font-bold px-2 py-0.5 rounded-md w-fit ${levelStyle[item.level].badge}`}>
+                    {item.level}
+                  </span>
+                  {/* Module */}
+                  <p className={`text-xs font-semibold ${moduleColor[item.module] ?? 'text-gray-600'}`}>{item.module}</p>
+                  {/* Ref + issue */}
+                  <div className="min-w-0">
+                    <span className="text-xs font-bold text-primary-700 mr-2">{item.ref}</span>
+                    <span className="text-xs text-gray-500">{item.issue}</span>
+                  </div>
+                  {/* Action button */}
+                  <button onClick={() => navigate(item.path)}
+                    className="text-[11px] font-bold text-primary-600 border border-primary-200 bg-primary-50 hover:bg-primary-100 px-3 py-1 rounded-lg transition-colors whitespace-nowrap">
+                    {item.action}
+                  </button>
+                </div>
               ))}
             </div>
           </div>
-          <div className="divide-y divide-gray-50">
-            {filtered.map((item, i) => (
-              <div key={i} onClick={() => setSelectedItem(item)}
-                className={`flex items-start gap-3 px-5 py-3.5 cursor-pointer hover:bg-gray-50/80 transition-colors group`}>
-                <div className={`w-1.5 h-1.5 rounded-full mt-2 shrink-0 ${item.priority === 'P1' ? 'bg-red-500' : 'bg-orange-400'}`} />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-0.5">
-                    <span className={`text-[9px] font-bold text-white px-1.5 py-0.5 rounded-full ${item.color}`}>{item.priority}</span>
-                    <span className="text-[10px] text-gray-400">{item.type === 'exception' ? 'Exception' : 'Task'}</span>
+
+          {/* Today & Next 48 hours */}
+          <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+            <div className="px-5 py-4 border-b border-gray-50">
+              <h2 className="text-sm font-bold text-gray-900">Today &amp; next 48 hours</h2>
+            </div>
+            <div className="px-5 py-3 space-y-0">
+              {TIMELINE_ITEMS.map((item, i) => (
+                <div key={i} className="flex items-start gap-4 py-3 group hover:bg-gray-50/60 -mx-5 px-5 transition-colors cursor-pointer" onClick={() => navigate(item.path)}>
+                  {/* Dot + line */}
+                  <div className="flex flex-col items-center shrink-0 pt-1" style={{ width: '16px' }}>
+                    <div className="w-3 h-3 rounded-full bg-primary-500 ring-2 ring-white ring-offset-1 shrink-0" />
+                    {i < TIMELINE_ITEMS.length - 1 && <div className="w-px flex-1 bg-gray-100 mt-1 min-h-[20px]" />}
                   </div>
-                  <p className="text-sm font-semibold text-gray-800">{item.label}</p>
-                  <p className="text-[11px] text-gray-500 mt-0.5 leading-relaxed">{item.desc}</p>
+                  {/* Time */}
+                  <p className="text-xs font-bold text-gray-400 w-16 shrink-0 pt-0.5">{item.time}</p>
+                  {/* Module badge */}
+                  <p className={`text-xs font-bold w-16 shrink-0 pt-0.5 ${moduleColor[item.module] ?? 'text-gray-600'}`}>{item.module}</p>
+                  {/* Label */}
+                  <p className="flex-1 text-sm text-gray-700 group-hover:text-primary-700 transition-colors">{item.label}</p>
+                  {/* Detail */}
+                  <p className="text-[11px] text-gray-400 shrink-0">{item.detail}</p>
                 </div>
-                <button className="shrink-0 text-[11px] text-primary-600 font-semibold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5 whitespace-nowrap mt-1">
-                  {item.action} <ArrowRight size={10} />
-                </button>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Right — AI + Quick links */}
-        <div className="col-span-2 space-y-4">
-
-          {/* AI Insights */}
-          <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+        {/* Right col — AI Copilot */}
+        <div className="col-span-2">
+          <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden h-full">
             <div className="flex items-center justify-between px-5 py-4 border-b border-gray-50">
               <div className="flex items-center gap-2">
-                <div className="w-6 h-6 bg-violet-500 rounded-full flex items-center justify-center">
-                  <Bot size={12} className="text-white" />
+                <div className="w-7 h-7 bg-violet-500 rounded-full flex items-center justify-center">
+                  <Bot size={14} className="text-white" />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-gray-900">AI Copilot</p>
-                  <p className="text-[10px] text-gray-400">Recommended actions</p>
+                  <p className="text-sm font-bold text-gray-900">AI Copilot</p>
+                  <p className="text-[10px] text-gray-400">Ask across inbound, inventory, shipping...</p>
                 </div>
               </div>
-              <button onClick={() => navigate('/agents?nav=chat')} className="text-[10px] text-violet-600 font-semibold hover:underline">Open →</button>
+              <button onClick={() => navigate('/agents?nav=chat')} className="text-[11px] text-violet-600 font-semibold hover:underline">Open →</button>
             </div>
-            <div className="p-4 space-y-2.5">
+
+            {/* Quick prompts */}
+            <div className="p-4 space-y-2">
+              {[
+                'Summarize today\'s exceptions',
+                'Find late inbound receipts',
+                'Export open invoice summary',
+                'Which orders are at OTIF risk?',
+              ].map((prompt, i) => (
+                <button key={i} onClick={() => navigate('/agents?nav=chat')}
+                  className="w-full text-left px-3.5 py-2.5 text-xs text-gray-600 bg-gray-50 hover:bg-primary-50 hover:text-primary-700 rounded-xl border border-gray-100 hover:border-primary-200 transition-colors">
+                  {prompt}
+                </button>
+              ))}
+            </div>
+
+            {/* AI insights */}
+            <div className="px-4 pb-4 space-y-2 border-t border-gray-50 pt-3">
+              <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-2">Recommended actions</p>
               {AI_INSIGHTS.map((s, i) => (
                 <div key={i} className="flex items-start gap-2 p-3 bg-gray-50 rounded-xl">
                   <div className="mt-0.5 shrink-0">{s.icon}</div>
@@ -258,8 +321,6 @@ function ReturningView() {
               ))}
             </div>
           </div>
-
-          {/* Quick Access — removed */}
         </div>
       </div>
 
