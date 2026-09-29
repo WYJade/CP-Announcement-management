@@ -44,24 +44,44 @@ const QUICK_ACTIONS = [
 
 const PLATFORM_LINKS = [
   {
-    system: 'WMS',  label: 'Warehouse Mgmt', icon: <Factory size={14} className="text-white" />,     color: 'bg-emerald-600', bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200',
-    when: 'When you need to manage inbound, inventory, or outbound warehouse operations.',
-    path: '/inventory/activity',
+    system: 'WMS',  label: 'Warehouse Mgmt', icon: <Factory size={14} className="text-white" />,     color: 'bg-emerald-600', bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-100',
+    question: 'Managing inbound, inventory, or outbound?',
+    scenarios: [
+      'Check or update an inbound receipt (RN)',
+      'Look up on-hand inventory by SKU or location',
+      'Process an outbound order or manage carrier pickup',
+    ],
+    cta: 'Go to WMS', path: '/inventory/activity',
   },
   {
-    system: 'OMS',  label: 'Order Management', icon: <ShoppingCart size={14} className="text-white" />, color: 'bg-blue-600',    bg: 'bg-blue-50',    text: 'text-blue-700',    border: 'border-blue-200',
-    when: 'When you need to track sales orders, purchase orders, or fulfillment status.',
-    path: '/sales/wholesale',
+    system: 'OMS',  label: 'Order Management', icon: <ShoppingCart size={14} className="text-white" />, color: 'bg-blue-600', bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-100',
+    question: 'Tracking a sales or purchase order?',
+    scenarios: [
+      'Check where a wholesale or retail order stands',
+      'View or submit a purchase order to your supplier',
+      'Confirm fulfillment status or download a POD',
+    ],
+    cta: 'Go to OMS', path: '/sales/wholesale',
   },
   {
-    system: 'YMS',  label: 'Yard Management',  icon: <Container size={14} className="text-white" />,   color: 'bg-amber-600',   bg: 'bg-amber-50',   text: 'text-amber-700',   border: 'border-amber-200',
-    when: 'When you need to monitor yard entries, dock assignments, or driver check-in.',
-    path: '/yard/entry-list',
+    system: 'YMS',  label: 'Yard Management',  icon: <Container size={14} className="text-white" />,   color: 'bg-amber-600',   bg: 'bg-amber-50',   text: 'text-amber-700',   border: 'border-amber-100',
+    question: 'Monitoring yard activity or gate entries?',
+    scenarios: [
+      'Track driver check-in / check-out at the gate',
+      'View dock door assignments and available slots',
+      'Manage yard appointments or follow up on no-shows',
+    ],
+    cta: 'Go to YMS', path: '/yard/entry-list',
   },
   {
-    system: 'SCM',  label: 'Supply Chain',     icon: <Globe size={14} className="text-white" />,       color: 'bg-teal-600',    bg: 'bg-teal-50',    text: 'text-teal-700',    border: 'border-teal-200',
-    when: 'When you need ocean tracking, customs status, LFD alerts, or OTIF insights.',
-    path: '/international-new/tracking',
+    system: 'SCM',  label: 'Supply Chain',     icon: <Globe size={14} className="text-white" />,       color: 'bg-teal-600',    bg: 'bg-teal-50',    text: 'text-teal-700',    border: 'border-teal-100',
+    question: 'Tracking ocean shipments or OTIF performance?',
+    scenarios: [
+      'Follow a container from origin port to your warehouse',
+      'Check customs clearance status or LFD deadline',
+      'Review OTIF scores, root cause, or penalty risks',
+    ],
+    cta: 'Go to SCM', path: '/international-new/tracking',
   },
 ]
 
@@ -239,46 +259,47 @@ function ReturningView() {
             </div>
           </div>
 
-          {/* Quick Access */}
-          <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-4">
-            <p className="text-xs font-bold text-gray-900 mb-3">Quick Access</p>
-            <div className="grid grid-cols-2 gap-2">
-              {QUICK_ACTIONS.map((q, i) => (
-                <button key={i} onClick={() => navigate(q.path)}
-                  className={`flex items-center gap-2.5 p-3 rounded-xl border border-gray-100 ${q.border} hover:border-gray-200 bg-white hover:shadow-sm transition-all text-left group`}>
-                  <div className={`w-7 h-7 ${q.bg} rounded-lg flex items-center justify-center shrink-0`}>{q.icon}</div>
-                  <div className="min-w-0">
-                    <p className="text-[11px] font-semibold text-gray-800 leading-tight">{q.label}</p>
-                    <p className="text-[9px] text-gray-400 truncate">{q.sub}</p>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
+          {/* Quick Access — removed */}
         </div>
       </div>
 
-      {/* ── Platform Gateway ── */}
-      <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-5">
-        <div className="flex items-center gap-2 mb-4">
-          <Layers size={14} className="text-gray-400" />
-          <h2 className="text-sm font-bold text-gray-900">Which platform do you need?</h2>
+      {/* ── Platform Gateway — scenario-driven ── */}
+      <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-6">
+        <div className="mb-5">
+          <h2 className="text-sm font-bold text-gray-900">What are you trying to do?</h2>
+          <p className="text-xs text-gray-400 mt-0.5">Find the right place based on your current task</p>
         </div>
-        <div className="grid grid-cols-4 gap-3">
+        <div className="grid grid-cols-4 gap-4">
           {PLATFORM_LINKS.map((p) => (
-            <div key={p.system} className={`border ${p.border} rounded-xl p-4 flex flex-col gap-3`}>
-              <div className="flex items-center gap-2">
+            <div key={p.system} className={`rounded-2xl border ${p.border} bg-white flex flex-col overflow-hidden hover:shadow-md transition-shadow`}>
+              {/* Header */}
+              <div className={`px-4 py-3 ${p.bg} border-b ${p.border} flex items-center gap-2.5`}>
                 <div className={`w-7 h-7 ${p.color} rounded-lg flex items-center justify-center shrink-0`}>{p.icon}</div>
                 <div>
                   <p className={`text-xs font-bold ${p.text}`}>{p.system}</p>
                   <p className="text-[10px] text-gray-400">{p.label}</p>
                 </div>
               </div>
-              <p className="text-[11px] text-gray-500 leading-snug flex-1">{p.when}</p>
-              <button onClick={() => navigate(p.path)}
-                className={`w-full py-1.5 text-xs font-semibold rounded-lg ${p.bg} ${p.text} hover:opacity-80 transition-opacity flex items-center justify-center gap-1`}>
-                Open <ArrowRight size={10} />
-              </button>
+              {/* Question */}
+              <div className="px-4 pt-3 pb-2">
+                <p className="text-[12px] font-semibold text-gray-800 leading-snug">{p.question}</p>
+              </div>
+              {/* Scenarios */}
+              <ul className="px-4 pb-3 flex-1 space-y-1.5">
+                {p.scenarios.map((sc, i) => (
+                  <li key={i} className="flex items-start gap-2 text-[11px] text-gray-500 leading-snug">
+                    <span className={`mt-1.5 w-1 h-1 rounded-full shrink-0 ${p.color.replace('bg-', 'bg-').replace('600', '400')}`} style={{ flexShrink: 0, width: '5px', height: '5px', borderRadius: '9999px', marginTop: '4px', background: p.color.includes('emerald') ? '#34d399' : p.color.includes('blue') ? '#60a5fa' : p.color.includes('amber') ? '#fbbf24' : '#2dd4bf' }} />
+                    {sc}
+                  </li>
+                ))}
+              </ul>
+              {/* CTA */}
+              <div className="px-4 pb-4">
+                <button onClick={() => navigate(p.path)}
+                  className={`w-full flex items-center justify-center gap-1.5 py-2 text-xs font-bold rounded-xl ${p.bg} ${p.text} border ${p.border} hover:opacity-80 transition-opacity`}>
+                  {p.cta} <ArrowRight size={11} />
+                </button>
+              </div>
             </div>
           ))}
         </div>
