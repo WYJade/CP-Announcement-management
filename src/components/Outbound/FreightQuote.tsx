@@ -1,19 +1,186 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, Check, Package, Truck, CreditCard } from 'lucide-react'
+import { ArrowLeft, Check, Package, Truck, CreditCard, Search, Plus, MoreHorizontal, ChevronRight } from 'lucide-react'
 
 const STEPS = ['Get a Quote', 'Rate Shopping', 'Result', 'Booking', 'Place Order']
 
+// ─── Mock Quote List Data ─────────────────────────────────────────────────────
+const QUOTE_LIST = [
+  { id: '20244071', serviceType: 'LTL', origin: 'Austin, TX 78754', destination: 'Dallas, TX 75201', quoteDate: 'Tue, 09 Dec 2025 17:46:37 GMT', quoteInfo: 'UPS GRND — 1 Pallet, 6 lbs', status: 'Accepted', estRate: 124.95 },
+  { id: '20244058', serviceType: 'LTL', origin: 'Los Angeles, CA 90001', destination: 'Phoenix, AZ 85001', quoteDate: 'Mon, 08 Dec 2025 10:22:15 GMT', quoteInfo: 'FedEx Freight — 2 Pallets, 220 lbs', status: 'Need Review', estRate: 389.50 },
+  { id: '20244041', serviceType: 'LTL', origin: 'Chicago, IL 60601', destination: 'Indianapolis, IN 46201', quoteDate: 'Fri, 05 Dec 2025 09:05:44 GMT', quoteInfo: 'Old Dominion — 3 Pallets, 480 lbs', status: 'Expired', estRate: 512.00 },
+  { id: '20244029', serviceType: 'Ocean Freight', origin: 'Shanghai, CN', destination: 'Long Beach, CA 90802', quoteDate: 'Wed, 03 Dec 2025 14:30:00 GMT', quoteInfo: '20ft Container — 8,000 kg', status: 'Accepted', estRate: 2850.00 },
+  { id: '20244017', serviceType: 'LTL', origin: 'Seattle, WA 98101', destination: 'Portland, OR 97201', quoteDate: 'Mon, 01 Dec 2025 08:18:22 GMT', quoteInfo: 'Estes Express — 1 Pallet, 95 lbs', status: 'Accepted', estRate: 198.75 },
+]
+
+type QuoteStatus = 'Accepted' | 'Need Review' | 'Expired' | 'All'
+
+const STATUS_COLORS: Record<string, string> = {
+  'Accepted':    'bg-green-100 text-green-700',
+  'Need Review': 'bg-amber-100 text-amber-700',
+  'Expired':     'bg-gray-100 text-gray-500',
+}
+
+// ─── List View ────────────────────────────────────────────────────────────────
+function QuoteListView({ onRequestQuote }: { onRequestQuote: () => void }) {
+  const [activeTab, setActiveTab] = useState<QuoteStatus>('All')
+  const [searchId, setSearchId] = useState('')
+  const [statusFilter, setStatusFilter] = useState('All')
+
+  const TABS: { label: QuoteStatus; count: number }[] = [
+    { label: 'All',         count: QUOTE_LIST.length },
+    { label: 'Accepted',    count: QUOTE_LIST.filter(q => q.status === 'Accepted').length },
+    { label: 'Need Review', count: QUOTE_LIST.filter(q => q.status === 'Need Review').length },
+    { label: 'Expired',     count: QUOTE_LIST.filter(q => q.status === 'Expired').length },
+  ]
+
+  const filtered = QUOTE_LIST.filter(q => {
+    if (activeTab !== 'All' && q.status !== activeTab) return false
+    if (searchId && !q.id.includes(searchId)) return false
+    if (statusFilter !== 'All' && q.status !== statusFilter) return false
+    return true
+  })
+
+  return (
+    <div className="p-6">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-5">
+        <h1 className="text-2xl font-bold text-gray-900">Freight Quote</h1>
+        <button onClick={onRequestQuote}
+          className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors">
+          <Plus size={15} /> Request Quote
+        </button>
+      </div>
+
+      {/* Filters */}
+      <div className="bg-white border border-gray-200 rounded-xl p-4 mb-4">
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="block text-xs text-gray-500 mb-1">Quote ID</label>
+            <input type="text" value={searchId} onChange={e => setSearchId(e.target.value)}
+              placeholder="Quote ID"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary-400" />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-500 mb-1">Status</label>
+            <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary-400">
+              <option value="All">All</option>
+              <option>Accepted</option>
+              <option>Need Review</option>
+              <option>Expired</option>
+            </select>
+          </div>
+        </div>
+        <div className="flex justify-end mt-3">
+          <button className="flex items-center gap-1.5 px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700">
+            <Search size={14} /> Search
+          </button>
+        </div>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex items-center gap-0.5 mb-4 border-b border-gray-200">
+        {TABS.map(tab => (
+          <button key={tab.label} onClick={() => setActiveTab(tab.label)}
+            className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === tab.label ? 'border-primary-600 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700'
+            }`}>
+            {tab.label}
+            <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-semibold ${activeTab === tab.label ? 'bg-primary-100 text-primary-700' : 'bg-gray-100 text-gray-400'}`}>
+              {tab.count}
+            </span>
+          </button>
+        ))}
+      </div>
+
+      {/* Table */}
+      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="bg-gray-50 border-b border-gray-200">
+              {['Quote ID', 'Service Type', 'Origin', 'Quote Date', 'Destination', 'Quote Info', 'Status', 'Est. Rate', ''].map(h => (
+                <th key={h} className="text-left py-3 px-4 text-[10px] font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-50">
+            {filtered.length === 0 ? (
+              <tr><td colSpan={9} className="text-center py-14">
+                <Search size={32} className="mx-auto text-gray-200 mb-3" />
+                <p className="text-sm text-gray-400">No data found</p>
+                <p className="text-xs text-gray-300 mt-1">Try adjusting your search criteria</p>
+              </td></tr>
+            ) : filtered.map(q => (
+              <tr key={q.id} className="hover:bg-gray-50/70 transition-colors group">
+                <td className="py-3 px-4 text-primary-600 font-medium">{q.id}</td>
+                <td className="py-3 px-4 text-gray-600 text-xs">{q.serviceType}</td>
+                <td className="py-3 px-4 text-gray-600 text-xs">{q.origin}</td>
+                <td className="py-3 px-4 text-gray-500 text-xs whitespace-nowrap">{q.quoteDate}</td>
+                <td className="py-3 px-4 text-gray-600 text-xs">{q.destination}</td>
+                <td className="py-3 px-4 text-gray-500 text-xs max-w-[160px] truncate">{q.quoteInfo}</td>
+                <td className="py-3 px-4">
+                  <span className={`text-[11px] font-semibold px-2 py-0.5 rounded ${STATUS_COLORS[q.status] ?? 'bg-gray-100 text-gray-500'}`}>
+                    {q.status}
+                  </span>
+                </td>
+                <td className="py-3 px-4 text-gray-800 font-semibold text-xs">
+                  {q.estRate.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}
+                </td>
+                <td className="py-3 px-4">
+                  <button className="text-gray-400 hover:text-gray-600 p-1 rounded hover:bg-gray-100 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <MoreHorizontal size={14} />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        {/* Pagination */}
+        {filtered.length > 0 && (
+          <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 text-xs text-gray-500">
+            <span>Rows per page: <select className="border-none outline-none bg-transparent font-medium text-gray-700 ml-1"><option>10</option><option>20</option></select></span>
+            <span>Page 1 of 1</span>
+            <div className="flex items-center gap-1">
+              {['«','‹','›','»'].map(a => (
+                <button key={a} className="w-7 h-7 rounded border border-gray-200 hover:bg-gray-50 flex items-center justify-center text-gray-400">{a}</button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 export default function FreightQuote() {
   const navigate = useNavigate()
+  const [view, setView] = useState<'list' | 'wizard'>('list')
   const [step, setStep] = useState(0)
   const [selectedService, setSelectedService] = useState<string | null>(null)
   const [paymentMethod, setPaymentMethod] = useState<'prepay' | 'postpay'>('prepay')
 
+  // Show list view first, switch to wizard on Request Quote
+  if (view === 'list') {
+    return <QuoteListView onRequestQuote={() => { setStep(0); setView('wizard') }} />
+  }
+
   return (
     <div className="p-6">
+      {/* Back to list */}
+      <button onClick={() => setView('list')} className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 mb-4">
+        <ArrowLeft size={14} /> Back
+      </button>
+
+      {/* Quote / Ocean Freight toggle */}
+      <div className="grid grid-cols-2 rounded-xl overflow-hidden border border-gray-200 mb-6 max-w-2xl">
+        <button className="py-2.5 text-sm font-medium bg-white text-gray-800 border-r border-gray-200">Quote</button>
+        <button className="py-2.5 text-sm font-medium bg-gray-50 text-gray-400">Ocean Freight</button>
+      </div>
+
       {/* Step Progress Bar */}
-      <div className="flex items-center justify-between mb-8 max-w-3xl mx-auto">
+      <div className="flex items-center justify-between mb-8 max-w-3xl">
         {STEPS.map((s, i) => (
           <div key={i} className="flex items-center">
             <div className="flex flex-col items-center">
