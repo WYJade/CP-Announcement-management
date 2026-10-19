@@ -40,6 +40,7 @@ import ClaimList from './components/Finance/ClaimList'
 import ShipmentsList from './components/Shipping/ShipmentsList'
 import RoleManagement from './components/System/RoleManagement'
 import EntryList from './components/Yard/EntryList'
+import EntryDetail from './components/Yard/EntryDetail'
 
 function App() {
   return (
@@ -129,6 +130,7 @@ function App() {
 
         {/* Yard Management — Entry Monitor */}
         <Route path="yard/entry-list" element={<EntryList />} />
+        <Route path="yard/entry-detail/:id" element={<EntryDetail />} />
       </Route>
     </Routes>
   )

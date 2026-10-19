@@ -1,240 +1,16 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
-  AlertTriangle, CheckCircle2, Clock, Truck, MapPin, User,
+  AlertTriangle, CheckCircle2, MapPin,
   Search, X, RefreshCw, Eye, AlertCircle, Info, Camera,
   ChevronLeft, ChevronRight, ZoomIn, Image as ImageIcon,
+  Clock, Truck, User,
 } from 'lucide-react'
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-type EntryStatus =
-  | 'Pre Entry'
-  | 'Gate Checked In'
-  | 'Waiting'
-  | 'Need Window Check-In'
-  | 'Window Checked In'
-  | 'Dock Checked In'
-  | 'Dock Checked Out'
-  | 'Gate Checked Out'
-  | 'Rejected'
-  | 'Dropping Off Delivery'
-  | 'Dropping Off Empty'
-  | 'Picking Up Preload'
-  | 'Picking Up Empty'
-
-type EntryType = 'Inbound' | 'Outbound' | 'Drop Off Empty' | 'Drop Off Delivery' | 'Pick Up'
-type AnomalyType = 'mismatch' | 'no-location' | null
-
-interface Photo {
-  id: string
-  label: string
-  url: string   // using placeholder images
-  type: 'driver' | 'vehicle' | 'camera'
-}
-
-interface EntryRecord {
-  id: string
-  entryId: string
-  status: EntryStatus
-  dock: string
-  facility: string
-  customer: string
-  driverName: string
-  driverPhone: string
-  driverLicense: string
-  tractorCarrier: string
-  equipType: string
-  tractor: string
-  trailer: string
-  container: string
-  seal: string
-  freightCarrier: string
-  entryType: EntryType
-  direction: string
-  location: string
-  loadTask: string
-  loadId: string
-  loadNo: string
-  receiptId: string
-  hasAppointment: boolean  // whether a pre-scheduled appointment exists
-  windowCheckIn: string    // Window Check-In timestamp; empty means not yet checked in
-  dockCheckIn: string      // Dock Check-In timestamp
-  dockCheckOut: string     // Dock Check-Out timestamp
-  gateCheckIn: string
-  gateCheckOut: string
-  anomaly: AnomalyType
-  anomalyDetail?: string
-  mismatch?: {
-    byCarrier: { name: string; phone: string; license: string; carrier: string; mcdot: string }
-    byGate:    { name: string; phone: string; license: string; carrier: string; mcdot: string }
-  }
-  photos: Photo[]
-}
-
-// ─── Constants ────────────────────────────────────────────────────────────────
-const ALL_STATUSES: EntryStatus[] = [
-  'Pre Entry', 'Gate Checked In', 'Waiting', 'Need Window Check-In',
-  'Window Checked In', 'Dock Checked In', 'Dock Checked Out', 'Gate Checked Out',
-  'Rejected', 'Dropping Off Delivery', 'Dropping Off Empty',
-  'Picking Up Preload', 'Picking Up Empty',
-]
-
-const CUSTOMERS  = ['All Customers', 'ADOORN LLC', 'THE ONLY BEAN LLC', 'VITA COCO', 'ORGAIN LLC', 'SAMUN INC']
-const FACILITIES = ['All Facilities', 'Ontario, CA', 'Fontana, CA', 'Garden City, NY', 'Savannah, GA', 'Chicago, IL']
-const ENTRY_TYPES: EntryType[] = ['Inbound', 'Outbound', 'Drop Off Empty', 'Drop Off Delivery', 'Pick Up']
-
-// ─── Placeholder photo URLs ───────────────────────────────────────────────────
-const PLACEHOLDER_DARK  = 'https://placehold.co/320x200/1a1a2e/555?text=Driver'
-const PLACEHOLDER_VEH   = 'https://placehold.co/320x200/1a1a2e/555?text=Vehicle'
-const PLACEHOLDER_EQUIP = 'https://placehold.co/320x200/1a1a2e/555?text=Equipment'
-const PLACEHOLDER_CAM   = 'https://placehold.co/640x360/0d1117/6e40c9?text=Camera+Feed'
-
-function makePh(label: string, type: Photo['type'] = 'driver'): Photo {
-  const url = type === 'camera' ? PLACEHOLDER_CAM
-    : type === 'vehicle' ? PLACEHOLDER_VEH
-    : PLACEHOLDER_DARK
-  return { id: `${label}-${Math.random()}`, label, url, type }
-}
-
-// ─── Mock data ────────────────────────────────────────────────────────────────
-const MOCK_ENTRIES: EntryRecord[] = [
-  {
-    id:'e1', entryId:'ET-822803', status:'Window Checked In', dock:'DOCK33456',
-    facility:'Ontario, CA', customer:'ADOORN LLC',
-    driverName:'Jason Miller', driverPhone:'(+1)9093451872', driverLicense:'CA-M293847', tractorCarrier:'SWIFT TRANSPORT',
-    equipType:'TRAILER', tractor:'T-10923', trailer:'4645', container:'CNTR-9901', seal:'SL-88421', freightCarrier:'SWIFT TRANSPORT',
-    entryType:'Outbound', direction:'Outbound', location:'DOCK33456', loadTask:'TASK-35688(jfeng)',
-    loadId:'LD-20230', loadNo:'LN-5521', receiptId:'RCP-10040',
-    hasAppointment:true, windowCheckIn:'2026-09-08 10:18', dockCheckIn:'2026-09-08 10:35', dockCheckOut:'', gateCheckIn:'2026-09-08 10:04', gateCheckOut:'', anomaly:null,
-    photos:[makePh('Driver'), makePh('Vehicle','vehicle'), makePh('Equipment','vehicle'), makePh('Camera In','camera')],
-  },
-  {
-    id:'e2', entryId:'ET-822802', status:'Dock Checked Out', dock:'DOCK711',
-    facility:'Ontario, CA', customer:'ADOORN LLC',
-    driverName:'api fox', driverPhone:'(+1)2013694258', driverLicense:'DL83R4J484', tractorCarrier:'TTS',
-    equipType:'TRAILER', tractor:'LPR443', trailer:'FJWONIX', container:'CNTR-7701', seal:'SL-00312', freightCarrier:'UPS',
-    entryType:'Outbound', direction:'Outbound', location:'DOCK711', loadTask:'TASK-837829(SMITH JOHN)',
-    loadId:'LD-20198', loadNo:'LN-5498', receiptId:'RCP-10045',
-    hasAppointment:true, windowCheckIn:'2026-09-08 03:22', dockCheckIn:'2026-09-08 03:40', dockCheckOut:'2026-09-08 05:12', gateCheckIn:'2026-09-08 03:14', gateCheckOut:'', anomaly:null,
-    photos:[makePh('Driver'), makePh('Driver 2'), makePh('Vehicle','vehicle'), makePh('Vehicle 2','vehicle'), makePh('Equipment','vehicle'), makePh('Equipment 2','vehicle'), makePh('Camera In','camera'), makePh('Camera Out','camera')],
-  },
-  {
-    id:'e3', entryId:'ET-822795', status:'Dropping Off Empty', dock:'YARD162',
-    facility:'Fontana, CA', customer:'THE ONLY BEAN LLC',
-    driverName:'ESTHER CHEN', driverPhone:'(+1)2542492894', driverLicense:'CA-12345568', tractorCarrier:'J B HUNT TRANSPORT INC',
-    equipType:'TRAILER', tractor:'T-33881', trailer:'8222733', container:'CNTR-5512', seal:'SL-44901', freightCarrier:'J B HUNT TRANSPORT INC',
-    entryType:'Drop Off Empty', direction:'Drop Off Empty', location:'YARD-B12',
-    loadTask:'TASK-35601(echen)', loadId:'LD-20187', loadNo:'LN-5490', receiptId:'RCP-10031',
-    hasAppointment:true, windowCheckIn:'', dockCheckIn:'', dockCheckOut:'', gateCheckIn:'2026-09-08 02:41', gateCheckOut:'',
-    anomaly:'no-location', anomalyDetail:'Driver has not filled in the actual parking location.',
-    photos:[makePh('Driver'), makePh('Driver 2'), makePh('Camera In','camera'), makePh('Camera In 2','camera'), makePh('Camera In 3','camera'), makePh('Camera In 4','camera'), makePh('Camera In 5','camera'), makePh('Camera In 6','camera'), makePh('Camera In 7','camera'), makePh('Camera In 8','camera')],
-  },
-  {
-    id:'e4', entryId:'ET-822711', status:'Gate Checked Out', dock:'DOCK442',
-    facility:'Garden City, NY', customer:'VITA COCO',
-    driverName:'test yuto', driverPhone:'(+1)9988880888', driverLicense:'NY-43e534626', tractorCarrier:'AMC TRANSPORT SERVICES LLC',
-    equipType:'TRAILER', tractor:'T-66120', trailer:'PGNN', container:'CNTR-4402', seal:'SL-77654', freightCarrier:'FEDEX FREIGHT INC',
-    entryType:'Outbound', direction:'Outbound', location:'DOCK442', loadTask:'TASK-34991(jsmith)',
-    loadId:'LD-19854', loadNo:'LN-5200', receiptId:'RCP-09988',
-    hasAppointment:false, windowCheckIn:'2026-09-02 00:45', dockCheckIn:'2026-09-02 01:00', dockCheckOut:'2026-09-02 01:48', gateCheckIn:'2026-09-02 00:32', gateCheckOut:'2026-09-02 01:55',
-    anomaly:'mismatch', anomalyDetail:'Driver info entered by carrier does not match gate check-in record.',
-    mismatch:{
-      byCarrier:{ name:'324234', phone:'(+1)2701661989', license:'46534354', carrier:'FEDEX FREIGHT INC', mcdot:'229039' },
-      byGate:   { name:'test yuto', phone:'(+1)9988880888', license:'43e534626', carrier:'AMC TRANSPORT SERVICES LLC', mcdot:'' },
-    },
-    photos:[makePh('Driver'), makePh('Vehicle','vehicle'), makePh('Equipment','vehicle'), makePh('Equipment 2','vehicle'), makePh('Equipment 3','vehicle'), makePh('Other')],
-  },
-  {
-    id:'e5', entryId:'ET-822710', status:'Window Checked In', dock:'DOCK8976',
-    facility:'Fontana, CA', customer:'ORGAIN LLC',
-    driverName:'Kevin Torres', driverPhone:'(+1)9095552341', driverLicense:'CA-K887712', tractorCarrier:'WERNER ENTERPRISES',
-    equipType:'TRAILER', tractor:'T-20541', trailer:'PGNN', container:'CNTR-3308', seal:'SL-33209', freightCarrier:'WERNER ENTERPRISES',
-    entryType:'Outbound', direction:'Outbound', location:'DOCK8976', loadTask:'TASK-36384(jfeng)',
-    loadId:'LD-20175', loadNo:'LN-5481', receiptId:'RCP-10038',
-    hasAppointment:true, windowCheckIn:'2026-09-02 00:50', dockCheckIn:'2026-09-02 01:05', dockCheckOut:'', gateCheckIn:'2026-09-02 00:32', gateCheckOut:'', anomaly:null,
-    photos:[makePh('Camera In','camera'), makePh('Camera In 2','camera')],
-  },
-  {
-    id:'e6', entryId:'ET-822804', status:'Need Window Check-In', dock:'DOCK115',
-    facility:'Chicago, IL', customer:'SAMUN INC',
-    driverName:'Maria Gonzalez', driverPhone:'(+1)3125559988', driverLicense:'IL-M334421', tractorCarrier:'COYOTE LOGISTICS',
-    equipType:'TRAILER', tractor:'T-77403', trailer:'TRL-2290', container:'CNTR-6614', seal:'SL-55820', freightCarrier:'COYOTE LOGISTICS',
-    entryType:'Inbound', direction:'Inbound', location:'', loadTask:'TASK-36401(mgonzalez)',
-    loadId:'LD-20231', loadNo:'LN-5522', receiptId:'RCP-10048',
-    hasAppointment:false, windowCheckIn:'', dockCheckIn:'', dockCheckOut:'', gateCheckIn:'2026-09-08 10:04', gateCheckOut:'', anomaly:null,
-    photos:[makePh('Driver'), makePh('Vehicle','vehicle'), makePh('Camera In','camera')],
-  },
-]
-
-// ─── Status style map ─────────────────────────────────────────────────────────
-const STATUS_STYLE: Record<EntryStatus, { bg: string; text: string; dot: string }> = {
-  'Pre Entry':             { bg:'bg-gray-100',    text:'text-gray-600',   dot:'bg-gray-400' },
-  'Gate Checked In':       { bg:'bg-blue-50',     text:'text-blue-700',   dot:'bg-blue-500' },
-  'Waiting':               { bg:'bg-yellow-50',   text:'text-yellow-700', dot:'bg-yellow-500' },
-  'Need Window Check-In':  { bg:'bg-orange-50',   text:'text-orange-700', dot:'bg-orange-500' },
-  'Window Checked In':     { bg:'bg-emerald-50',  text:'text-emerald-700',dot:'bg-emerald-500' },
-  'Dock Checked In':       { bg:'bg-teal-50',     text:'text-teal-700',   dot:'bg-teal-500' },
-  'Dock Checked Out':      { bg:'bg-violet-50',   text:'text-violet-700', dot:'bg-violet-500' },
-  'Gate Checked Out':      { bg:'bg-gray-100',    text:'text-gray-600',   dot:'bg-gray-400' },
-  'Rejected':              { bg:'bg-red-50',      text:'text-red-700',    dot:'bg-red-500' },
-  'Dropping Off Delivery': { bg:'bg-cyan-50',     text:'text-cyan-700',   dot:'bg-cyan-500' },
-  'Dropping Off Empty':    { bg:'bg-amber-50',    text:'text-amber-700',  dot:'bg-amber-500' },
-  'Picking Up Preload':    { bg:'bg-indigo-50',   text:'text-indigo-700', dot:'bg-indigo-500' },
-  'Picking Up Empty':      { bg:'bg-purple-50',   text:'text-purple-700', dot:'bg-purple-500' },
-}
-
-function StatusBadge({ status }: { status: EntryStatus }) {
-  const s = STATUS_STYLE[status]
-  return (
-    <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium ${s.bg} ${s.text}`}>
-      <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`} />
-      {status}
-    </span>
-  )
-}
-
-// ─── Window Check-In Badge (3-state logic) ────────────────────────────────────
-function WindowCheckInBadge({
-  hasAppointment, windowCheckIn, gateCheckIn,
-}: {
-  hasAppointment: boolean
-  windowCheckIn: string
-  gateCheckIn: string
-}) {
-  // Case 2 & 3b — has windowCheckIn or (no appt but gate check-in exists) → Arrived
-  if (windowCheckIn) {
-    return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-        Arrived at {windowCheckIn}
-      </span>
-    )
-  }
-  // Case 3b — no appointment, but already gate checked-in → treat as arrived
-  if (!hasAppointment && gateCheckIn) {
-    return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-        Arrived at {gateCheckIn}
-      </span>
-    )
-  }
-  // Case 3a — no appointment, no gate check-in yet
-  if (!hasAppointment) {
-    return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-gray-100 text-gray-500 border border-gray-200">
-        <span className="w-1.5 h-1.5 rounded-full bg-gray-400 shrink-0" />
-        Not Scheduled
-      </span>
-    )
-  }
-  // Case 1 — has appointment but windowCheckIn is empty → pending
-  return (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
-      <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse shrink-0" />
-      Pending Arrival
-    </span>
-  )
-}
+import {
+  MOCK_ENTRIES, STATUS_STYLE, PLACEHOLDER_DARK, PLACEHOLDER_CAM,
+  CUSTOMERS, FACILITIES, ENTRY_TYPES, ALL_STATUSES,
+  type EntryRecord, type EntryStatus, type Photo, type AnomalyType,
+} from './entryData'
 
 // ─── Photo Lightbox ───────────────────────────────────────────────────────────
 function PhotoLightbox({ photos, startIndex, onClose }: {
@@ -416,178 +192,14 @@ function MismatchModal({ entry, onClose }: { entry: EntryRecord; onClose: () => 
   )
 }
 
-// ─── Entry Detail Panel ───────────────────────────────────────────────────────
-function EntryDetailPanel({ entry, onClose }: { entry: EntryRecord; onClose: () => void }) {
+// ─── Status Badge ─────────────────────────────────────────────────────────────
+function StatusBadge({ status }: { status: EntryStatus }) {
+  const s = STATUS_STYLE[status]
   return (
-    <div className="fixed inset-0 bg-black/30 z-40 flex justify-end" onClick={onClose}>
-      <div className="w-[520px] bg-white h-full overflow-y-auto shadow-2xl" onClick={e => e.stopPropagation()}
-        style={{ animation:'slideInRight 0.2s cubic-bezier(0.16,1,0.3,1)' }}>
-        {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between z-10">
-          <div>
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-sm font-bold text-gray-900">{entry.entryId}</span>
-              <StatusBadge status={entry.status} />
-            </div>
-            <div className="flex items-center gap-3 mt-0.5 text-xs text-gray-400">
-              {entry.dock && <span className="flex items-center gap-1"><MapPin size={10} />{entry.dock}</span>}
-              <span>{entry.facility}</span>
-              <span className="bg-gray-100 px-2 py-0.5 rounded-full">{entry.customer}</span>
-            </div>
-          </div>
-          <button onClick={onClose} className="p-2 rounded-lg hover:bg-gray-100 text-gray-400"><X size={15} /></button>
-        </div>
-
-        <div className="px-6 py-5 space-y-5">
-          {/* Anomaly */}
-          {entry.anomaly && (
-            <div className={`rounded-xl px-4 py-3 flex items-start gap-3 ${entry.anomaly==='mismatch'?'bg-red-50 border border-red-200':'bg-amber-50 border border-amber-200'}`}>
-              <AlertTriangle size={15} className={`shrink-0 mt-0.5 ${entry.anomaly==='mismatch'?'text-red-500':'text-amber-500'}`} />
-              <div>
-                <p className={`text-xs font-semibold ${entry.anomaly==='mismatch'?'text-red-700':'text-amber-700'}`}>
-                  {entry.anomaly==='mismatch'?'Driver Mismatch Detected':'Location Not Filled'}
-                </p>
-                <p className={`text-xs mt-0.5 ${entry.anomaly==='mismatch'?'text-red-600':'text-amber-600'}`}>{entry.anomalyDetail}</p>
-              </div>
-            </div>
-          )}
-
-          {/* Timeline */}
-          <section>
-            <h3 className="text-xs font-semibold text-gray-400 uppercase mb-2 flex items-center gap-1.5"><Clock size={12}/> Timeline</h3>
-            <div className="bg-gray-50 rounded-xl px-4 py-3 space-y-3">
-              {/* Gate Check-in / Check-out */}
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <p className="text-[10px] text-gray-400 mb-0.5">Gate Check-in</p>
-                  <p className="text-sm font-medium text-gray-800">{entry.gateCheckIn||'–'}</p>
-                </div>
-                <div>
-                  <p className="text-[10px] text-gray-400 mb-0.5">Gate Check-out</p>
-                  <p className="text-sm font-medium text-gray-800">{entry.gateCheckOut||'–'}</p>
-                </div>
-              </div>
-              {/* Window Check-In status — linked to windowCheckIn field */}
-              <div className="border-t border-gray-200 pt-2.5">
-                <p className="text-[10px] text-gray-400 mb-1.5">Window Check-in</p>
-                <WindowCheckInBadge
-                  hasAppointment={entry.hasAppointment}
-                  windowCheckIn={entry.windowCheckIn}
-                  gateCheckIn={entry.gateCheckIn}
-                />
-              </div>
-              {/* Dock Check-in / Check-out */}
-              {(entry.dockCheckIn || entry.dockCheckOut) && (
-                <div className="border-t border-gray-200 pt-2.5 grid grid-cols-2 gap-3">
-                  <div>
-                    <p className="text-[10px] text-gray-400 mb-0.5">Dock Check-in</p>
-                    <p className="text-sm font-medium text-gray-800">{entry.dockCheckIn||'–'}</p>
-                  </div>
-                  <div>
-                    <p className="text-[10px] text-gray-400 mb-0.5">Dock Check-out</p>
-                    <p className="text-sm font-medium text-gray-800">{entry.dockCheckOut||'–'}</p>
-                  </div>
-                </div>
-              )}
-            </div>
-          </section>
-
-          {/* Driver */}
-          {entry.driverName && (
-            <section>
-              <h3 className="text-xs font-semibold text-gray-400 uppercase mb-2 flex items-center gap-1.5"><User size={12}/> Driver</h3>
-              <div className="bg-gray-50 rounded-xl px-4 py-3 space-y-1.5">
-                {[['Name',entry.driverName],['Phone',entry.driverPhone],['License',entry.driverLicense],['Carrier',entry.tractorCarrier]].map(([l,v])=>v?(
-                  <div key={l} className="flex justify-between text-xs">
-                    <span className="text-gray-400">{l}</span>
-                    <span className="text-gray-800 font-medium">{v}</span>
-                  </div>
-                ):null)}
-              </div>
-            </section>
-          )}
-
-          {/* Equipment */}
-          <section>
-            <h3 className="text-xs font-semibold text-gray-400 uppercase mb-2 flex items-center gap-1.5"><Truck size={12}/> Equipment</h3>
-            <div className="bg-gray-50 rounded-xl px-4 py-3 space-y-1.5">
-              {([['Type',entry.equipType],['Tractor',entry.tractor],['Trailer',entry.trailer],['Container',entry.container],['Freight Carrier',entry.freightCarrier]] as [string,string][]).map(([l,v])=>v?(
-                <div key={l} className="flex justify-between text-xs">
-                  <span className="text-gray-400">{l}</span>
-                  <span className="text-gray-800 font-medium">{v}</span>
-                </div>
-              ):null)}
-              {entry.seal && (
-                <div className="flex justify-between text-xs">
-                  <span className="text-gray-400">Seal</span>
-                  <span className="inline-flex items-center px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-medium text-xs">{entry.seal}</span>
-                </div>
-              )}
-            </div>
-          </section>
-
-          {/* Location */}
-          <section>
-            <h3 className="text-xs font-semibold text-gray-400 uppercase mb-2 flex items-center gap-1.5"><MapPin size={12}/> Location</h3>
-            <div className={`rounded-xl px-4 py-3 ${entry.anomaly==='no-location'?'bg-amber-50 border border-amber-200':'bg-gray-50'}`}>
-              {entry.location
-                ? <p className="text-sm font-medium text-gray-800">{entry.location}</p>
-                : <p className="text-xs text-amber-600 font-medium">Location not entered by driver</p>}
-            </div>
-          </section>
-
-          {/* Direction & Load Info */}
-          {(entry.loadTask||entry.loadId||entry.loadNo||entry.receiptId) && (
-            <section>
-              <h3 className="text-xs font-semibold text-gray-400 uppercase mb-2">Direction &amp; Load</h3>
-              <div className="bg-gray-50 rounded-xl px-4 py-3 space-y-1.5">
-                <div className="flex justify-between text-xs">
-                  <span className="text-gray-400">Direction</span>
-                  <span className={`font-medium ${entry.direction==='Outbound'?'text-emerald-600':entry.direction==='Inbound'?'text-blue-600':'text-gray-700'}`}>{entry.direction}</span>
-                </div>
-                {entry.loadTask&&(
-                  <div className="flex justify-between text-xs">
-                    <span className="text-gray-400">Load Task</span>
-                    <span className="text-primary-600 font-medium">{entry.loadTask}</span>
-                  </div>
-                )}
-                {(entry.loadId||entry.loadNo||entry.receiptId)&&(
-                  <div className="border-t border-gray-200 pt-1.5 mt-1 space-y-1.5">
-                    {entry.loadId&&(
-                      <div className="flex justify-between text-xs">
-                        <span className="text-gray-400">Load ID</span>
-                        <span className="text-gray-800 font-medium">{entry.loadId}</span>
-                      </div>
-                    )}
-                    {entry.loadNo&&(
-                      <div className="flex justify-between text-xs">
-                        <span className="text-gray-400">Load No.</span>
-                        <span className="text-gray-800 font-medium">{entry.loadNo}</span>
-                      </div>
-                    )}
-                    {entry.receiptId&&(
-                      <div className="flex justify-between text-xs">
-                        <span className="text-gray-400">Receipt ID</span>
-                        <span className="text-gray-800 font-medium">{entry.receiptId}</span>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            </section>
-          )}
-
-          {/* Photos & Camera */}
-          <section>
-            <h3 className="text-xs font-semibold text-gray-400 uppercase mb-2 flex items-center gap-1.5"><Camera size={12}/> Photos &amp; Camera</h3>
-            <div className="bg-gray-50 rounded-xl px-4 py-4">
-              <PhotoGallery photos={entry.photos} maxVisible={8} />
-            </div>
-          </section>
-        </div>
-      </div>
-      <style>{`@keyframes slideInRight{from{transform:translateX(100%)}to{transform:translateX(0)}}`}</style>
-    </div>
+    <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium ${s.bg} ${s.text}`}>
+      <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`} />
+      {status}
+    </span>
   )
 }
 
@@ -641,11 +253,11 @@ function InlinePhotoStrip({ photos }: { photos: Photo[] }) {
 }
 
 // ─── Entry Card ───────────────────────────────────────────────────────────────
-function EntryCard({ entry, onViewDetail, onViewMismatch }: {
+function EntryCard({ entry, onViewMismatch }: {
   entry: EntryRecord
-  onViewDetail: ()=>void
   onViewMismatch: ()=>void
 }) {
+  const navigate = useNavigate()
   const hasAnomaly = !!entry.anomaly
   const photoCount = entry.photos.length
 
@@ -679,7 +291,7 @@ function EntryCard({ entry, onViewDetail, onViewMismatch }: {
               <Camera size={13} className="text-gray-400" /> {photoCount} Photos
             </span>
           )}
-          <button onClick={onViewDetail}
+          <button onClick={() => navigate(`/yard/entry-detail/${entry.id}`)}
             className="flex items-center gap-1.5 text-xs text-primary-600 hover:text-primary-800 font-medium transition-colors px-2 py-1 rounded-lg hover:bg-gray-100">
             <Eye size={13}/> View Details
           </button>
@@ -820,7 +432,6 @@ export default function EntryList() {
   const [dateFrom,    setDateFrom]    = useState('')
   const [dateTo,      setDateTo]      = useState('')
 
-  const [detailEntry,   setDetailEntry]   = useState<EntryRecord|null>(null)
   const [mismatchEntry, setMismatchEntry] = useState<EntryRecord|null>(null)
 
   const filtered = MOCK_ENTRIES.filter(e => {
@@ -848,7 +459,7 @@ export default function EntryList() {
       {/* Page header */}
       <div className="flex items-start justify-between mb-5">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">Yard Entry Monitor</h1>
+          <h1 className="text-xl font-bold text-gray-900">Entry Monitor</h1>
           <p className="text-sm text-gray-500 mt-0.5">Read-only view of gate entries. Tap any entry to view details and photos.</p>
         </div>
         <button className="p-2 rounded-lg hover:bg-gray-100 text-gray-500 transition-colors" title="Refresh">
@@ -967,13 +578,11 @@ export default function EntryList() {
           <EntryCard
             key={entry.id}
             entry={entry}
-            onViewDetail={()=>setDetailEntry(entry)}
             onViewMismatch={()=>setMismatchEntry(entry)}
           />
         ))}
       </div>
 
-      {detailEntry   && <EntryDetailPanel entry={detailEntry}   onClose={()=>setDetailEntry(null)}/>}
       {mismatchEntry && <MismatchModal    entry={mismatchEntry} onClose={()=>setMismatchEntry(null)}/>}
     </div>
   )
