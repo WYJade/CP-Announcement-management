@@ -1,13 +1,12 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import {
-  AlertTriangle, Clock, Truck, MapPin, User,
+  AlertTriangle, MapPin,
   X, ChevronLeft, ChevronRight, ZoomIn, Image as ImageIcon,
-  Camera,
+  Camera, ArrowLeft,
 } from 'lucide-react'
 import {
   MOCK_ENTRIES, STATUS_STYLE, PLACEHOLDER_DARK, PLACEHOLDER_CAM,
-  PLACEHOLDER_VEH,
   type EntryRecord, type Photo, type EntryStatus,
 } from './entryData'
 
@@ -32,7 +31,7 @@ function WindowCheckInBadge({
 }) {
   if (windowCheckIn) {
     return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
         Arrived at {windowCheckIn}
       </span>
@@ -40,7 +39,7 @@ function WindowCheckInBadge({
   }
   if (!hasAppointment && gateCheckIn) {
     return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
         Arrived at {gateCheckIn}
       </span>
@@ -48,14 +47,14 @@ function WindowCheckInBadge({
   }
   if (!hasAppointment) {
     return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-gray-100 text-gray-500 border border-gray-200">
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-500 border border-gray-200">
         <span className="w-1.5 h-1.5 rounded-full bg-gray-400 shrink-0" />
         Not Scheduled
       </span>
     )
   }
   return (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
       <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse shrink-0" />
       Pending Arrival
     </span>
@@ -91,7 +90,6 @@ function PhotoLightbox({ photos, startIndex, onClose }: {
         >
           <ChevronLeft size={20} />
         </button>
-
         <div className="max-w-4xl w-full">
           <img
             src={current.url}
@@ -106,7 +104,6 @@ function PhotoLightbox({ photos, startIndex, onClose }: {
             </div>
           )}
         </div>
-
         <button
           onClick={() => setIdx(i => (i + 1) % photos.length)}
           className="absolute right-4 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
@@ -138,12 +135,12 @@ function PhotoLightbox({ photos, startIndex, onClose }: {
 }
 
 // ─── Photo Gallery ────────────────────────────────────────────────────────────
-function PhotoGallery({ photos, maxVisible = 8 }: { photos: Photo[]; maxVisible?: number }) {
+function PhotoGallery({ photos, maxVisible = 12 }: { photos: Photo[]; maxVisible?: number }) {
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null)
 
   if (photos.length === 0) return (
-    <div className="flex items-center gap-2 text-gray-300 text-xs py-2">
-      <ImageIcon size={14} /> No photos available
+    <div className="flex items-center gap-2 text-gray-300 text-sm py-4">
+      <ImageIcon size={16} /> No photos available
     </div>
   )
 
@@ -152,12 +149,12 @@ function PhotoGallery({ photos, maxVisible = 8 }: { photos: Photo[]; maxVisible?
 
   return (
     <>
-      <div className="flex items-center gap-2 flex-wrap">
+      <div className="flex items-center gap-3 flex-wrap">
         {visible.map((p, i) => (
           <button
             key={p.id}
             onClick={() => setLightboxIdx(i)}
-            className="relative w-14 h-12 rounded-lg overflow-hidden border border-gray-200 hover:border-primary-400 hover:scale-105 transition-all group shrink-0"
+            className="relative w-20 h-16 rounded-lg overflow-hidden border border-gray-200 hover:border-primary-400 hover:scale-105 transition-all group shrink-0"
           >
             <img src={p.url} alt={p.label} className="w-full h-full object-cover" onError={e => { (e.target as HTMLImageElement).src = PLACEHOLDER_DARK }} />
             {p.type === 'camera' && (
@@ -173,16 +170,17 @@ function PhotoGallery({ photos, maxVisible = 8 }: { photos: Photo[]; maxVisible?
         {extra > 0 && (
           <button
             onClick={() => setLightboxIdx(maxVisible)}
-            className="w-14 h-12 rounded-lg border border-dashed border-gray-300 hover:border-primary-400 bg-gray-50 hover:bg-primary-50 flex flex-col items-center justify-center text-gray-400 hover:text-primary-600 transition-all shrink-0"
+            className="w-20 h-16 rounded-lg border border-dashed border-gray-300 hover:border-primary-400 bg-gray-50 hover:bg-primary-50 flex flex-col items-center justify-center text-gray-400 hover:text-primary-600 transition-all shrink-0"
           >
-            <span className="text-xs font-semibold">+{extra}</span>
-            <span className="text-[9px]">more</span>
+            <span className="text-sm font-semibold">+{extra}</span>
+            <span className="text-[10px]">more</span>
           </button>
         )}
       </div>
-      <div className="flex items-center gap-2 flex-wrap mt-1">
+      {/* Labels */}
+      <div className="flex items-center gap-3 flex-wrap mt-1.5">
         {visible.map(p => (
-          <span key={p.id} className="w-14 text-center text-[9px] text-gray-400 truncate shrink-0">{p.label}</span>
+          <span key={p.id} className="w-20 text-center text-[10px] text-gray-400 truncate shrink-0">{p.label}</span>
         ))}
       </div>
       {lightboxIdx !== null && (
@@ -237,6 +235,30 @@ function MismatchModal({ entry, onClose }: { entry: EntryRecord; onClose: () => 
   )
 }
 
+// ─── Info Row ─────────────────────────────────────────────────────────────────
+function InfoRow({ label, value, highlight }: { label: string; value: React.ReactNode; highlight?: boolean }) {
+  return (
+    <div className="flex justify-between items-start py-2.5 border-b border-gray-100 last:border-0">
+      <span className="text-sm text-gray-500 shrink-0 w-36">{label}</span>
+      <span className={`text-sm font-medium text-right ${highlight ? 'text-primary-600' : 'text-gray-800'}`}>{value || '–'}</span>
+    </div>
+  )
+}
+
+// ─── Section Card ─────────────────────────────────────────────────────────────
+function SectionCard({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+      <div className="px-5 py-3 border-b border-gray-100 bg-gray-50">
+        <h3 className="text-sm font-semibold text-gray-700">{title}</h3>
+      </div>
+      <div className="px-5 py-1">
+        {children}
+      </div>
+    </div>
+  )
+}
+
 // ─── Entry Detail Page ────────────────────────────────────────────────────────
 export default function EntryDetail() {
   const { id } = useParams<{ id: string }>()
@@ -249,185 +271,169 @@ export default function EntryDetail() {
     return (
       <div className="flex flex-col items-center justify-center py-24 text-gray-400">
         <p className="text-sm">Entry not found.</p>
-        <button onClick={() => navigate(-1)} className="mt-4 text-xs text-primary-600 hover:underline">← Back to Entry Monitor</button>
+        <button onClick={() => navigate(-1)} className="mt-4 text-sm text-primary-600 hover:underline flex items-center gap-1">
+          <ArrowLeft size={14} /> Back to Entry Monitor
+        </button>
       </div>
     )
   }
 
   return (
-    <div className="max-w-2xl mx-auto pb-12">
-      {/* Page header */}
-      <div className="flex items-center gap-3 mb-6">
+    <div className="pb-12">
+
+      {/* ── Top nav bar ── */}
+      <div className="flex items-center justify-between mb-6">
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 transition-colors px-2 py-1.5 rounded-lg hover:bg-gray-100"
+          className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 transition-colors border border-gray-200 px-3 py-1.5 rounded-lg hover:bg-gray-50"
         >
-          <ChevronLeft size={16} /> Back
+          <ArrowLeft size={14} /> Back to Entry Monitor
         </button>
-        <div className="flex-1">
-          <div className="flex items-center gap-2 flex-wrap">
-            <h1 className="text-xl font-bold text-gray-900">{entry.entryId}</h1>
-            <StatusBadge status={entry.status} />
-          </div>
-          <div className="flex items-center gap-3 mt-0.5 text-xs text-gray-400">
-            {entry.dock && <span className="flex items-center gap-1"><MapPin size={10} />{entry.dock}</span>}
-            <span>{entry.facility}</span>
-            <span className="bg-gray-100 px-2 py-0.5 rounded-full">{entry.customer}</span>
-          </div>
+      </div>
+
+      {/* ── Title row ── */}
+      <div className="mb-6">
+        <div className="flex items-center gap-3 flex-wrap">
+          <h1 className="text-2xl font-bold text-gray-900">Entry # <span className="text-primary-600">{entry.entryId}</span></h1>
+          <StatusBadge status={entry.status} />
+        </div>
+        <div className="flex items-center gap-4 mt-1.5 text-sm text-gray-500">
+          {entry.dock && (
+            <span className="flex items-center gap-1"><MapPin size={13} />{entry.dock}</span>
+          )}
+          <span>{entry.facility}</span>
+          <span className="bg-gray-100 px-2.5 py-0.5 rounded-full text-xs">{entry.customer}</span>
         </div>
       </div>
 
-      <div className="space-y-5">
-        {/* Anomaly */}
-        {entry.anomaly && (
-          <div className={`rounded-xl px-4 py-3 flex items-start gap-3 ${entry.anomaly === 'mismatch' ? 'bg-red-50 border border-red-200' : 'bg-amber-50 border border-amber-200'}`}>
-            <AlertTriangle size={15} className={`shrink-0 mt-0.5 ${entry.anomaly === 'mismatch' ? 'text-red-500' : 'text-amber-500'}`} />
-            <div className="flex-1">
-              <p className={`text-xs font-semibold ${entry.anomaly === 'mismatch' ? 'text-red-700' : 'text-amber-700'}`}>
-                {entry.anomaly === 'mismatch' ? 'Driver Mismatch Detected' : 'Location Not Filled'}
-              </p>
-              <p className={`text-xs mt-0.5 ${entry.anomaly === 'mismatch' ? 'text-red-600' : 'text-amber-600'}`}>{entry.anomalyDetail}</p>
-            </div>
-            {entry.anomaly === 'mismatch' && entry.mismatch && (
-              <button
-                onClick={() => setShowMismatch(true)}
-                className="shrink-0 text-xs font-medium text-red-700 bg-red-100 hover:bg-red-200 px-3 py-1 rounded-lg transition-colors"
-              >
-                View Details
-              </button>
-            )}
+      {/* ── Anomaly Banner ── */}
+      {entry.anomaly && (
+        <div className={`mb-5 rounded-xl px-5 py-4 flex items-start gap-3 ${entry.anomaly === 'mismatch' ? 'bg-red-50 border border-red-200' : 'bg-amber-50 border border-amber-200'}`}>
+          <AlertTriangle size={16} className={`shrink-0 mt-0.5 ${entry.anomaly === 'mismatch' ? 'text-red-500' : 'text-amber-500'}`} />
+          <div className="flex-1">
+            <p className={`text-sm font-semibold ${entry.anomaly === 'mismatch' ? 'text-red-700' : 'text-amber-700'}`}>
+              {entry.anomaly === 'mismatch' ? 'Driver Mismatch Detected' : 'Location Not Filled'}
+            </p>
+            <p className={`text-xs mt-0.5 ${entry.anomaly === 'mismatch' ? 'text-red-600' : 'text-amber-600'}`}>{entry.anomalyDetail}</p>
           </div>
-        )}
+          {entry.anomaly === 'mismatch' && entry.mismatch && (
+            <button
+              onClick={() => setShowMismatch(true)}
+              className="shrink-0 text-sm font-medium text-red-700 border border-red-300 hover:bg-red-100 px-4 py-1.5 rounded-lg transition-colors"
+            >
+              View Mismatch
+            </button>
+          )}
+        </div>
+      )}
 
-        {/* Timeline */}
-        <section>
-          <h3 className="text-xs font-semibold text-gray-400 uppercase mb-2 flex items-center gap-1.5"><Clock size={12} /> Timeline</h3>
-          <div className="bg-gray-50 rounded-xl px-4 py-3 space-y-3">
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <p className="text-[10px] text-gray-400 mb-0.5">Gate Check-in</p>
-                <p className="text-sm font-medium text-gray-800">{entry.gateCheckIn || '–'}</p>
-              </div>
-              <div>
-                <p className="text-[10px] text-gray-400 mb-0.5">Gate Check-out</p>
-                <p className="text-sm font-medium text-gray-800">{entry.gateCheckOut || '–'}</p>
-              </div>
-            </div>
-            <div className="border-t border-gray-200 pt-2.5">
-              <p className="text-[10px] text-gray-400 mb-1.5">Window Check-in</p>
-              <WindowCheckInBadge
-                hasAppointment={entry.hasAppointment}
-                windowCheckIn={entry.windowCheckIn}
-                gateCheckIn={entry.gateCheckIn}
-              />
-            </div>
-            {(entry.dockCheckIn || entry.dockCheckOut) && (
-              <div className="border-t border-gray-200 pt-2.5 grid grid-cols-2 gap-3">
-                <div>
-                  <p className="text-[10px] text-gray-400 mb-0.5">Dock Check-in</p>
-                  <p className="text-sm font-medium text-gray-800">{entry.dockCheckIn || '–'}</p>
-                </div>
-                <div>
-                  <p className="text-[10px] text-gray-400 mb-0.5">Dock Check-out</p>
-                  <p className="text-sm font-medium text-gray-800">{entry.dockCheckOut || '–'}</p>
-                </div>
-              </div>
-            )}
-          </div>
-        </section>
+      {/* ── Main grid ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
-        {/* Driver */}
-        {entry.driverName && (
-          <section>
-            <h3 className="text-xs font-semibold text-gray-400 uppercase mb-2 flex items-center gap-1.5"><User size={12} /> Driver</h3>
-            <div className="bg-gray-50 rounded-xl px-4 py-3 space-y-1.5">
-              {([['Name', entry.driverName], ['Phone', entry.driverPhone], ['License', entry.driverLicense], ['Carrier', entry.tractorCarrier]] as [string, string][]).map(([l, v]) => v ? (
-                <div key={l} className="flex justify-between text-xs">
-                  <span className="text-gray-400">{l}</span>
-                  <span className="text-gray-800 font-medium">{v}</span>
-                </div>
-              ) : null)}
-            </div>
-          </section>
-        )}
+        {/* ── Left column (2/3) ── */}
+        <div className="lg:col-span-2 space-y-5">
 
-        {/* Equipment */}
-        <section>
-          <h3 className="text-xs font-semibold text-gray-400 uppercase mb-2 flex items-center gap-1.5"><Truck size={12} /> Equipment</h3>
-          <div className="bg-gray-50 rounded-xl px-4 py-3 space-y-1.5">
-            {([['Type', entry.equipType], ['Tractor', entry.tractor], ['Trailer', entry.trailer], ['Container', entry.container], ['Freight Carrier', entry.freightCarrier]] as [string, string][]).map(([l, v]) => v ? (
-              <div key={l} className="flex justify-between text-xs">
-                <span className="text-gray-400">{l}</span>
-                <span className="text-gray-800 font-medium">{v}</span>
+          {/* Timeline */}
+          <SectionCard title="Timeline">
+            <div className="grid grid-cols-2 gap-x-8">
+              <InfoRow label="Gate Check-in"  value={entry.gateCheckIn} />
+              <InfoRow label="Gate Check-out" value={entry.gateCheckOut} />
+              <div className="col-span-2 flex justify-between items-center py-2.5 border-b border-gray-100">
+                <span className="text-sm text-gray-500 w-36">Window Check-in</span>
+                <WindowCheckInBadge
+                  hasAppointment={entry.hasAppointment}
+                  windowCheckIn={entry.windowCheckIn}
+                  gateCheckIn={entry.gateCheckIn}
+                />
               </div>
-            ) : null)}
-            {entry.seal && (
-              <div className="flex justify-between text-xs">
-                <span className="text-gray-400">Seal</span>
+              {(entry.dockCheckIn || entry.dockCheckOut) && <>
+                <InfoRow label="Dock Check-in"  value={entry.dockCheckIn} />
+                <InfoRow label="Dock Check-out" value={entry.dockCheckOut} />
+              </>}
+            </div>
+          </SectionCard>
+
+          {/* Equipment */}
+          <SectionCard title="Equipment">
+            <div className="grid grid-cols-2 gap-x-8">
+              <InfoRow label="Type"            value={entry.equipType} />
+              <InfoRow label="Tractor"         value={entry.tractor} />
+              <InfoRow label="Trailer"         value={entry.trailer} />
+              <InfoRow label="Container"       value={entry.container} />
+              <InfoRow label="Freight Carrier" value={entry.freightCarrier} />
+              {entry.seal && <InfoRow label="Seal" value={
                 <span className="inline-flex items-center px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-medium text-xs">{entry.seal}</span>
-              </div>
-            )}
-          </div>
-        </section>
+              } />}
+            </div>
+          </SectionCard>
 
-        {/* Location */}
-        <section>
-          <h3 className="text-xs font-semibold text-gray-400 uppercase mb-2 flex items-center gap-1.5"><MapPin size={12} /> Location</h3>
-          <div className={`rounded-xl px-4 py-3 ${entry.anomaly === 'no-location' ? 'bg-amber-50 border border-amber-200' : 'bg-gray-50'}`}>
-            {entry.location
-              ? <p className="text-sm font-medium text-gray-800">{entry.location}</p>
-              : <p className="text-xs text-amber-600 font-medium">Location not entered by driver</p>}
-          </div>
-        </section>
-
-        {/* Direction & Load Info */}
-        {(entry.loadTask || entry.loadId || entry.loadNo || entry.receiptId) && (
-          <section>
-            <h3 className="text-xs font-semibold text-gray-400 uppercase mb-2">Direction &amp; Load</h3>
-            <div className="bg-gray-50 rounded-xl px-4 py-3 space-y-1.5">
-              <div className="flex justify-between text-xs">
-                <span className="text-gray-400">Direction</span>
-                <span className={`font-medium ${entry.direction === 'Outbound' ? 'text-emerald-600' : entry.direction === 'Inbound' ? 'text-blue-600' : 'text-gray-700'}`}>{entry.direction}</span>
+          {/* Direction & Load */}
+          {(entry.loadTask || entry.loadId || entry.loadNo || entry.receiptId) && (
+            <SectionCard title="Direction & Load">
+              <div className="grid grid-cols-2 gap-x-8">
+                <InfoRow label="Direction" value={
+                  <span className={entry.direction === 'Outbound' ? 'text-emerald-600 font-semibold' : entry.direction === 'Inbound' ? 'text-blue-600 font-semibold' : 'text-gray-700'}>
+                    {entry.direction}
+                  </span>
+                } />
+                {entry.loadTask  && <InfoRow label="Load Task"  value={entry.loadTask}  highlight />}
+                {entry.loadId    && <InfoRow label="Load ID"    value={entry.loadId} />}
+                {entry.loadNo    && <InfoRow label="Load No."   value={entry.loadNo} />}
+                {entry.receiptId && <InfoRow label="Receipt ID" value={entry.receiptId} />}
               </div>
-              {entry.loadTask && (
-                <div className="flex justify-between text-xs">
-                  <span className="text-gray-400">Load Task</span>
-                  <span className="text-primary-600 font-medium">{entry.loadTask}</span>
+            </SectionCard>
+          )}
+
+          {/* Photos & Camera */}
+          <SectionCard title={`Photos & Camera (${entry.photos.length})`}>
+            <div className="py-3">
+              <PhotoGallery photos={entry.photos} maxVisible={12} />
+            </div>
+          </SectionCard>
+
+        </div>
+
+        {/* ── Right column (1/3) ── */}
+        <div className="space-y-5">
+
+          {/* Driver */}
+          {entry.driverName && (
+            <SectionCard title="Driver">
+              <InfoRow label="Name"    value={entry.driverName} />
+              <InfoRow label="Phone"   value={entry.driverPhone} />
+              <InfoRow label="License" value={entry.driverLicense} />
+              <InfoRow label="Carrier" value={entry.tractorCarrier} />
+            </SectionCard>
+          )}
+
+          {/* Location */}
+          <SectionCard title="Location">
+            <div className="py-3">
+              {entry.location ? (
+                <div className="flex items-center gap-2 text-sm font-medium text-gray-800">
+                  <MapPin size={14} className="text-gray-400" />
+                  {entry.location}
                 </div>
-              )}
-              {(entry.loadId || entry.loadNo || entry.receiptId) && (
-                <div className="border-t border-gray-200 pt-1.5 mt-1 space-y-1.5">
-                  {entry.loadId && (
-                    <div className="flex justify-between text-xs">
-                      <span className="text-gray-400">Load ID</span>
-                      <span className="text-gray-800 font-medium">{entry.loadId}</span>
-                    </div>
-                  )}
-                  {entry.loadNo && (
-                    <div className="flex justify-between text-xs">
-                      <span className="text-gray-400">Load No.</span>
-                      <span className="text-gray-800 font-medium">{entry.loadNo}</span>
-                    </div>
-                  )}
-                  {entry.receiptId && (
-                    <div className="flex justify-between text-xs">
-                      <span className="text-gray-400">Receipt ID</span>
-                      <span className="text-gray-800 font-medium">{entry.receiptId}</span>
-                    </div>
-                  )}
+              ) : (
+                <div className={`rounded-lg px-3 py-2.5 text-sm font-medium flex items-center gap-2 ${entry.anomaly === 'no-location' ? 'bg-amber-50 text-amber-700' : 'text-gray-400'}`}>
+                  <MapPin size={14} />
+                  Location not entered by driver
                 </div>
               )}
             </div>
-          </section>
-        )}
+          </SectionCard>
 
-        {/* Photos & Camera */}
-        <section>
-          <h3 className="text-xs font-semibold text-gray-400 uppercase mb-2 flex items-center gap-1.5"><Camera size={12} /> Photos &amp; Camera</h3>
-          <div className="bg-gray-50 rounded-xl px-4 py-4">
-            <PhotoGallery photos={entry.photos} maxVisible={8} />
-          </div>
-        </section>
+          {/* Entry Type */}
+          <SectionCard title="Entry Type">
+            <InfoRow label="Type"      value={entry.entryType} />
+            <InfoRow label="Direction" value={
+              <span className={entry.direction === 'Outbound' ? 'text-emerald-600 font-semibold' : entry.direction === 'Inbound' ? 'text-blue-600 font-semibold' : ''}>
+                {entry.direction}
+              </span>
+            } />
+          </SectionCard>
+
+        </div>
       </div>
 
       {/* Mismatch Modal */}
