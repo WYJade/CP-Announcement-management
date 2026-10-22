@@ -117,7 +117,8 @@ function Modal({ onClose, children }: { onClose: () => void; children: React.Rea
 }
 
 // ─── Priority Item Modal ──────────────────────────────────────────────────────
-function PriorityModal({ item, onClose }: { item: typeof PRIORITY_ITEMS[0]; onClose: () => void }) {
+type PriorityItem = { priority: string; color: string; label: string; desc: string }
+function PriorityModal({ item, onClose }: { item: PriorityItem; onClose: () => void }) {
   const navigate = useNavigate()
   const [step, setStep] = useState(0)
   const [done, setDone] = useState(false)
@@ -173,6 +174,7 @@ function PriorityModal({ item, onClose }: { item: typeof PRIORITY_ITEMS[0]; onCl
 // ═══════════════════════════════════════════════════════════════════════════════
 function ReturningView() {
   const navigate = useNavigate()
+  const [selectedItem, setSelectedItem] = useState<null | { priority: string; color: string; label: string; desc: string }>(null)
 
   const levelStyle: Record<string, { badge: string; dot: string }> = {
     High: { badge: 'bg-red-100 text-red-600',    dot: 'bg-red-500' },
