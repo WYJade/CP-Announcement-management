@@ -15,7 +15,6 @@ import FreightQuote from './components/Outbound/FreightQuote'
 import InboundInquiry from './components/Orders/InboundInquiry'
 import ReceiptDetail from './components/Inbound/ReceiptDetail'
 import Shipments from './components/Shipping/Shipments'
-import Tracking from './components/Shipping/Tracking'
 import ShipperShipmentManagement from './components/Shipping/ShipperShipmentManagement'
 import CustomsEntries from './components/International/CustomsEntries'
 import CustomsEntryDetail from './components/International/CustomsEntryDetail'
@@ -83,7 +82,7 @@ function App() {
         {/* Shipping */}
         <Route path="shipping/shipments" element={<Shipments />} />
         <Route path="shipping/shipments-list" element={<ShipmentsList />} />
-        <Route path="shipping/tracking" element={<Tracking />} />
+        <Route path="shipping/tracking" element={<Navigate to="/shipping/shipments-list" replace />} />
         <Route path="shipping/shipper-shipments" element={<ShipperShipmentManagement />} />
 
         {/* International */}

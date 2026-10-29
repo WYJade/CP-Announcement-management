@@ -154,8 +154,7 @@ const menuItems: MenuItem[] = [
     icon: <Ship size={16} />,
     expandable: true,
     children: [
-      { id: 'shipments', label: 'Shipments', path: '/shipping/shipments-list' },
-      { id: 'tracking', label: 'Domestic Tracking', path: '/shipping/tracking' },
+      { id: 'shipments', label: 'Domestic Tracking', path: '/shipping/shipments-list' },
       { id: 'shipment-tracking', label: 'International Tracking', path: '/international-new/tracking' },
       { id: 'freight-quote', label: 'Freight Quote', path: '/outbound/freight-quote' },
     ],
