@@ -41,6 +41,7 @@ import ShipmentsList from './components/Shipping/ShipmentsList'
 import RoleManagement from './components/System/RoleManagement'
 import EntryList from './components/Yard/EntryList'
 import EntryDetail from './components/Yard/EntryDetail'
+import InsightsSubPage from './components/Insights/InsightsSubPage'
 
 function App() {
   return (
@@ -131,6 +132,16 @@ function App() {
         {/* Yard Management — Entry Monitor */}
         <Route path="yard/entry-list" element={<EntryList />} />
         <Route path="yard/entry-detail/:id" element={<EntryDetail />} />
+
+        {/* Insights — Dashboards & Reports */}
+        <Route path="insights/kpi"          element={<InsightsSubPage pageKey="kpi" />} />
+        <Route path="insights/otif"         element={<InsightsSubPage pageKey="otif" />} />
+        <Route path="insights/ticket"       element={<InsightsSubPage pageKey="ticket" />} />
+        <Route path="insights/otif-summary" element={<InsightsSubPage pageKey="otif-summary" />} />
+        <Route path="insights/lead-time"    element={<InsightsSubPage pageKey="lead-time" />} />
+        <Route path="insights/penalties"    element={<InsightsSubPage pageKey="penalties" />} />
+        <Route path="insights/routing"      element={<InsightsSubPage pageKey="routing" />} />
+        <Route path="insights/root-cause"   element={<InsightsSubPage pageKey="root-cause" />} />
       </Route>
     </Routes>
   )

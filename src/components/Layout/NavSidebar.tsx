@@ -29,7 +29,7 @@ import {
   Clock,
   Search,
   ArrowRight,
-  BarChart2 as BarChart2Icon,
+  BarChart2,
   Ship,
   TrendingUp,
   RefreshCw,
@@ -42,6 +42,7 @@ interface ChildItem {
   id: string
   label: string
   path?: string
+  groupLabel?: boolean  // 如果为 true，作为分组标题渲染
 }
 
 interface MenuItem {
@@ -228,6 +229,26 @@ const menuItems: MenuItem[] = [
       { id: 'damaged-box', label: 'Damaged Box Detection' },
       { id: 'recovery-portal', label: 'Recovery Portal' },
       { id: 'deductions', label: 'Deductions' },
+    ],
+  },
+
+  // ── Insights (Dashboards + Reports, before Integration) ──────────────────
+  {
+    id: 'insights',
+    label: 'Insights',
+    icon: <BarChart2 size={16} />,
+    expandable: true,
+    children: [
+      { id: 'insights-dashboards-header', label: 'Dashboards', groupLabel: true },
+      { id: 'insights-kpi',     label: 'KPI',            path: '/insights/kpi' },
+      { id: 'insights-otif',    label: 'OTIF',           path: '/insights/otif' },
+      { id: 'insights-ticket',  label: 'Ticket Insights',path: '/insights/ticket' },
+      { id: 'insights-reports-header', label: 'Reports', groupLabel: true },
+      { id: 'insights-otif-summary',   label: 'OTIF Summary',      path: '/insights/otif-summary' },
+      { id: 'insights-lead-time',      label: 'Lead Time Analysis', path: '/insights/lead-time' },
+      { id: 'insights-penalties',      label: 'Penalties',          path: '/insights/penalties' },
+      { id: 'insights-routing',        label: 'Routing Report',     path: '/insights/routing' },
+      { id: 'insights-root-cause',     label: 'Root Cause Analysis',path: '/insights/root-cause' },
     ],
   },
 
@@ -554,6 +575,10 @@ function NavSidebar() {
               child.id.includes('recents-header') ? (
                 <p key={child.id} className="text-[9px] font-semibold text-gray-400 uppercase px-3 pt-2 pb-0.5 flex items-center gap-1">
                   <Clock size={9} /> RECENTS
+                </p>
+              ) : child.groupLabel ? (
+                <p key={child.id} className="text-[9px] font-semibold text-gray-400 uppercase tracking-wide px-3 pt-2.5 pb-0.5">
+                  {child.label}
                 </p>
               ) : (
               <button
