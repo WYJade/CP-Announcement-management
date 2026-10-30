@@ -346,15 +346,15 @@ function EntryCard({ entry, onViewMismatch }: {
                 <p className={`font-medium mt-0.5 ${entry.dockCheckIn ? 'text-gray-800' : 'text-gray-300'}`}>{entry.dockCheckIn || '–'}</p>
               </div>
             </div>
-            {/* Dock / Gate Check-Out */}
+            {/* Gate Check-Out */}
             <div className="flex items-start gap-2">
               <div className="flex flex-col items-center mt-0.5 shrink-0">
-                <span className={`w-2 h-2 rounded-full ${(entry.dockCheckOut || entry.gateCheckOut) ? 'bg-violet-500' : 'bg-gray-300'}`} />
+                <span className={`w-2 h-2 rounded-full ${entry.gateCheckOut ? 'bg-violet-500' : 'bg-gray-300'}`} />
               </div>
               <div>
-                <p className="text-gray-400 leading-none">{entry.dockCheckOut ? 'Dock Out' : 'Gate Out'}</p>
-                <p className={`font-medium mt-0.5 ${(entry.dockCheckOut || entry.gateCheckOut) ? 'text-gray-800' : 'text-gray-300'}`}>
-                  {entry.dockCheckOut || entry.gateCheckOut || '–'}
+                <p className="text-gray-400 leading-none">Gate Out</p>
+                <p className={`font-medium mt-0.5 ${entry.gateCheckOut ? 'text-gray-800' : 'text-gray-300'}`}>
+                  {entry.gateCheckOut || '–'}
                 </p>
               </div>
             </div>
