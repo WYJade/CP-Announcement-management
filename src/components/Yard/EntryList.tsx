@@ -278,11 +278,6 @@ function EntryCard({ entry, onViewMismatch }: {
               <AlertTriangle size={11}/> Mismatch
             </button>
           )}
-          {entry.anomaly==='no-location' && (
-            <span className="flex items-center gap-1 px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full text-xs font-semibold">
-              <MapPin size={11}/> Location Missing
-            </span>
-          )}
         </div>
 
         <div className="flex items-center gap-2">
@@ -403,9 +398,7 @@ function EntryCard({ entry, onViewMismatch }: {
           <p className="text-gray-400 mb-1 font-semibold uppercase tracking-wide text-[10px]">Location</p>
           {entry.location
             ?<p className="text-gray-700 font-medium flex items-center gap-1"><MapPin size={10}/>{entry.location}</p>
-            :entry.anomaly==='no-location'
-              ?<p className="text-amber-500 flex items-center gap-1 font-medium"><MapPin size={10}/>No location</p>
-              :<p className="text-gray-300 italic">–</p>}
+            :<p className="text-gray-300 italic">–</p>}
         </div>
 
       </div>
@@ -472,7 +465,7 @@ export default function EntryList() {
         <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-4 flex items-center gap-3">
           <AlertCircle size={16} className="text-red-500 shrink-0"/>
           <span className="text-sm font-semibold text-red-700">{anomalyCount} anomal{anomalyCount>1?'ies':'y'} detected</span>
-          <span className="text-xs text-red-500">— driver mismatch or missing location.</span>
+          <span className="text-xs text-red-500">— driver mismatch detected.</span>
           <button onClick={()=>setAnomalyOnly(v=>!v)}
             className={`ml-auto text-xs font-medium px-3 py-1.5 rounded-lg transition-colors ${anomalyOnly?'bg-red-600 text-white':'bg-white border border-red-200 text-red-700 hover:bg-red-100'}`}>
             {anomalyOnly?'Show All':'Anomalies Only'}

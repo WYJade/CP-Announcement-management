@@ -16,7 +16,7 @@ export type EntryStatus =
   | 'Picking Up Empty'
 
 export type EntryType = 'Inbound' | 'Outbound' | 'Drop Off Empty' | 'Drop Off Delivery' | 'Pick Up'
-export type AnomalyType = 'mismatch' | 'no-location' | null
+export type AnomalyType = 'mismatch' | null
 
 export interface Photo {
   id: string
@@ -119,7 +119,7 @@ export const MOCK_ENTRIES: EntryRecord[] = [
     entryType:'Drop Off Empty', direction:'Drop Off Empty', location:'YARD-B12',
     loadTask:'TASK-35601(echen)', loadId:'LD-20187', loadNo:'LN-5490', receiptId:'RCP-10031',
     hasAppointment:true, windowCheckIn:'', dockCheckIn:'', dockCheckOut:'', gateCheckIn:'2026-09-08 02:41', gateCheckOut:'',
-    anomaly:'no-location', anomalyDetail:'Driver has not filled in the actual parking location.',
+    anomaly:null,
     photos:[makePh('Driver'), makePh('Driver 2'), makePh('Camera In','camera'), makePh('Camera In 2','camera'), makePh('Camera In 3','camera'), makePh('Camera In 4','camera'), makePh('Camera In 5','camera'), makePh('Camera In 6','camera'), makePh('Camera In 7','camera'), makePh('Camera In 8','camera')],
   },
   {

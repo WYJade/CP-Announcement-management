@@ -307,16 +307,14 @@ export default function EntryDetail() {
       </div>
 
       {/* ── Anomaly Banner ── */}
-      {entry.anomaly && (
-        <div className={`mb-5 rounded-xl px-5 py-4 flex items-start gap-3 ${entry.anomaly === 'mismatch' ? 'bg-red-50 border border-red-200' : 'bg-amber-50 border border-amber-200'}`}>
-          <AlertTriangle size={16} className={`shrink-0 mt-0.5 ${entry.anomaly === 'mismatch' ? 'text-red-500' : 'text-amber-500'}`} />
+      {entry.anomaly === 'mismatch' && (
+        <div className="mb-5 rounded-xl px-5 py-4 flex items-start gap-3 bg-red-50 border border-red-200">
+          <AlertTriangle size={16} className="shrink-0 mt-0.5 text-red-500" />
           <div className="flex-1">
-            <p className={`text-sm font-semibold ${entry.anomaly === 'mismatch' ? 'text-red-700' : 'text-amber-700'}`}>
-              {entry.anomaly === 'mismatch' ? 'Driver Mismatch Detected' : 'Location Not Filled'}
-            </p>
-            <p className={`text-xs mt-0.5 ${entry.anomaly === 'mismatch' ? 'text-red-600' : 'text-amber-600'}`}>{entry.anomalyDetail}</p>
+            <p className="text-sm font-semibold text-red-700">Driver Mismatch Detected</p>
+            <p className="text-xs mt-0.5 text-red-600">{entry.anomalyDetail}</p>
           </div>
-          {entry.anomaly === 'mismatch' && entry.mismatch && (
+          {entry.mismatch && (
             <button
               onClick={() => setShowMismatch(true)}
               className="shrink-0 text-sm font-medium text-red-700 border border-red-300 hover:bg-red-100 px-4 py-1.5 rounded-lg transition-colors"
@@ -415,9 +413,9 @@ export default function EntryDetail() {
                   {entry.location}
                 </div>
               ) : (
-                <div className={`rounded-lg px-3 py-2.5 text-sm font-medium flex items-center gap-2 ${entry.anomaly === 'no-location' ? 'bg-amber-50 text-amber-700' : 'text-gray-400'}`}>
+                <div className="rounded-lg px-3 py-2.5 text-sm font-medium flex items-center gap-2 text-gray-400">
                   <MapPin size={14} />
-                  Location not entered by driver
+                  Location not entered
                 </div>
               )}
             </div>
