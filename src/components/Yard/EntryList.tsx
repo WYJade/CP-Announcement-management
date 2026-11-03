@@ -416,8 +416,8 @@ function EntryCard({ entry, onViewMismatch }: {
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function EntryList() {
   // Filters
-  const [customer,    setCustomer]    = useState('All Customers')
-  const [facility,    setFacility]    = useState('All Facilities')
+  const [customer,    setCustomer]    = useState('')
+  const [facility,    setFacility]    = useState('')
   const [statusFilter,setStatusFilter]= useState('')
   const [entryType,   setEntryType]   = useState('')
   const [anomalyOnly, setAnomalyOnly] = useState(false)
@@ -430,8 +430,8 @@ export default function EntryList() {
   const [mismatchEntry, setMismatchEntry] = useState<EntryRecord|null>(null)
 
   const filtered = MOCK_ENTRIES.filter(e => {
-    if (customer  !== 'All Customers'  && e.customer  !== customer)  return false
-    if (facility  !== 'All Facilities' && e.facility  !== facility)  return false
+    if (customer  && e.customer  !== customer)  return false
+    if (facility  && e.facility  !== facility)  return false
     if (statusFilter && e.status  !== statusFilter)                  return false
     if (entryType    && e.entryType !== entryType)                   return false
     if (anomalyOnly  && !e.anomaly)                                  return false
@@ -444,7 +444,7 @@ export default function EntryList() {
   const anomalyCount = MOCK_ENTRIES.filter(e => e.anomaly).length
 
   const resetFilters = () => {
-    setCustomer('All Customers'); setFacility('All Facilities')
+    setCustomer(''); setFacility('')
     setStatusFilter(''); setEntryType(''); setAnomalyOnly(false)
     setSearchEntryId(''); setSearchDriver(''); setSearchTrailer(''); setDateFrom(''); setDateTo('')
   }
@@ -483,6 +483,7 @@ export default function EntryList() {
             <label className="block text-xs text-gray-400 font-medium mb-1">Customer</label>
             <select value={customer} onChange={e=>setCustomer(e.target.value)}
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 focus:outline-none focus:border-primary-400">
+              <option value=""></option>
               {CUSTOMERS.map(c=><option key={c}>{c}</option>)}
             </select>
           </div>
@@ -492,6 +493,7 @@ export default function EntryList() {
             <label className="block text-xs text-gray-400 font-medium mb-1">Facility</label>
             <select value={facility} onChange={e=>setFacility(e.target.value)}
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 focus:outline-none focus:border-primary-400">
+              <option value=""></option>
               {FACILITIES.map(f=><option key={f}>{f}</option>)}
             </select>
           </div>
@@ -501,7 +503,7 @@ export default function EntryList() {
             <label className="block text-xs text-gray-400 font-medium mb-1">Status</label>
             <select value={statusFilter} onChange={e=>setStatusFilter(e.target.value)}
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 focus:outline-none focus:border-primary-400">
-              <option value="">All Status</option>
+              <option value=""></option>
               {ALL_STATUSES.map(s=><option key={s}>{s}</option>)}
             </select>
           </div>
@@ -511,7 +513,7 @@ export default function EntryList() {
             <label className="block text-xs text-gray-400 font-medium mb-1">Entry Type</label>
             <select value={entryType} onChange={e=>setEntryType(e.target.value)}
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 focus:outline-none focus:border-primary-400">
-              <option value="">All Types</option>
+              <option value=""></option>
               {ENTRY_TYPES.map(t=><option key={t}>{t}</option>)}
             </select>
           </div>
@@ -558,7 +560,6 @@ export default function EntryList() {
               <input value={searchTrailer} onChange={e=>setSearchTrailer(e.target.value)}
                 placeholder="e.g. FJWONIX"
                 className="w-full pl-7 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-primary-400"/>
-            </div>
             </div>
           </div>
         </div>

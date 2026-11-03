@@ -72,8 +72,8 @@ export const ALL_STATUSES: EntryStatus[] = [
   'Picking Up Preload', 'Picking Up Empty',
 ]
 
-export const CUSTOMERS  = ['All Customers', 'ADOORN LLC', 'THE ONLY BEAN LLC', 'VITA COCO', 'ORGAIN LLC', 'SAMUN INC']
-export const FACILITIES = ['All Facilities', 'Ontario, CA', 'Fontana, CA', 'Garden City, NY', 'Savannah, GA', 'Chicago, IL']
+export const CUSTOMERS  = ['ADOORN LLC', 'THE ONLY BEAN LLC', 'VITA COCO', 'ORGAIN LLC', 'SAMUN INC']
+export const FACILITIES = ['Ontario, CA', 'Fontana, CA', 'Garden City, NY', 'Savannah, GA', 'Chicago, IL']
 export const ENTRY_TYPES: EntryType[] = ['Inbound', 'Outbound', 'Drop Off Empty', 'Drop Off Delivery', 'Pick Up']
 
 // ─── Placeholder photo URLs ───────────────────────────────────────────────────
