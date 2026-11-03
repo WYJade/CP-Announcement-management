@@ -421,7 +421,9 @@ export default function EntryList() {
   const [statusFilter,setStatusFilter]= useState('')
   const [entryType,   setEntryType]   = useState('')
   const [anomalyOnly, setAnomalyOnly] = useState(false)
-  const [searchId,    setSearchId]    = useState('')
+  const [searchEntryId, setSearchEntryId] = useState('')
+  const [searchDriver,  setSearchDriver]  = useState('')
+  const [searchTrailer, setSearchTrailer] = useState('')
   const [dateFrom,    setDateFrom]    = useState('')
   const [dateTo,      setDateTo]      = useState('')
 
@@ -433,9 +435,9 @@ export default function EntryList() {
     if (statusFilter && e.status  !== statusFilter)                  return false
     if (entryType    && e.entryType !== entryType)                   return false
     if (anomalyOnly  && !e.anomaly)                                  return false
-    if (searchId && !e.entryId.toLowerCase().includes(searchId.toLowerCase())
-                 && !e.driverName.toLowerCase().includes(searchId.toLowerCase())
-                 && !e.trailer.toLowerCase().includes(searchId.toLowerCase())) return false
+    if (searchEntryId && !e.entryId.toLowerCase().includes(searchEntryId.toLowerCase())) return false
+    if (searchDriver  && !e.driverName.toLowerCase().includes(searchDriver.toLowerCase())) return false
+    if (searchTrailer && !e.trailer.toLowerCase().includes(searchTrailer.toLowerCase())) return false
     return true
   })
 
@@ -444,7 +446,7 @@ export default function EntryList() {
   const resetFilters = () => {
     setCustomer('All Customers'); setFacility('All Facilities')
     setStatusFilter(''); setEntryType(''); setAnomalyOnly(false)
-    setSearchId(''); setDateFrom(''); setDateTo('')
+    setSearchEntryId(''); setSearchDriver(''); setSearchTrailer(''); setDateFrom(''); setDateTo('')
   }
 
   return (
@@ -526,14 +528,35 @@ export default function EntryList() {
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 focus:outline-none focus:border-primary-400"/>
           </div>
 
-          {/* Search */}
-          <div className="sm:col-span-2">
-            <label className="block text-xs text-gray-400 font-medium mb-1">Search</label>
+          {/* Entry ID */}
+          <div>
+            <label className="block text-xs text-gray-400 font-medium mb-1">Entry ID</label>
             <div className="relative">
               <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"/>
-              <input value={searchId} onChange={e=>setSearchId(e.target.value)}
-                placeholder="Search by Entry ID, driver name, or trailer number (exact or partial match)"
-                title="Supports: Entry ID (e.g. ET-822802) · Driver name (e.g. Jason Miller) · Trailer number (e.g. FJWONIX). Partial match supported. Case-insensitive."
+              <input value={searchEntryId} onChange={e=>setSearchEntryId(e.target.value)}
+                placeholder="e.g. ET-822802"
+                className="w-full pl-7 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-primary-400"/>
+            </div>
+          </div>
+
+          {/* Driver */}
+          <div>
+            <label className="block text-xs text-gray-400 font-medium mb-1">Driver</label>
+            <div className="relative">
+              <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"/>
+              <input value={searchDriver} onChange={e=>setSearchDriver(e.target.value)}
+                placeholder="e.g. Jason Miller"
+                className="w-full pl-7 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-primary-400"/>
+            </div>
+          </div>
+
+          {/* Trailer */}
+          <div>
+            <label className="block text-xs text-gray-400 font-medium mb-1">Trailer</label>
+            <div className="relative">
+              <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"/>
+              <input value={searchTrailer} onChange={e=>setSearchTrailer(e.target.value)}
+                placeholder="e.g. FJWONIX"
                 className="w-full pl-7 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-primary-400"/>
             </div>
             </div>
