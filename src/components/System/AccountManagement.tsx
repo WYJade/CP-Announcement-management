@@ -352,6 +352,8 @@ function AccountTable({ accounts, searchUser, searchEmail, filterStatus }: {
   searchEmail: string
   filterStatus: string
 }) {
+  const [deleteTarget, setDeleteTarget] = useState<Account | null>(null)
+
   const filtered = accounts.filter(a => {
     if (searchUser && !a.username.toLowerCase().includes(searchUser.toLowerCase())) return false
     if (searchEmail && !a.email.toLowerCase().includes(searchEmail.toLowerCase())) return false
@@ -360,6 +362,7 @@ function AccountTable({ accounts, searchUser, searchEmail, filterStatus }: {
   })
 
   return (
+    <>
     <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
       <table className="w-full text-sm">
         <thead>
@@ -399,11 +402,7 @@ function AccountTable({ accounts, searchUser, searchEmail, filterStatus }: {
                     <Edit2 size={12} /> Edit
                   </button>
                   <button
-                    onClick={() => {
-                      if (window.confirm(`Delete account "${acc.username}"? This action cannot be undone.`)) {
-                        // delete handler placeholder
-                      }
-                    }}
+                    onClick={() => setDeleteTarget(acc)}
                     className="flex items-center gap-1 text-xs text-red-400 hover:text-red-600 transition-colors"
                   >
                     <Trash2 size={12} /> Delete
@@ -418,6 +417,53 @@ function AccountTable({ accounts, searchUser, searchEmail, filterStatus }: {
         </tbody>
       </table>
     </div>
+
+    {/* ── Delete Confirm Modal ── */}
+    {deleteTarget && (
+      <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center px-4" onClick={() => setDeleteTarget(null)}>
+        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm" onClick={e => e.stopPropagation()}>
+          {/* Header */}
+          <div className="flex items-center gap-3 px-6 py-5 border-b border-gray-100">
+            <div className="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center shrink-0">
+              <Trash2 size={18} className="text-red-600" />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-gray-900">Delete Sub Account</p>
+              <p className="text-xs text-gray-500 mt-0.5">This action cannot be undone.</p>
+            </div>
+          </div>
+          {/* Body */}
+          <div className="px-6 py-5">
+            <p className="text-sm text-gray-600">
+              Are you sure you want to delete the account{' '}
+              <span className="font-semibold text-gray-900">{deleteTarget.username}</span>?
+            </p>
+            {deleteTarget.email && (
+              <p className="text-xs text-gray-400 mt-1">{deleteTarget.email}</p>
+            )}
+          </div>
+          {/* Footer */}
+          <div className="flex items-center justify-end gap-2 px-6 pb-5">
+            <button
+              onClick={() => setDeleteTarget(null)}
+              className="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => {
+                // delete handler placeholder
+                setDeleteTarget(null)
+              }}
+              className="px-4 py-2 text-sm text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors font-medium"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+  </>
   )
 }
 
