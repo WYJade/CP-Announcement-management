@@ -1,19 +1,20 @@
-import { useState, useRef, useEffect } from 'react'
+﻿import { useState, useRef, useEffect } from 'react'
 import { Plus, X, ChevronDown, ChevronRight, MoreHorizontal, Edit2, Copy, Trash2, Sparkles } from 'lucide-react'
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// 鈹€鈹€鈹€ Types 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 type RoleType = 'Tenant Role' | 'Customer Role'
 type RoleStatus = 'Active' | 'Inactive'
 type TenantOption = 'Unis, LLC' | 'Unis Transportation LLC'
 
 const TENANT_OPTIONS: TenantOption[] = ['Unis, LLC', 'Unis Transportation LLC']
+const CUSTOMER_OPTIONS = ['ADOORN LLC', 'THE ONLY BEAN LLC', 'VITA COCO', 'ORGAIN LLC', 'SAMUN INC']
 
 interface PermissionNode {
   id: string
   label: string
   children?: PermissionNode[]
-  actions?: string[]        // 页面功能
-  apis?: string[]           // API权限
+  actions?: string[]        // 椤甸潰鍔熻兘
+  apis?: string[]           // API鏉冮檺
 }
 
 interface Role {
@@ -22,13 +23,14 @@ interface Role {
   description: string
   tenant: TenantOption | ''
   roleType: RoleType
+  customer?: string        // Customer Role 涓撳睘
   modules: string[]
   users: number
   status: RoleStatus
   lastModified: string
 }
 
-// ─── Permission tree data ─────────────────────────────────────────────────────
+// 鈹€鈹€鈹€ Permission tree data 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 const PERMISSION_TREE: PermissionNode[] = [
   {
     id: 'dashboards', label: 'Dashboards', children: [
@@ -78,7 +80,7 @@ const PERMISSION_TREE: PermissionNode[] = [
 
 const MODULE_OPTIONS = PERMISSION_TREE.map(n => n.label)
 
-// ─── Sample roles ─────────────────────────────────────────────────────────────
+// 鈹€鈹€鈹€ Sample roles 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 const INITIAL_ROLES: Role[] = [
   {
     id: 'r1', name: 'sub-Admin', description: 'No description provided.',
@@ -95,18 +97,19 @@ const INITIAL_ROLES: Role[] = [
     users: 1, status: 'Active', lastModified: '2026/08/26',
   },
   {
-    id: 'r3', name: 'Client Portal –UF External User',
-    description: '供外部客户访问 UF 系统中的客户服务功能及其他授权的业务数据…',
+    id: 'r3', name: 'Client Portal 鈥揢F External User',
+    description: '渚涘閮ㄥ鎴疯闂?UF 绯荤粺涓殑瀹㈡埛鏈嶅姟鍔熻兘鍙婂叾浠栨巿鏉冪殑涓氬姟鏁版嵁鈥?,
     tenant: 'Unis, LLC',
     roleType: 'Customer Role',
+    customer: 'ADOORN LLC',
     modules: [],
     users: 40, status: 'Active', lastModified: '2026/08/24',
   },
 ]
 
-// ─── Permission tree node component ──────────────────────────────────────────
+// 鈹€鈹€鈹€ Permission tree node component 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 // Top-level (depth=0): section header with expand/collapse + checkbox
-// Second-level (depth=1): sub-menu label + two-column table (页面功能 | API权限)
+// Second-level (depth=1): sub-menu label + two-column table (椤甸潰鍔熻兘 | API鏉冮檺)
 function PermNode({
   node, depth = 0, checked, onToggle,
 }: {
@@ -124,7 +127,7 @@ function PermNode({
   if (isTopLevel) {
     return (
       <div className="mb-2">
-        {/* Top-level header row — purple-tinted */}
+        {/* Top-level header row 鈥?purple-tinted */}
         <div className="flex items-center gap-2 py-2 px-3 bg-violet-50 rounded-lg mb-1">
           <button onClick={() => setExpanded(v => !v)} className="text-violet-400 hover:text-violet-600 transition-colors">
             {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
@@ -164,17 +167,17 @@ function PermNode({
         <div className="ml-6 border border-gray-200 rounded-lg overflow-hidden">
           {/* Column headers */}
           <div className="grid grid-cols-2 border-b border-gray-200 bg-gray-50">
-            <div className="px-4 py-2 text-xs font-semibold text-gray-500 border-r border-gray-200">页面功能</div>
-            <div className="px-4 py-2 text-xs font-semibold text-gray-500">API 权限</div>
+            <div className="px-4 py-2 text-xs font-semibold text-gray-500 border-r border-gray-200">椤甸潰鍔熻兘</div>
+            <div className="px-4 py-2 text-xs font-semibold text-gray-500">API 鏉冮檺</div>
           </div>
-          {/* Rows — zip actions and apis side by side */}
+          {/* Rows 鈥?zip actions and apis side by side */}
           {(() => {
             const acts = node.actions ?? []
             const apis = node.apis ?? []
             const maxLen = Math.max(acts.length, apis.length)
             return Array.from({ length: maxLen }).map((_, i) => (
               <div key={i} className={`grid grid-cols-2 ${i < maxLen - 1 ? 'border-b border-gray-100' : ''}`}>
-                {/* 页面功能 cell */}
+                {/* 椤甸潰鍔熻兘 cell */}
                 <div className="px-4 py-2 border-r border-gray-100 flex items-center gap-2">
                   {acts[i] !== undefined ? (
                     <>
@@ -188,7 +191,7 @@ function PermNode({
                     </>
                   ) : null}
                 </div>
-                {/* API权限 cell */}
+                {/* API鏉冮檺 cell */}
                 <div className="px-4 py-2 flex items-center gap-2">
                   {apis[i] !== undefined ? (
                     <>
@@ -211,7 +214,7 @@ function PermNode({
   )
 }
 
-// ─── Create / Edit Role Page ──────────────────────────────────────────────────
+// 鈹€鈹€鈹€ Create / Edit Role Page 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 function RoleForm({
   initial,
   onCancel,
@@ -265,7 +268,7 @@ function RoleForm({
       </div>
 
       <div className="flex gap-6 flex-1 min-h-0">
-        {/* Left — Role Details */}
+        {/* Left 鈥?Role Details */}
         <div className="w-72 shrink-0">
           <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-4">
             <h2 className="text-sm font-semibold text-gray-800 mb-2">Role Details</h2>
@@ -296,7 +299,7 @@ function RoleForm({
               />
             </div>
 
-            {/* Tenant — above Role Type */}
+            {/* Tenant 鈥?above Role Type */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">
                 Tenant <span className="text-red-500">*</span>
@@ -312,7 +315,7 @@ function RoleForm({
               {tenantError && <p className="text-xs text-red-500 mt-1">{tenantError}</p>}
             </div>
 
-            {/* Role Type — Tenant Role / Customer Role */}
+            {/* Role Type 鈥?Tenant Role / Customer Role */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">
                 Role Type <span className="text-red-500">*</span>
@@ -359,12 +362,12 @@ function RoleForm({
           </div>
         </div>
 
-        {/* Right — Permission Configuration */}
+        {/* Right 鈥?Permission Configuration */}
         <div className="flex-1 min-w-0">
           <div className="bg-white border border-gray-200 rounded-xl p-5 h-full flex flex-col">
             {/* Header */}
             <div className="flex items-center justify-between mb-3">
-              <h2 className="text-sm font-semibold text-gray-800">权限配置</h2>
+              <h2 className="text-sm font-semibold text-gray-800">鏉冮檺閰嶇疆</h2>
               <div className="flex items-center gap-2">
                 <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-white bg-primary-600 rounded-lg hover:bg-primary-700 font-medium">
                   <Sparkles size={12} /> Role Templates
@@ -394,13 +397,13 @@ function RoleForm({
               </div>
             </div>
 
-            {/* Fixed tab: 菜单功能/API权限 + hint text */}
+            {/* Fixed tab: 鑿滃崟鍔熻兘/API鏉冮檺 + hint text */}
             <div className="border-b border-gray-200 mb-4 flex items-center justify-between">
               <div className="inline-block px-1 pb-2 text-sm font-semibold text-primary-600 border-b-2 border-primary-600">
-                菜单功能/API权限
+                鑿滃崟鍔熻兘/API鏉冮檺
               </div>
               <p className="text-xs text-amber-600 font-medium pb-2">
-                此处配置的 API 权限仅对 Client Portal 本体及 Agent 生效，不影响页面功能。
+                姝ゅ閰嶇疆鐨?API 鏉冮檺浠呭 Client Portal 鏈綋鍙?Agent 鐢熸晥锛屼笉褰卞搷椤甸潰鍔熻兘銆?
               </p>
             </div>
 
@@ -417,7 +420,7 @@ function RoleForm({
   )
 }
 
-// ─── Actions dropdown ─────────────────────────────────────────────────────────
+// 鈹€鈹€鈹€ Actions dropdown 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 function ActionsMenu({ role, onEdit, onDuplicate, onDelete }: {
   role: Role
   onEdit: () => void
@@ -471,28 +474,45 @@ function ActionsMenu({ role, onEdit, onDuplicate, onDelete }: {
   )
 }
 
-// ─── Main Role Management Page ────────────────────────────────────────────────
+// 鈹€鈹€鈹€ Main Role Management Page 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 export default function RoleManagement() {
   const [roles, setRoles] = useState<Role[]>(INITIAL_ROLES)
   const [view, setView] = useState<'list' | 'create' | 'edit'>('list')
   const [editTarget, setEditTarget] = useState<Role | null>(null)
+  const [activeTab, setActiveTab] = useState<'tenant' | 'customer'>('tenant')
 
-  // Filter state
-  const [filterModule, setFilterModule] = useState('')
-  const [filterStatus, setFilterStatus] = useState('')
-  const [filterRoleType, setFilterRoleType] = useState('')
-  const [filterTenant, setFilterTenant] = useState('')
-  const [filterRoleName, setFilterRoleName] = useState('')
-  const [activeFilters, setActiveFilters] = useState({ module: '', status: '', roleType: '', tenant: '', roleName: '' })
+  // 鈹€鈹€ Tenant Roles filter state 鈹€鈹€
+  const [tFilterModule,   setTFilterModule]   = useState('')
+  const [tFilterStatus,   setTFilterStatus]   = useState('')
+  const [tFilterTenant,   setTFilterTenant]   = useState('')
+  const [tFilterRoleName, setTFilterRoleName] = useState('')
+  const [tActive, setTActive] = useState({ module: '', status: '', tenant: '', roleName: '' })
 
-  const filtered = roles.filter(r => {
-    if (activeFilters.roleName && !r.name.toLowerCase().includes(activeFilters.roleName.toLowerCase())) return false
-    if (activeFilters.status && r.status !== activeFilters.status) return false
-    if (activeFilters.roleType && r.roleType !== activeFilters.roleType) return false
-    if (activeFilters.tenant && r.tenant !== activeFilters.tenant) return false
-    if (activeFilters.module && !r.modules.includes(activeFilters.module)) return false
-    return true
-  })
+  // 鈹€鈹€ Customer Roles filter state 鈹€鈹€
+  const [cFilterCustomer,  setCFilterCustomer]  = useState('')
+  const [cFilterStatus,    setCFilterStatus]    = useState('')
+  const [cFilterRoleName,  setCFilterRoleName]  = useState('')
+  const [cActive, setCActive] = useState({ customer: '', status: '', roleName: '' })
+
+  // Filtered lists
+  const tenantRoles = roles
+    .filter(r => r.roleType === 'Tenant Role')
+    .filter(r => {
+      if (tActive.roleName && !r.name.toLowerCase().includes(tActive.roleName.toLowerCase())) return false
+      if (tActive.status   && r.status  !== tActive.status)  return false
+      if (tActive.tenant   && r.tenant  !== tActive.tenant)  return false
+      if (tActive.module   && !r.modules.includes(tActive.module)) return false
+      return true
+    })
+
+  const customerRoles = roles
+    .filter(r => r.roleType === 'Customer Role')
+    .filter(r => {
+      if (cActive.roleName && !r.name.toLowerCase().includes(cActive.roleName.toLowerCase())) return false
+      if (cActive.status   && r.status   !== cActive.status)   return false
+      if (cActive.customer && r.customer !== cActive.customer) return false
+      return true
+    })
 
   const handleCreate = (data: Omit<Role, 'id' | 'users' | 'lastModified'>) => {
     const now = new Date()
@@ -516,167 +536,239 @@ export default function RoleManagement() {
     setRoles(prev => [...prev, { ...role, id: `r${Date.now()}`, name: `${role.name} (Copy)`, users: 0, lastModified: dateStr }])
   }
 
-  const handleDelete = (id: string) => {
-    setRoles(prev => prev.filter(r => r.id !== id))
-  }
+  const handleDelete = (id: string) => setRoles(prev => prev.filter(r => r.id !== id))
 
-  // ── Create / Edit view ──
-  if (view === 'create') {
-    return (
-      <div className="p-6 h-full">
-        <RoleForm onCancel={() => setView('list')} onSave={handleCreate} />
-      </div>
-    )
-  }
-  if (view === 'edit' && editTarget) {
-    return (
-      <div className="p-6 h-full">
-        <RoleForm initial={editTarget} onCancel={() => { setView('list'); setEditTarget(null) }} onSave={handleEdit} />
-      </div>
-    )
-  }
+  // 鈹€鈹€ Create / Edit view 鈹€鈹€
+  if (view === 'create') return (
+    <div className="p-6 h-full">
+      <RoleForm onCancel={() => setView('list')} onSave={handleCreate} />
+    </div>
+  )
+  if (view === 'edit' && editTarget) return (
+    <div className="p-6 h-full">
+      <RoleForm initial={editTarget} onCancel={() => { setView('list'); setEditTarget(null) }} onSave={handleEdit} />
+    </div>
+  )
 
-  // ── List view ──
+  // 鈹€鈹€ Shared table cols renderer 鈹€鈹€
+  const renderRoleRows = (list: Role[], isCustomer: boolean) => (
+    <>
+      {list.map(role => (
+        <tr key={role.id} className="hover:bg-gray-50 transition-colors">
+          {isCustomer && (
+            <td className="py-3.5 px-4 text-gray-700 text-xs whitespace-nowrap">{role.customer || '鈥?}</td>
+          )}
+          <td className="py-3.5 px-4 font-medium text-gray-800">{role.name}</td>
+          <td className="py-3.5 px-4 text-gray-500 text-xs max-w-[180px] truncate">{role.description}</td>
+          <td className="py-3.5 px-4 text-gray-600 text-xs whitespace-nowrap">{role.tenant || '鈥?}</td>
+          <td className="py-3.5 px-4">
+            {role.modules.length === 0 ? (
+              <span className="text-gray-400 text-xs">鈥?/span>
+            ) : (
+              <div className="flex flex-wrap gap-1">
+                {role.modules.slice(0,3).map(m => (
+                  <span key={m} className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs">{m}</span>
+                ))}
+                {role.modules.length > 3 && (
+                  <span className="px-2 py-0.5 bg-gray-100 text-gray-500 rounded text-xs">+{role.modules.length - 3}</span>
+                )}
+              </div>
+            )}
+          </td>
+          <td className="py-3.5 px-4">
+            <div className="flex items-center gap-1.5 text-xs font-medium text-violet-700 bg-violet-50 border border-violet-200 rounded-md px-2 py-1 w-fit">
+              <span className="text-[10px]">馃懁</span> {role.users}
+            </div>
+          </td>
+          <td className="py-3.5 px-4">
+            <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold ${role.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+              {role.status}
+            </span>
+          </td>
+          <td className="py-3.5 px-4 text-gray-500 text-xs whitespace-nowrap">{role.lastModified}</td>
+          <td className="py-3.5 px-4">
+            <ActionsMenu
+              role={role}
+              onEdit={() => { setEditTarget(role); setView('edit') }}
+              onDuplicate={() => handleDuplicate(role)}
+              onDelete={() => handleDelete(role.id)}
+            />
+          </td>
+        </tr>
+      ))}
+      {list.length === 0 && (
+        <tr>
+          <td colSpan={isCustomer ? 9 : 8} className="text-center py-12 text-gray-400 text-sm">
+            No roles found
+          </td>
+        </tr>
+      )}
+    </>
+  )
+
+  // 鈹€鈹€ List view 鈹€鈹€
   return (
     <div className="p-6">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-bold text-gray-900">Role Management</h1>
-        <button
-          onClick={() => setView('create')}
-          className="flex items-center gap-1.5 px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors shadow-sm"
-        >
-          <Plus size={14} /> Create Role
-        </button>
+      {/* Page title */}
+      <h1 className="text-xl font-bold text-gray-900 mb-4">Role Management</h1>
+
+      {/* Tabs */}
+      <div className="flex border-b border-gray-200 mb-5">
+        {([['tenant', 'Tenant Roles'], ['customer', 'Customer Roles']] as const).map(([key, label]) => (
+          <button
+            key={key}
+            onClick={() => setActiveTab(key)}
+            className={`px-5 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors ${
+              activeTab === key
+                ? 'border-primary-600 text-primary-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            {label}
+          </button>
+        ))}
       </div>
 
-      {/* Filter card */}
-      <div className="bg-white border border-gray-200 rounded-xl p-5 mb-5">
-        <div className="grid grid-cols-5 gap-4 mb-4">
-          {/* Module */}
-          <div>
-            <label className="block text-xs font-medium text-gray-500 mb-1.5">Module</label>
-            <select value={filterModule} onChange={e => setFilterModule(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 focus:outline-none focus:border-primary-400">
-              <option value="">Select Module</option>
-              {MODULE_OPTIONS.map(m => <option key={m}>{m}</option>)}
-            </select>
+      {/* 鈺愨晲鈺?TENANT ROLES TAB 鈺愨晲鈺?*/}
+      {activeTab === 'tenant' && (
+        <>
+          {/* Create button */}
+          <div className="flex justify-end mb-4">
+            <button
+              onClick={() => setView('create')}
+              className="flex items-center gap-1.5 px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors shadow-sm"
+            >
+              <Plus size={14} /> Create Role
+            </button>
           </div>
-          {/* Status */}
-          <div>
-            <label className="block text-xs font-medium text-gray-500 mb-1.5">Status</label>
-            <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 focus:outline-none focus:border-primary-400">
-              <option value="">Select Status</option>
-              <option>Active</option>
-              <option>Inactive</option>
-            </select>
-          </div>
-          {/* Tenant */}
-          <div>
-            <label className="block text-xs font-medium text-gray-500 mb-1.5">Tenant</label>
-            <select value={filterTenant} onChange={e => setFilterTenant(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 focus:outline-none focus:border-primary-400">
-              <option value="">Select Tenant</option>
-              {TENANT_OPTIONS.map(t => <option key={t} value={t}>{t}</option>)}
-            </select>
-          </div>
-          {/* Role Type */}
-          <div>
-            <label className="block text-xs font-medium text-gray-500 mb-1.5">Role Type</label>
-            <select value={filterRoleType} onChange={e => setFilterRoleType(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 focus:outline-none focus:border-primary-400">
-              <option value="">Select Role Type</option>
-              <option>Tenant Role</option>
-              <option>Customer Role</option>
-            </select>
-          </div>
-          {/* Role Name */}
-          <div>
-            <label className="block text-xs font-medium text-gray-500 mb-1.5">Role Name</label>
-            <input value={filterRoleName} onChange={e => setFilterRoleName(e.target.value)}
-              placeholder="Search by role name"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary-400" />
-          </div>
-        </div>
-        <div className="flex justify-end gap-2">
-          <button
-            onClick={() => { setFilterModule(''); setFilterStatus(''); setFilterRoleType(''); setFilterTenant(''); setFilterRoleName(''); setActiveFilters({ module: '', status: '', roleType: '', tenant: '', roleName: '' }) }}
-            className="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50"
-          >Reset</button>
-          <button
-            onClick={() => setActiveFilters({ module: filterModule, status: filterStatus, roleType: filterRoleType, tenant: filterTenant, roleName: filterRoleName })}
-            className="px-4 py-2 text-sm text-white bg-primary-600 rounded-lg hover:bg-primary-700"
-          >Search</button>
-        </div>
-      </div>
 
-      {/* Table */}
-      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="bg-gray-50 border-b border-gray-200">
-              {['Role Name', 'Description', 'Tenant', 'Role Type', 'Modules', 'Users', 'Status', 'Last Modified', 'Actions'].map(h => (
-                <th key={h} className="text-left py-3 px-4 text-xs font-semibold text-gray-500 whitespace-nowrap">{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {filtered.map(role => (
-              <tr key={role.id} className="hover:bg-gray-50 transition-colors">
-                <td className="py-3.5 px-4 font-medium text-gray-800">{role.name}</td>
-                <td className="py-3.5 px-4 text-gray-500 text-xs max-w-[180px] truncate">{role.description}</td>
-                <td className="py-3.5 px-4 text-gray-600 text-xs whitespace-nowrap">{role.tenant || '–'}</td>
-                <td className="py-3.5 px-4">
-                  <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold ${
-                    role.roleType === 'Tenant Role'
-                      ? 'bg-blue-50 text-blue-700'
-                      : 'bg-orange-50 text-orange-700'
-                  }`}>
-                    {role.roleType}
-                  </span>
-                </td>
-                <td className="py-3.5 px-4">
-                  {role.modules.length === 0 ? (
-                    <span className="text-gray-400 text-xs">No modules mapped</span>
-                  ) : (
-                    <div className="flex flex-wrap gap-1">
-                      {role.modules.slice(0, 3).map(m => (
-                        <span key={m} className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs">{m}</span>
-                      ))}
-                      {role.modules.length > 3 && (
-                        <span className="px-2 py-0.5 bg-gray-100 text-gray-500 rounded text-xs">+{role.modules.length - 3}</span>
-                      )}
-                    </div>
-                  )}
-                </td>
-                <td className="py-3.5 px-4">
-                  <div className="flex items-center gap-1.5 text-xs font-medium text-violet-700 bg-violet-50 border border-violet-200 rounded-md px-2 py-1 w-fit">
-                    <span className="text-[10px]">👤</span> {role.users}
-                  </div>
-                </td>
-                <td className="py-3.5 px-4">
-                  <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold ${role.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
-                    {role.status}
-                  </span>
-                </td>
-                <td className="py-3.5 px-4 text-gray-500 text-xs whitespace-nowrap">{role.lastModified}</td>
-                <td className="py-3.5 px-4">
-                  <ActionsMenu
-                    role={role}
-                    onEdit={() => { setEditTarget(role); setView('edit') }}
-                    onDuplicate={() => handleDuplicate(role)}
-                    onDelete={() => handleDelete(role.id)}
-                  />
-                </td>
-              </tr>
-            ))}
-            {filtered.length === 0 && (
-              <tr><td colSpan={9} className="text-center py-12 text-gray-400 text-sm">No roles found</td></tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+          {/* Filter */}
+          <div className="bg-white border border-gray-200 rounded-xl p-5 mb-5">
+            <div className="grid grid-cols-4 gap-4 mb-4">
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1.5">Module</label>
+                <select value={tFilterModule} onChange={e => setTFilterModule(e.target.value)}
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 focus:outline-none focus:border-primary-400">
+                  <option value="">Select Module</option>
+                  {MODULE_OPTIONS.map(m => <option key={m}>{m}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1.5">Status</label>
+                <select value={tFilterStatus} onChange={e => setTFilterStatus(e.target.value)}
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 focus:outline-none focus:border-primary-400">
+                  <option value="">Select Status</option>
+                  <option>Active</option>
+                  <option>Inactive</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1.5">Tenant</label>
+                <select value={tFilterTenant} onChange={e => setTFilterTenant(e.target.value)}
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 focus:outline-none focus:border-primary-400">
+                  <option value="">Select Tenant</option>
+                  {TENANT_OPTIONS.map(t => <option key={t} value={t}>{t}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1.5">Role Name</label>
+                <input value={tFilterRoleName} onChange={e => setTFilterRoleName(e.target.value)}
+                  placeholder="Search by role name"
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary-400" />
+              </div>
+            </div>
+            <div className="flex justify-end gap-2">
+              <button onClick={() => { setTFilterModule(''); setTFilterStatus(''); setTFilterTenant(''); setTFilterRoleName(''); setTActive({ module: '', status: '', tenant: '', roleName: '' }) }}
+                className="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50">Reset</button>
+              <button onClick={() => setTActive({ module: tFilterModule, status: tFilterStatus, tenant: tFilterTenant, roleName: tFilterRoleName })}
+                className="px-4 py-2 text-sm text-white bg-primary-600 rounded-lg hover:bg-primary-700">Search</button>
+            </div>
+          </div>
+
+          {/* Table */}
+          <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-gray-50 border-b border-gray-200">
+                  {['Role Name', 'Description', 'Tenant', 'Modules', 'Users', 'Status', 'Last Modified', 'Actions'].map(h => (
+                    <th key={h} className="text-left py-3 px-4 text-xs font-semibold text-gray-500 whitespace-nowrap">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {renderRoleRows(tenantRoles, false)}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
+
+      {/* 鈺愨晲鈺?CUSTOMER ROLES TAB 鈺愨晲鈺?*/}
+      {activeTab === 'customer' && (
+        <>
+          {/* Create button */}
+          <div className="flex justify-end mb-4">
+            <button
+              onClick={() => setView('create')}
+              className="flex items-center gap-1.5 px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors shadow-sm"
+            >
+              <Plus size={14} /> Create Role
+            </button>
+          </div>
+
+          {/* Filter 鈥?with Customer */}
+          <div className="bg-white border border-gray-200 rounded-xl p-5 mb-5">
+            <div className="grid grid-cols-4 gap-4 mb-4">
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1.5">Customer</label>
+                <select value={cFilterCustomer} onChange={e => setCFilterCustomer(e.target.value)}
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 focus:outline-none focus:border-primary-400">
+                  <option value="">Select Customer</option>
+                  {CUSTOMER_OPTIONS.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1.5">Status</label>
+                <select value={cFilterStatus} onChange={e => setCFilterStatus(e.target.value)}
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 focus:outline-none focus:border-primary-400">
+                  <option value="">Select Status</option>
+                  <option>Active</option>
+                  <option>Inactive</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1.5">Role Name</label>
+                <input value={cFilterRoleName} onChange={e => setCFilterRoleName(e.target.value)}
+                  placeholder="Search by role name"
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary-400" />
+              </div>
+            </div>
+            <div className="flex justify-end gap-2">
+              <button onClick={() => { setCFilterCustomer(''); setCFilterStatus(''); setCFilterRoleName(''); setCActive({ customer: '', status: '', roleName: '' }) }}
+                className="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50">Reset</button>
+              <button onClick={() => setCActive({ customer: cFilterCustomer, status: cFilterStatus, roleName: cFilterRoleName })}
+                className="px-4 py-2 text-sm text-white bg-primary-600 rounded-lg hover:bg-primary-700">Search</button>
+            </div>
+          </div>
+
+          {/* Table 鈥?with Customer column first */}
+          <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-gray-50 border-b border-gray-200">
+                  {['Customer', 'Role Name', 'Description', 'Tenant', 'Modules', 'Users', 'Status', 'Last Modified', 'Actions'].map(h => (
+                    <th key={h} className="text-left py-3 px-4 text-xs font-semibold text-gray-500 whitespace-nowrap">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {renderRoleRows(customerRoles, true)}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
     </div>
   )
 }
+
