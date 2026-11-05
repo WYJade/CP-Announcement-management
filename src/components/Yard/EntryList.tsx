@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   AlertTriangle, CheckCircle2, MapPin,
-  Search, X, RefreshCw, Eye, AlertCircle, Info, Camera,
+  Search, X, Eye, AlertCircle, Info, Camera,
   ChevronLeft, ChevronRight, ZoomIn, Image as ImageIcon,
   Clock, Truck, User,
 } from 'lucide-react'
@@ -457,9 +457,6 @@ export default function EntryList() {
           <h1 className="text-xl font-bold text-gray-900">Entry Monitor</h1>
           <p className="text-sm text-gray-500 mt-0.5">Read-only view of gate entries. Tap any entry to view details and photos.</p>
         </div>
-        <button className="p-2 rounded-lg hover:bg-gray-100 text-gray-500 transition-colors" title="Refresh">
-          <RefreshCw size={15}/>
-        </button>
       </div>
 
       {/* Anomaly banner */}
