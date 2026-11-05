@@ -80,33 +80,87 @@ const PERMISSION_TREE: PermissionNode[] = [
 
 const MODULE_OPTIONS = PERMISSION_TREE.map(n => n.label)
 
-// 鈹€鈹€鈹€ Sample roles 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+// ─── Sample roles ─────────────────────────────────────────────────────────────
 const INITIAL_ROLES: Role[] = [
+  // ── Tenant Roles (from screenshot) ──
   {
-    id: 'r1', name: 'sub-Admin', description: 'No description provided.',
-    tenant: 'Unis, LLC',
-    roleType: 'Tenant Role',
-    modules: ['Web Methods', 'International', 'Warehouse Map'],
-    users: 1, status: 'Active', lastModified: '2026/08/28',
+    id: 'r1', name: 'Asset Manager',
+    description: 'No description provided.',
+    tenant: 'Unis, LLC', roleType: 'Tenant Role',
+    modules: [], users: 1, status: 'Active', lastModified: '2025/10/29',
   },
   {
-    id: 'r2', name: 'sdssss', description: 'No description provided.',
-    tenant: 'Unis Transportation LLC',
-    roleType: 'Tenant Role',
-    modules: ['Dashboards'],
-    users: 1, status: 'Active', lastModified: '2026/08/26',
+    id: 'r2', name: 'Inventory – Standard User',
+    description: 'Access to inventory modules only, read-only except restock requests.',
+    tenant: 'Unis, LLC', roleType: 'Tenant Role',
+    modules: [], users: 7, status: 'Active', lastModified: '2025/10/29',
   },
   {
-    id: 'r3', name: 'Client Portal 鈥揢F External User',
-    description: '渚涘閮ㄥ鎴疯闂?UF 绯荤粺涓殑瀹㈡埛鏈嶅姟鍔熻兘鍙婂叾浠栨巿鏉冪殑涓氬姟鏁版嵁鈥?,
-    tenant: 'Unis, LLC',
-    roleType: 'Customer Role',
+    id: 'r3', name: 'Internal Transfer',
+    description: 'No description provided.',
+    tenant: 'Unis, LLC', roleType: 'Tenant Role',
+    modules: [], users: 1, status: 'Active', lastModified: '2025/10/29',
+  },
+  {
+    id: 'r4', name: 'Customer Service – Dashboard Access',
+    description: 'Full access to Dashboards; limited access to other operational data.',
+    tenant: 'Unis, LLC', roleType: 'Tenant Role',
+    modules: [], users: 2, status: 'Active', lastModified: '2025/10/29',
+  },
+  {
+    id: 'r5', name: 'Facility Management',
+    description: 'No description provided.',
+    tenant: 'Unis, LLC', roleType: 'Tenant Role',
+    modules: [], users: 1, status: 'Active', lastModified: '2025/10/29',
+  },
+  {
+    id: 'r6', name: 'Order Management – Order Clone Access',
+    description: 'Allows users to clone existing outbound orders for faster order creation.',
+    tenant: 'Unis, LLC', roleType: 'Tenant Role',
+    modules: [], users: 2, status: 'Active', lastModified: '2025/10/29',
+  },
+  {
+    id: 'r7', name: 'Order Management – Manual Entry Access',
+    description: 'Allows users to manually input order data and submit for processing.',
+    tenant: 'Unis, LLC', roleType: 'Tenant Role',
+    modules: [], users: 1, status: 'Active', lastModified: '2025/10/29',
+  },
+  {
+    id: 'r8', name: 'Operations – Batch Rollback Access',
+    description: 'Grants permission to perform batch rollback operations on order records.',
+    tenant: 'Unis, LLC', roleType: 'Tenant Role',
+    modules: [], users: 3, status: 'Active', lastModified: '2025/10/29',
+  },
+  // ── Customer Roles ──
+  {
+    id: 'r9', name: 'Client Portal – Power User',
+    description: 'Full access to all client portal features including reports and exports.',
+    tenant: 'Unis, LLC', roleType: 'Customer Role',
     customer: 'ADOORN LLC',
-    modules: [],
-    users: 40, status: 'Active', lastModified: '2026/08/24',
+    modules: [], users: 5, status: 'Active', lastModified: '2025/10/29',
+  },
+  {
+    id: 'r10', name: 'Client Portal – Standard User',
+    description: 'Read-only access to shipment tracking, invoices, and inventory.',
+    tenant: 'Unis, LLC', roleType: 'Customer Role',
+    customer: 'THE ONLY BEAN LLC',
+    modules: [], users: 3, status: 'Active', lastModified: '2025/10/28',
+  },
+  {
+    id: 'r11', name: 'Client Portal – Finance Viewer',
+    description: 'Access to invoices, claims, and payment history only.',
+    tenant: 'Unis, LLC', roleType: 'Customer Role',
+    customer: 'VITA COCO',
+    modules: [], users: 2, status: 'Active', lastModified: '2025/10/27',
+  },
+  {
+    id: 'r12', name: 'Client Portal – Logistics User',
+    description: 'Access to outbound inquiry, shipment tracking, and freight quote.',
+    tenant: 'Unis, LLC', roleType: 'Customer Role',
+    customer: 'ORGAIN LLC',
+    modules: [], users: 4, status: 'Inactive', lastModified: '2025/10/26',
   },
 ]
-
 // 鈹€鈹€鈹€ Permission tree node component 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 // Top-level (depth=0): section header with expand/collapse + checkbox
 // Second-level (depth=1): sub-menu label + two-column table (椤甸潰鍔熻兘 | API鏉冮檺)
@@ -609,8 +663,16 @@ export default function RoleManagement() {
   // 鈹€鈹€ List view 鈹€鈹€
   return (
     <div className="p-6">
-      {/* Page title */}
-      <h1 className="text-xl font-bold text-gray-900 mb-4">Role Management</h1>
+      {/* Page header — title + Create Role on same line like screenshot */}
+      <div className="flex items-center justify-between mb-4">
+        <h1 className="text-xl font-bold text-gray-900">Role Management</h1>
+        <button
+          onClick={() => setView('create')}
+          className="flex items-center gap-1.5 px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors shadow-sm"
+        >
+          <Plus size={14} /> Create Role
+        </button>
+      </div>
 
       {/* Tabs */}
       <div className="flex border-b border-gray-200 mb-5">
@@ -629,19 +691,9 @@ export default function RoleManagement() {
         ))}
       </div>
 
-      {/* 鈺愨晲鈺?TENANT ROLES TAB 鈺愨晲鈺?*/}
+      {/* ═══ TENANT ROLES TAB ═══ */}
       {activeTab === 'tenant' && (
         <>
-          {/* Create button */}
-          <div className="flex justify-end mb-4">
-            <button
-              onClick={() => setView('create')}
-              className="flex items-center gap-1.5 px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors shadow-sm"
-            >
-              <Plus size={14} /> Create Role
-            </button>
-          </div>
-
           {/* Filter */}
           <div className="bg-white border border-gray-200 rounded-xl p-5 mb-5">
             <div className="grid grid-cols-4 gap-4 mb-4">
@@ -690,7 +742,7 @@ export default function RoleManagement() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-gray-50 border-b border-gray-200">
-                  {['Role Name', 'Description', 'Tenant', 'Modules', 'Users', 'Status', 'Last Modified', 'Actions'].map(h => (
+                  {['Role Name', 'Description', 'Modules', 'Users', 'Status', 'Last Modified', 'Actions'].map(h => (
                     <th key={h} className="text-left py-3 px-4 text-xs font-semibold text-gray-500 whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
@@ -703,20 +755,10 @@ export default function RoleManagement() {
         </>
       )}
 
-      {/* 鈺愨晲鈺?CUSTOMER ROLES TAB 鈺愨晲鈺?*/}
+      {/* ═══ CUSTOMER ROLES TAB ═══ */}
       {activeTab === 'customer' && (
         <>
-          {/* Create button */}
-          <div className="flex justify-end mb-4">
-            <button
-              onClick={() => setView('create')}
-              className="flex items-center gap-1.5 px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors shadow-sm"
-            >
-              <Plus size={14} /> Create Role
-            </button>
-          </div>
-
-          {/* Filter 鈥?with Customer */}
+          {/* Filter — with Customer */}
           <div className="bg-white border border-gray-200 rounded-xl p-5 mb-5">
             <div className="grid grid-cols-4 gap-4 mb-4">
               <div>
@@ -756,7 +798,7 @@ export default function RoleManagement() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-gray-50 border-b border-gray-200">
-                  {['Customer', 'Role Name', 'Description', 'Tenant', 'Modules', 'Users', 'Status', 'Last Modified', 'Actions'].map(h => (
+                  {['Customer', 'Role Name', 'Description', 'Modules', 'Users', 'Status', 'Last Modified', 'Actions'].map(h => (
                     <th key={h} className="text-left py-3 px-4 text-xs font-semibold text-gray-500 whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
