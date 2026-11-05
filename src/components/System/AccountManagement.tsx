@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, X, Edit2, Users, Link } from 'lucide-react'
+import { Plus, X, Edit2, Users, Link, Trash2 } from 'lucide-react'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface Account {
@@ -394,9 +394,21 @@ function AccountTable({ accounts, searchUser, searchEmail, filterStatus }: {
               </td>
               <td className="py-3 px-4 text-gray-500 text-xs">{acc.lastLogin}</td>
               <td className="py-3 px-4">
-                <button className="flex items-center gap-1 text-xs text-gray-500 hover:text-primary-600 transition-colors">
-                  <Edit2 size={12} /> Edit
-                </button>
+                <div className="flex items-center gap-3">
+                  <button className="flex items-center gap-1 text-xs text-gray-500 hover:text-primary-600 transition-colors">
+                    <Edit2 size={12} /> Edit
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (window.confirm(`Delete account "${acc.username}"? This action cannot be undone.`)) {
+                        // delete handler placeholder
+                      }
+                    }}
+                    className="flex items-center gap-1 text-xs text-red-400 hover:text-red-600 transition-colors"
+                  >
+                    <Trash2 size={12} /> Delete
+                  </button>
+                </div>
               </td>
             </tr>
           ))}
