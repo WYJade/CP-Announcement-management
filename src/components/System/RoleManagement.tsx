@@ -660,11 +660,12 @@ export default function RoleManagement() {
     </>
   )
 
-  // 鈹€鈹€ List view 鈹€鈹€
+
+  // -- List view --
   return (
     <div className="p-6">
-      {/* Page header — title + Create Role on same line like screenshot */}
-      <div className="flex items-center justify-between mb-4">
+      {/* Page header — title + Create Role button (matches screenshot) */}
+      <div className="flex items-center justify-between mb-5">
         <h1 className="text-xl font-bold text-gray-900">Role Management</h1>
         <button
           onClick={() => setView('create')}
@@ -674,8 +675,62 @@ export default function RoleManagement() {
         </button>
       </div>
 
-      {/* Tabs */}
-      <div className="flex border-b border-gray-200 mb-5">
+      {/* Filter card — always visible, applies to current tab */}
+      <div className="bg-white border border-gray-200 rounded-xl p-5 mb-4">
+        <div className="grid grid-cols-4 gap-4 mb-4">
+          {/* Tenant */}
+          <div>
+            <label className="block text-xs font-medium text-gray-500 mb-1.5">Tenant</label>
+            <select value={tFilterTenant} onChange={e => setTFilterTenant(e.target.value)}
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 focus:outline-none focus:border-primary-400">
+              <option value="">Select Tenant</option>
+              {TENANT_OPTIONS.map(t => <option key={t} value={t}>{t}</option>)}
+            </select>
+          </div>
+          {/* Module */}
+          <div>
+            <label className="block text-xs font-medium text-gray-500 mb-1.5">Module</label>
+            <select value={tFilterModule} onChange={e => setTFilterModule(e.target.value)}
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 focus:outline-none focus:border-primary-400">
+              <option value="">Select Module</option>
+              {MODULE_OPTIONS.map(m => <option key={m}>{m}</option>)}
+            </select>
+          </div>
+          {/* Status */}
+          <div>
+            <label className="block text-xs font-medium text-gray-500 mb-1.5">Status</label>
+            <select value={tFilterStatus} onChange={e => setTFilterStatus(e.target.value)}
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 focus:outline-none focus:border-primary-400">
+              <option value="">Select Status</option>
+              <option>Active</option>
+              <option>Inactive</option>
+            </select>
+          </div>
+          {/* Role Name */}
+          <div>
+            <label className="block text-xs font-medium text-gray-500 mb-1.5">Role Name</label>
+            <input value={tFilterRoleName} onChange={e => setTFilterRoleName(e.target.value)}
+              placeholder="Search by role name"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary-400" />
+          </div>
+        </div>
+        <div className="flex justify-end gap-2">
+          <button
+            onClick={() => {
+              setTFilterModule(''); setTFilterStatus(''); setTFilterTenant(''); setTFilterRoleName('')
+              setTActive({ module: '', status: '', tenant: '', roleName: '' })
+            }}
+            className="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50"
+          >Reset</button>
+          <button
+            onClick={() => setTActive({ module: tFilterModule, status: tFilterStatus, tenant: tFilterTenant, roleName: tFilterRoleName })}
+            className="px-4 py-2 text-sm text-white bg-primary-600 rounded-lg hover:bg-primary-700"
+          >Search</button>
+        </div>
+      </div>
+
+      {/* Tabs — BELOW filter card, matching screenshot */}
+      <div className="flex border-b border-gray-200 mb-4">
         {([['tenant', 'Tenant Roles'], ['customer', 'Customer Roles']] as const).map(([key, label]) => (
           <button
             key={key}
@@ -691,126 +746,98 @@ export default function RoleManagement() {
         ))}
       </div>
 
-      {/* ═══ TENANT ROLES TAB ═══ */}
-      {activeTab === 'tenant' && (
-        <>
-          {/* Filter */}
-          <div className="bg-white border border-gray-200 rounded-xl p-5 mb-5">
-            <div className="grid grid-cols-4 gap-4 mb-4">
-              <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1.5">Module</label>
-                <select value={tFilterModule} onChange={e => setTFilterModule(e.target.value)}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 focus:outline-none focus:border-primary-400">
-                  <option value="">Select Module</option>
-                  {MODULE_OPTIONS.map(m => <option key={m}>{m}</option>)}
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1.5">Status</label>
-                <select value={tFilterStatus} onChange={e => setTFilterStatus(e.target.value)}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 focus:outline-none focus:border-primary-400">
-                  <option value="">Select Status</option>
-                  <option>Active</option>
-                  <option>Inactive</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1.5">Tenant</label>
-                <select value={tFilterTenant} onChange={e => setTFilterTenant(e.target.value)}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 focus:outline-none focus:border-primary-400">
-                  <option value="">Select Tenant</option>
-                  {TENANT_OPTIONS.map(t => <option key={t} value={t}>{t}</option>)}
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1.5">Role Name</label>
-                <input value={tFilterRoleName} onChange={e => setTFilterRoleName(e.target.value)}
-                  placeholder="Search by role name"
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary-400" />
-              </div>
-            </div>
-            <div className="flex justify-end gap-2">
-              <button onClick={() => { setTFilterModule(''); setTFilterStatus(''); setTFilterTenant(''); setTFilterRoleName(''); setTActive({ module: '', status: '', tenant: '', roleName: '' }) }}
-                className="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50">Reset</button>
-              <button onClick={() => setTActive({ module: tFilterModule, status: tFilterStatus, tenant: tFilterTenant, roleName: tFilterRoleName })}
-                className="px-4 py-2 text-sm text-white bg-primary-600 rounded-lg hover:bg-primary-700">Search</button>
-            </div>
-          </div>
-
-          {/* Table */}
-          <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-gray-50 border-b border-gray-200">
-                  {['Role Name', 'Description', 'Modules', 'Users', 'Status', 'Last Modified', 'Actions'].map(h => (
-                    <th key={h} className="text-left py-3 px-4 text-xs font-semibold text-gray-500 whitespace-nowrap">{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {renderRoleRows(tenantRoles, false)}
-              </tbody>
-            </table>
-          </div>
-        </>
-      )}
-
-      {/* ═══ CUSTOMER ROLES TAB ═══ */}
+      {/* Customer Roles: extra Customer filter row */}
       {activeTab === 'customer' && (
-        <>
-          {/* Filter — with Customer */}
-          <div className="bg-white border border-gray-200 rounded-xl p-5 mb-5">
-            <div className="grid grid-cols-4 gap-4 mb-4">
-              <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1.5">Customer</label>
-                <select value={cFilterCustomer} onChange={e => setCFilterCustomer(e.target.value)}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 focus:outline-none focus:border-primary-400">
-                  <option value="">Select Customer</option>
-                  {CUSTOMER_OPTIONS.map(c => <option key={c} value={c}>{c}</option>)}
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1.5">Status</label>
-                <select value={cFilterStatus} onChange={e => setCFilterStatus(e.target.value)}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 focus:outline-none focus:border-primary-400">
-                  <option value="">Select Status</option>
-                  <option>Active</option>
-                  <option>Inactive</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1.5">Role Name</label>
-                <input value={cFilterRoleName} onChange={e => setCFilterRoleName(e.target.value)}
-                  placeholder="Search by role name"
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary-400" />
-              </div>
+        <div className="bg-white border border-gray-200 rounded-xl p-4 mb-4">
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <label className="block text-xs font-medium text-gray-500 mb-1.5">Customer</label>
+              <select value={cFilterCustomer} onChange={e => setCFilterCustomer(e.target.value)}
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 focus:outline-none focus:border-primary-400">
+                <option value="">Select Customer</option>
+                {CUSTOMER_OPTIONS.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
             </div>
-            <div className="flex justify-end gap-2">
-              <button onClick={() => { setCFilterCustomer(''); setCFilterStatus(''); setCFilterRoleName(''); setCActive({ customer: '', status: '', roleName: '' }) }}
-                className="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50">Reset</button>
-              <button onClick={() => setCActive({ customer: cFilterCustomer, status: cFilterStatus, roleName: cFilterRoleName })}
-                className="px-4 py-2 text-sm text-white bg-primary-600 rounded-lg hover:bg-primary-700">Search</button>
+            <div>
+              <label className="block text-xs font-medium text-gray-500 mb-1.5">Status</label>
+              <select value={cFilterStatus} onChange={e => setCFilterStatus(e.target.value)}
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 focus:outline-none focus:border-primary-400">
+                <option value="">Select Status</option>
+                <option>Active</option>
+                <option>Inactive</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-500 mb-1.5">Role Name</label>
+              <input value={cFilterRoleName} onChange={e => setCFilterRoleName(e.target.value)}
+                placeholder="Search by role name"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary-400" />
             </div>
           </div>
-
-          {/* Table 鈥?with Customer column first */}
-          <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-gray-50 border-b border-gray-200">
-                  {['Customer', 'Role Name', 'Description', 'Modules', 'Users', 'Status', 'Last Modified', 'Actions'].map(h => (
-                    <th key={h} className="text-left py-3 px-4 text-xs font-semibold text-gray-500 whitespace-nowrap">{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {renderRoleRows(customerRoles, true)}
-              </tbody>
-            </table>
+          <div className="flex justify-end gap-2 mt-3">
+            <button onClick={() => { setCFilterCustomer(''); setCFilterStatus(''); setCFilterRoleName(''); setCActive({ customer: '', status: '', roleName: '' }) }}
+              className="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50">Reset</button>
+            <button onClick={() => setCActive({ customer: cFilterCustomer, status: cFilterStatus, roleName: cFilterRoleName })}
+              className="px-4 py-2 text-sm text-white bg-primary-600 rounded-lg hover:bg-primary-700">Search</button>
           </div>
-        </>
+        </div>
       )}
+
+      {/* Table */}
+      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="bg-gray-50 border-b border-gray-200">
+              {activeTab === 'customer' && (
+                <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 whitespace-nowrap">Customer</th>
+              )}
+              {['Role Name', 'Description', 'Modules', 'Users', 'Status', 'Last Modified', 'Actions'].map(h => (
+                <th key={h} className="text-left py-3 px-4 text-xs font-semibold text-gray-500 whitespace-nowrap">{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100">
+            {(activeTab === 'tenant' ? tenantRoles : customerRoles).map(role => (
+              <tr key={role.id} className="hover:bg-gray-50 transition-colors">
+                {activeTab === 'customer' && (
+                  <td className="py-3.5 px-4 text-gray-700 text-xs whitespace-nowrap">{role.customer || '--'}</td>
+                )}
+                <td className="py-3.5 px-4 font-medium text-gray-800 text-sm">{role.name}</td>
+                <td className="py-3.5 px-4 text-gray-500 text-xs max-w-[240px] truncate">{role.description}</td>
+                <td className="py-3.5 px-4 text-gray-400 text-xs">
+                  {role.modules.length === 0 ? 'No modules mapped' : role.modules.slice(0,3).join(', ')}
+                </td>
+                <td className="py-3.5 px-4">
+                  <span className="inline-flex items-center gap-1 text-xs font-medium text-violet-700 bg-violet-50 border border-violet-200 rounded-md px-2 py-1">
+                    Al {role.users}
+                  </span>
+                </td>
+                <td className="py-3.5 px-4">
+                  <span className={`inline-flex px-2.5 py-1 rounded text-xs font-semibold ${role.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                    {role.status}
+                  </span>
+                </td>
+                <td className="py-3.5 px-4 text-gray-500 text-xs whitespace-nowrap">{role.lastModified}</td>
+                <td className="py-3.5 px-4">
+                  <ActionsMenu
+                    role={role}
+                    onEdit={() => { setEditTarget(role); setView('edit') }}
+                    onDuplicate={() => handleDuplicate(role)}
+                    onDelete={() => handleDelete(role.id)}
+                  />
+                </td>
+              </tr>
+            ))}
+            {(activeTab === 'tenant' ? tenantRoles : customerRoles).length === 0 && (
+              <tr>
+                <td colSpan={activeTab === 'customer' ? 8 : 7} className="text-center py-12 text-gray-400 text-sm">
+                  No data
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   )
 }
-
