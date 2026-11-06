@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+﻿import { useState, useRef, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard,
@@ -281,7 +281,7 @@ const favoritesItems: MenuItem[] = [
     icon: <Heart size={16} />,
     expandable: true,
     children: [
-      { id: 'fav-chat', label: 'Chat', path: '/agents?nav=chat' },
+      { id: 'fav-chat', label: 'Chat', path: '/portal/agents?nav=chat' },
       { id: 'fav-scrap-report', label: 'Scrap Report' },
       { id: 'fav-service-claim', label: 'Service Claim Report' },
       { id: 'fav-freight-quote', label: 'Freight Quote', path: '/outbound/freight-quote' },
@@ -375,9 +375,9 @@ const SEARCH_INDEX: SearchEntry[] = [
   // Backup
   { label: 'End-to-End Tracking', parent: 'Backup', path: '/backup/tracking', keywords: ['end to end', 'tracking', 'backup'] },
   // AI Agents
-  { label: 'Chat', parent: 'AI Agents', path: '/agents?nav=chat', keywords: ['chat', 'ai', 'agents', 'assistant'] },
-  { label: 'Agent Workstation', parent: 'AI Agents', path: '/agents?nav=workstation', keywords: ['workstation', 'agents', 'ai'] },
-  { label: 'Marketplace', parent: 'AI Agents', path: '/agents?nav=marketplace', keywords: ['marketplace', 'agents'] },
+  { label: 'Chat', parent: 'AI Agents', path: '/portal/agents?nav=chat', keywords: ['chat', 'ai', 'agents', 'assistant'] },
+  { label: 'Agent Workstation', parent: 'AI Agents', path: '/portal/agents?nav=workstation', keywords: ['workstation', 'agents', 'ai'] },
+  { label: 'Marketplace', parent: 'AI Agents', path: '/portal/agents?nav=marketplace', keywords: ['marketplace', 'agents'] },
   // System
   { label: 'User Management', parent: 'System', path: '/', keywords: ['user', 'management', 'system', 'admin'] },
   { label: 'Role Management', parent: 'System', path: '/', keywords: ['role', 'management', 'system', 'permission'] },
@@ -495,7 +495,7 @@ function NavSidebar() {
 
   // Enter AI mode when navigating to /agents
   useEffect(() => {
-    if (location.pathname === '/agents') {
+    if (location.pathname === '/portal/agents') {
       setAiMode(true)
     }
   }, [location.pathname])
@@ -600,10 +600,10 @@ function NavSidebar() {
   })
 
   const agentSubItems = [
-    { label: 'Chat', path: '/agents?nav=chat' },
-    { label: 'Agent Workstation', path: '/agents?nav=workstation' },
-    { label: 'Customize', path: '/agents?nav=customize' },
-    { label: 'Marketplace', path: '/agents?nav=marketplace' },
+    { label: 'Chat', path: '/portal/agents?nav=chat' },
+    { label: 'Agent Workstation', path: '/portal/agents?nav=workstation' },
+    { label: 'Customize', path: '/portal/agents?nav=customize' },
+    { label: 'Marketplace', path: '/portal/agents?nav=marketplace' },
   ]
 
   // ── AI Agents mode sidebar ──────────────────────────────────────────────────
@@ -623,14 +623,21 @@ function NavSidebar() {
             <span className="text-sm font-bold text-gray-800">Client Portal</span>
           </div>
 
-          {/* ← 返回工作台 — 顶部明显位置 */}
-          <div className="px-1 mb-4">
+          {/* 顶部导航入口 */}
+          <div className="px-1 mb-4 space-y-1">
             <button
-              onClick={() => { setAiMode(false); navigate('/') }}
+              onClick={() => navigate('/landing')}
               className="w-full flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
             >
               <ChevronRight size={13} className="rotate-180 shrink-0 text-gray-400" />
-              <span className="font-medium">返回工作台</span>
+              <span className="font-medium">返回首页</span>
+            </button>
+            <button
+              onClick={() => { setAiMode(false); navigate('/portal') }}
+              className="w-full flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs text-violet-600 hover:bg-violet-50 hover:text-violet-700 transition-colors"
+            >
+              <LayoutDashboard size={13} className="shrink-0 text-violet-400" />
+              <span className="font-medium">切换到 Portal System</span>
             </button>
           </div>
 
@@ -684,7 +691,7 @@ function NavSidebar() {
                     <div key={item.id} className="relative group/rec">
                       {/* Row */}
                       <button
-                        onClick={() => navigate('/agents?nav=chat')}
+                        onClick={() => navigate('/portal/agents?nav=chat')}
                         className="w-full text-left pl-3 pr-7 py-1.5 text-xs text-gray-500 hover:text-primary-700 hover:bg-primary-50 rounded-md transition-colors truncate"
                       >
                         {item.title}
@@ -743,15 +750,24 @@ function NavSidebar() {
       {/* Scrollable content */}
       <div className="flex-1 overflow-y-auto py-4 px-3">
         {/* Logo */}
-        <div className="flex items-center gap-2 px-3 mb-4">
-          <div className="w-7 h-7 bg-primary-600 rounded-lg flex items-center justify-center">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="white" />
-              <path d="M2 17L12 22L22 17" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M2 12L12 17L22 12" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+        <div className="flex items-center justify-between px-3 mb-4">
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 bg-primary-600 rounded-lg flex items-center justify-center">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="white" />
+                <path d="M2 17L12 22L22 17" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M2 12L12 17L22 12" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+            <span className="text-sm font-bold text-gray-800">Client Portal</span>
           </div>
-          <span className="text-sm font-bold text-gray-800">Client Portal</span>
+          <button
+            onClick={() => navigate('/landing')}
+            title="返回首页"
+            className="p-1 rounded-md hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
+          >
+            <ChevronRight size={13} className="rotate-180" />
+          </button>
         </div>
 
         {/* Global Search */}
@@ -842,11 +858,11 @@ function NavSidebar() {
       </div>
 
       {/* ── Sticky AI Agents bottom entry ── */}
-      <div className="px-3 pb-3 pt-1.5 bg-white shrink-0 border-t border-gray-100">
+      <div className="px-3 pb-3 pt-1.5 bg-white shrink-0 border-t border-gray-100 space-y-1.5">
         <button
           onClick={() => {
             setAiMode(true)
-            navigate('/agents?nav=chat')
+            navigate('/portal/agents?nav=chat')
           }}
           className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-violet-50 border border-violet-200 hover:bg-violet-100 transition-all"
         >
@@ -858,6 +874,13 @@ function NavSidebar() {
             <p className="text-[9px] text-violet-400 leading-tight">Your AI agent</p>
           </div>
           <ChevronRight size={13} className="text-violet-400 shrink-0" />
+        </button>
+        <button
+          onClick={() => navigate('/landing')}
+          className="w-full flex items-center justify-center gap-1.5 py-1.5 text-[10px] text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
+        >
+          <ChevronRight size={11} className="rotate-180" />
+          返回首页
         </button>
       </div>
     </div>

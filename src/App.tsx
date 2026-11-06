@@ -42,10 +42,17 @@ import EntryList from './components/Yard/EntryList'
 import EntryDetail from './components/Yard/EntryDetail'
 import InsightsSubPage from './components/Insights/InsightsSubPage'
 
+import LandingPage from './components/Landing/LandingPage'
+
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Layout />}>
+      {/* ── Landing Page — 无 Layout，独立全屏 ── */}
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/landing" element={<LandingPage />} />
+
+      {/* ── Portal System — 所有原有路由移至 /portal/* ── */}
+      <Route path="/portal" element={<Layout />}>
         <Route index element={<HomePage />} />
         <Route path="home" element={<HomePage />} />
         <Route path="dashboard/otif" element={<OTIFDashboard />} />
