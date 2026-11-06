@@ -1,7 +1,7 @@
 ﻿import { useState, useRef, useEffect } from 'react'
 import { Plus, X, ChevronDown, ChevronRight, MoreHorizontal, Edit2, Copy, Trash2, Sparkles } from 'lucide-react'
 
-// 鈹€鈹€鈹€ Types 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+// ─── Types ───────────────────────────────────────────────────────────────────
 type RoleType = 'Tenant Role' | 'Customer Role'
 type RoleStatus = 'Active' | 'Inactive'
 type TenantOption = 'Unis, LLC' | 'Unis Transportation LLC'
@@ -13,8 +13,8 @@ interface PermissionNode {
   id: string
   label: string
   children?: PermissionNode[]
-  actions?: string[]        // 椤甸潰鍔熻兘
-  apis?: string[]           // API鏉冮檺
+  actions?: string[]        // 页面功能
+  apis?: string[]           // API权限
 }
 
 interface Role {
@@ -23,14 +23,14 @@ interface Role {
   description: string
   tenant: TenantOption | ''
   roleType: RoleType
-  customer?: string        // Customer Role 涓撳睘
+  customer?: string        // Customer Role 专属
   modules: string[]
   users: number
   status: RoleStatus
   lastModified: string
 }
 
-// 鈹€鈹€鈹€ Permission tree data 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+// ─── Permission tree data ─────────────────────────────────────────────────────
 const PERMISSION_TREE: PermissionNode[] = [
   {
     id: 'dashboards', label: 'Dashboards', children: [
@@ -161,9 +161,10 @@ const INITIAL_ROLES: Role[] = [
     modules: [], users: 4, status: 'Inactive', lastModified: '2025/10/26',
   },
 ]
-// 鈹€鈹€鈹€ Permission tree node component 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+
+// ─── Permission tree node component ──────────────────────────────────────────
 // Top-level (depth=0): section header with expand/collapse + checkbox
-// Second-level (depth=1): sub-menu label + two-column table (椤甸潰鍔熻兘 | API鏉冮檺)
+// Second-level (depth=1): sub-menu label + two-column table (页面功能 | API权限)
 function PermNode({
   node, depth = 0, checked, onToggle,
 }: {
@@ -181,7 +182,7 @@ function PermNode({
   if (isTopLevel) {
     return (
       <div className="mb-2">
-        {/* Top-level header row 鈥?purple-tinted */}
+        {/* Top-level header row – purple-tinted */}
         <div className="flex items-center gap-2 py-2 px-3 bg-violet-50 rounded-lg mb-1">
           <button onClick={() => setExpanded(v => !v)} className="text-violet-400 hover:text-violet-600 transition-colors">
             {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
@@ -221,17 +222,17 @@ function PermNode({
         <div className="ml-6 border border-gray-200 rounded-lg overflow-hidden">
           {/* Column headers */}
           <div className="grid grid-cols-2 border-b border-gray-200 bg-gray-50">
-            <div className="px-4 py-2 text-xs font-semibold text-gray-500 border-r border-gray-200">椤甸潰鍔熻兘</div>
-            <div className="px-4 py-2 text-xs font-semibold text-gray-500">API 鏉冮檺</div>
+            <div className="px-4 py-2 text-xs font-semibold text-gray-500 border-r border-gray-200">页面功能</div>
+            <div className="px-4 py-2 text-xs font-semibold text-gray-500">API 权限</div>
           </div>
-          {/* Rows 鈥?zip actions and apis side by side */}
+          {/* Rows – zip actions and apis side by side */}
           {(() => {
             const acts = node.actions ?? []
             const apis = node.apis ?? []
             const maxLen = Math.max(acts.length, apis.length)
             return Array.from({ length: maxLen }).map((_, i) => (
               <div key={i} className={`grid grid-cols-2 ${i < maxLen - 1 ? 'border-b border-gray-100' : ''}`}>
-                {/* 椤甸潰鍔熻兘 cell */}
+                {/* 页面功能 cell */}
                 <div className="px-4 py-2 border-r border-gray-100 flex items-center gap-2">
                   {acts[i] !== undefined ? (
                     <>
@@ -245,7 +246,7 @@ function PermNode({
                     </>
                   ) : null}
                 </div>
-                {/* API鏉冮檺 cell */}
+                {/* API权限 cell */}
                 <div className="px-4 py-2 flex items-center gap-2">
                   {apis[i] !== undefined ? (
                     <>
@@ -268,7 +269,7 @@ function PermNode({
   )
 }
 
-// 鈹€鈹€鈹€ Create / Edit Role Page 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+// ─── Create / Edit Role Page ──────────────────────────────────────────────────
 function RoleForm({
   initial,
   onCancel,
@@ -322,7 +323,7 @@ function RoleForm({
       </div>
 
       <div className="flex gap-6 flex-1 min-h-0">
-        {/* Left 鈥?Role Details */}
+        {/* Left – Role Details */}
         <div className="w-72 shrink-0">
           <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-4">
             <h2 className="text-sm font-semibold text-gray-800 mb-2">Role Details</h2>
@@ -353,7 +354,7 @@ function RoleForm({
               />
             </div>
 
-            {/* Tenant 鈥?above Role Type */}
+            {/* Tenant – above Role Type */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">
                 Tenant <span className="text-red-500">*</span>
@@ -369,7 +370,7 @@ function RoleForm({
               {tenantError && <p className="text-xs text-red-500 mt-1">{tenantError}</p>}
             </div>
 
-            {/* Role Type 鈥?Tenant Role / Customer Role */}
+            {/* Role Type – Tenant Role / Customer Role */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">
                 Role Type <span className="text-red-500">*</span>
@@ -416,12 +417,12 @@ function RoleForm({
           </div>
         </div>
 
-        {/* Right 鈥?Permission Configuration */}
+        {/* Right – Permission Configuration */}
         <div className="flex-1 min-w-0">
           <div className="bg-white border border-gray-200 rounded-xl p-5 h-full flex flex-col">
             {/* Header */}
             <div className="flex items-center justify-between mb-3">
-              <h2 className="text-sm font-semibold text-gray-800">鏉冮檺閰嶇疆</h2>
+              <h2 className="text-sm font-semibold text-gray-800">权限配置</h2>
               <div className="flex items-center gap-2">
                 <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-white bg-primary-600 rounded-lg hover:bg-primary-700 font-medium">
                   <Sparkles size={12} /> Role Templates
@@ -451,13 +452,13 @@ function RoleForm({
               </div>
             </div>
 
-            {/* Fixed tab: 鑿滃崟鍔熻兘/API鏉冮檺 + hint text */}
+            {/* Fixed tab: 菜单功能/API权限 + hint text */}
             <div className="border-b border-gray-200 mb-4 flex items-center justify-between">
               <div className="inline-block px-1 pb-2 text-sm font-semibold text-primary-600 border-b-2 border-primary-600">
-                鑿滃崟鍔熻兘/API鏉冮檺
+                菜单功能/API权限
               </div>
               <p className="text-xs text-amber-600 font-medium pb-2">
-                姝ゅ閰嶇疆鐨?API 鏉冮檺浠呭 Client Portal 鏈綋鍙?Agent 鐢熸晥锛屼笉褰卞搷椤甸潰鍔熻兘銆?
+                此处配置的 API 权限仅对 Client Portal 本身和 Agent 生效，不影响页面功能。
               </p>
             </div>
 
@@ -474,7 +475,7 @@ function RoleForm({
   )
 }
 
-// 鈹€鈹€鈹€ Actions dropdown 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+// ─── Actions dropdown ─────────────────────────────────────────────────────────
 function ActionsMenu({ role, onEdit, onDuplicate, onDelete }: {
   role: Role
   onEdit: () => void
@@ -528,21 +529,21 @@ function ActionsMenu({ role, onEdit, onDuplicate, onDelete }: {
   )
 }
 
-// 鈹€鈹€鈹€ Main Role Management Page 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+// ─── Main Role Management Page ────────────────────────────────────────────────
 export default function RoleManagement() {
   const [roles, setRoles] = useState<Role[]>(INITIAL_ROLES)
   const [view, setView] = useState<'list' | 'create' | 'edit'>('list')
   const [editTarget, setEditTarget] = useState<Role | null>(null)
   const [activeTab, setActiveTab] = useState<'tenant' | 'customer'>('tenant')
 
-  // 鈹€鈹€ Tenant Roles filter state 鈹€鈹€
+  // ── Tenant Roles filter state ──
   const [tFilterModule,   setTFilterModule]   = useState('')
   const [tFilterStatus,   setTFilterStatus]   = useState('')
   const [tFilterTenant,   setTFilterTenant]   = useState('')
   const [tFilterRoleName, setTFilterRoleName] = useState('')
   const [tActive, setTActive] = useState({ module: '', status: '', tenant: '', roleName: '' })
 
-  // 鈹€鈹€ Customer Roles filter state 鈹€鈹€
+  // ── Customer Roles filter state ──
   const [cFilterCustomer,  setCFilterCustomer]  = useState('')
   const [cFilterStatus,    setCFilterStatus]    = useState('')
   const [cFilterRoleName,  setCFilterRoleName]  = useState('')
@@ -592,7 +593,7 @@ export default function RoleManagement() {
 
   const handleDelete = (id: string) => setRoles(prev => prev.filter(r => r.id !== id))
 
-  // 鈹€鈹€ Create / Edit view 鈹€鈹€
+  // ── Create / Edit view ──
   if (view === 'create') return (
     <div className="p-6 h-full">
       <RoleForm onCancel={() => setView('list')} onSave={handleCreate} />
@@ -604,38 +605,26 @@ export default function RoleManagement() {
     </div>
   )
 
-  // 鈹€鈹€ Shared table cols renderer 鈹€鈹€
+  // -- Shared table cols renderer --
   const renderRoleRows = (list: Role[], isCustomer: boolean) => (
     <>
       {list.map(role => (
         <tr key={role.id} className="hover:bg-gray-50 transition-colors">
           {isCustomer && (
-            <td className="py-3.5 px-4 text-gray-700 text-xs whitespace-nowrap">{role.customer || '鈥?}</td>
+            <td className="py-3.5 px-4 text-gray-700 text-xs whitespace-nowrap">{role.customer || '--'}</td>
           )}
-          <td className="py-3.5 px-4 font-medium text-gray-800">{role.name}</td>
-          <td className="py-3.5 px-4 text-gray-500 text-xs max-w-[180px] truncate">{role.description}</td>
-          <td className="py-3.5 px-4 text-gray-600 text-xs whitespace-nowrap">{role.tenant || '鈥?}</td>
-          <td className="py-3.5 px-4">
-            {role.modules.length === 0 ? (
-              <span className="text-gray-400 text-xs">鈥?/span>
-            ) : (
-              <div className="flex flex-wrap gap-1">
-                {role.modules.slice(0,3).map(m => (
-                  <span key={m} className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs">{m}</span>
-                ))}
-                {role.modules.length > 3 && (
-                  <span className="px-2 py-0.5 bg-gray-100 text-gray-500 rounded text-xs">+{role.modules.length - 3}</span>
-                )}
-              </div>
-            )}
+          <td className="py-3.5 px-4 font-medium text-gray-800 text-sm">{role.name}</td>
+          <td className="py-3.5 px-4 text-gray-500 text-xs max-w-[220px] truncate">{role.description}</td>
+          <td className="py-3.5 px-4 text-gray-400 text-xs">
+            {role.modules.length === 0 ? 'No modules mapped' : role.modules.slice(0, 3).join(', ')}
           </td>
           <td className="py-3.5 px-4">
-            <div className="flex items-center gap-1.5 text-xs font-medium text-violet-700 bg-violet-50 border border-violet-200 rounded-md px-2 py-1 w-fit">
-              <span className="text-[10px]">馃懁</span> {role.users}
-            </div>
+            <span className="inline-flex items-center gap-1 text-xs font-medium text-violet-700 bg-violet-50 border border-violet-200 rounded-md px-2 py-1">
+              Al {role.users}
+            </span>
           </td>
           <td className="py-3.5 px-4">
-            <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold ${role.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+            <span className={`inline-flex px-2.5 py-1 rounded text-xs font-semibold ${role.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
               {role.status}
             </span>
           </td>
@@ -652,19 +641,18 @@ export default function RoleManagement() {
       ))}
       {list.length === 0 && (
         <tr>
-          <td colSpan={isCustomer ? 9 : 8} className="text-center py-12 text-gray-400 text-sm">
-            No roles found
+          <td colSpan={isCustomer ? 8 : 7} className="text-center py-12 text-gray-400 text-sm">
+            No data
           </td>
         </tr>
       )}
     </>
   )
 
-
   // -- List view --
   return (
     <div className="p-6">
-      {/* Page header — title + Create Role button (matches screenshot) */}
+      {/* Page header */}
       <div className="flex items-center justify-between mb-5">
         <h1 className="text-xl font-bold text-gray-900">Role Management</h1>
         <button
@@ -675,10 +663,9 @@ export default function RoleManagement() {
         </button>
       </div>
 
-      {/* Filter card — always visible, applies to current tab */}
+      {/* Filter card */}
       <div className="bg-white border border-gray-200 rounded-xl p-5 mb-4">
         <div className="grid grid-cols-4 gap-4 mb-4">
-          {/* Tenant */}
           <div>
             <label className="block text-xs font-medium text-gray-500 mb-1.5">Tenant</label>
             <select value={tFilterTenant} onChange={e => setTFilterTenant(e.target.value)}
@@ -687,7 +674,6 @@ export default function RoleManagement() {
               {TENANT_OPTIONS.map(t => <option key={t} value={t}>{t}</option>)}
             </select>
           </div>
-          {/* Module */}
           <div>
             <label className="block text-xs font-medium text-gray-500 mb-1.5">Module</label>
             <select value={tFilterModule} onChange={e => setTFilterModule(e.target.value)}
@@ -696,7 +682,6 @@ export default function RoleManagement() {
               {MODULE_OPTIONS.map(m => <option key={m}>{m}</option>)}
             </select>
           </div>
-          {/* Status */}
           <div>
             <label className="block text-xs font-medium text-gray-500 mb-1.5">Status</label>
             <select value={tFilterStatus} onChange={e => setTFilterStatus(e.target.value)}
@@ -706,7 +691,6 @@ export default function RoleManagement() {
               <option>Inactive</option>
             </select>
           </div>
-          {/* Role Name */}
           <div>
             <label className="block text-xs font-medium text-gray-500 mb-1.5">Role Name</label>
             <input value={tFilterRoleName} onChange={e => setTFilterRoleName(e.target.value)}
@@ -716,10 +700,7 @@ export default function RoleManagement() {
         </div>
         <div className="flex justify-end gap-2">
           <button
-            onClick={() => {
-              setTFilterModule(''); setTFilterStatus(''); setTFilterTenant(''); setTFilterRoleName('')
-              setTActive({ module: '', status: '', tenant: '', roleName: '' })
-            }}
+            onClick={() => { setTFilterModule(''); setTFilterStatus(''); setTFilterTenant(''); setTFilterRoleName(''); setTActive({ module: '', status: '', tenant: '', roleName: '' }) }}
             className="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50"
           >Reset</button>
           <button
@@ -729,16 +710,14 @@ export default function RoleManagement() {
         </div>
       </div>
 
-      {/* Tabs — BELOW filter card, matching screenshot */}
+      {/* Tabs */}
       <div className="flex border-b border-gray-200 mb-4">
         {([['tenant', 'Tenant Roles'], ['customer', 'Customer Roles']] as const).map(([key, label]) => (
           <button
             key={key}
             onClick={() => setActiveTab(key)}
             className={`px-5 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors ${
-              activeTab === key
-                ? 'border-primary-600 text-primary-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
+              activeTab === key ? 'border-primary-600 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700'
             }`}
           >
             {label}
@@ -746,7 +725,7 @@ export default function RoleManagement() {
         ))}
       </div>
 
-      {/* Customer Roles: extra Customer filter row */}
+      {/* Customer extra filter */}
       {activeTab === 'customer' && (
         <div className="bg-white border border-gray-200 rounded-xl p-4 mb-4">
           <div className="grid grid-cols-3 gap-4">
@@ -797,44 +776,7 @@ export default function RoleManagement() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {(activeTab === 'tenant' ? tenantRoles : customerRoles).map(role => (
-              <tr key={role.id} className="hover:bg-gray-50 transition-colors">
-                {activeTab === 'customer' && (
-                  <td className="py-3.5 px-4 text-gray-700 text-xs whitespace-nowrap">{role.customer || '--'}</td>
-                )}
-                <td className="py-3.5 px-4 font-medium text-gray-800 text-sm">{role.name}</td>
-                <td className="py-3.5 px-4 text-gray-500 text-xs max-w-[240px] truncate">{role.description}</td>
-                <td className="py-3.5 px-4 text-gray-400 text-xs">
-                  {role.modules.length === 0 ? 'No modules mapped' : role.modules.slice(0,3).join(', ')}
-                </td>
-                <td className="py-3.5 px-4">
-                  <span className="inline-flex items-center gap-1 text-xs font-medium text-violet-700 bg-violet-50 border border-violet-200 rounded-md px-2 py-1">
-                    Al {role.users}
-                  </span>
-                </td>
-                <td className="py-3.5 px-4">
-                  <span className={`inline-flex px-2.5 py-1 rounded text-xs font-semibold ${role.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
-                    {role.status}
-                  </span>
-                </td>
-                <td className="py-3.5 px-4 text-gray-500 text-xs whitespace-nowrap">{role.lastModified}</td>
-                <td className="py-3.5 px-4">
-                  <ActionsMenu
-                    role={role}
-                    onEdit={() => { setEditTarget(role); setView('edit') }}
-                    onDuplicate={() => handleDuplicate(role)}
-                    onDelete={() => handleDelete(role.id)}
-                  />
-                </td>
-              </tr>
-            ))}
-            {(activeTab === 'tenant' ? tenantRoles : customerRoles).length === 0 && (
-              <tr>
-                <td colSpan={activeTab === 'customer' ? 8 : 7} className="text-center py-12 text-gray-400 text-sm">
-                  No data
-                </td>
-              </tr>
-            )}
+            {renderRoleRows(activeTab === 'tenant' ? tenantRoles : customerRoles, activeTab === 'customer')}
           </tbody>
         </table>
       </div>
