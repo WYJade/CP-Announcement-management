@@ -66,7 +66,8 @@ export default function LandingPage() {
       <div className="relative z-10 flex flex-1 gap-0 min-h-0">
 
         {/* ════════════════ LEFT — Super Agent (主版面) ════════════════ */}
-        <div className="flex-1 flex flex-col justify-center px-12 py-10 border-r border-white/6">
+        <div className="flex-1 flex flex-col justify-center items-center px-12 py-10 border-r border-white/6">
+          <div className="w-full max-w-2xl">
 
           {/* Badge */}
           <div className="flex items-center gap-2 mb-6">
@@ -85,13 +86,13 @@ export default function LandingPage() {
               supply chain
             </span>
           </h1>
-          <p className="text-white/45 text-sm mb-8 max-w-lg leading-relaxed">
+          <p className="text-white/45 text-sm mb-8 leading-relaxed">
             Natural language AI across Inbound, Inventory, Outbound, Shipping & Finance.
             No module switching — just ask.
           </p>
 
           {/* ── Chat input box ── */}
-          <div className="relative mb-5 max-w-xl">
+          <div className="relative mb-5">
             <div className="flex items-end gap-2 bg-white/6 border border-white/12 rounded-2xl px-4 py-3 focus-within:border-violet-500/50 focus-within:bg-white/8 transition-all">
               <MessageSquare size={16} className="text-violet-400 shrink-0 mb-0.5" />
               <textarea
@@ -113,7 +114,7 @@ export default function LandingPage() {
           </div>
 
           {/* ── Quick prompts ── */}
-          <div className="flex flex-wrap gap-2 max-w-xl mb-8">
+          <div className="flex flex-wrap gap-2 mb-8">
             {CHIPS.map(chip => (
               <button
                 key={chip.text}
@@ -127,7 +128,7 @@ export default function LandingPage() {
           </div>
 
           {/* Feature row */}
-          <div className="flex items-center gap-5">
+          <div className="flex items-center gap-6">
             {[
               { icon: Zap, text: 'Instant answers' },
               { icon: BarChart2, text: 'Real-time data' },
@@ -138,6 +139,8 @@ export default function LandingPage() {
                 {text}
               </div>
             ))}
+          </div>
+
           </div>
         </div>
 
