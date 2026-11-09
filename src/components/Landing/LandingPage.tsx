@@ -296,8 +296,8 @@ export default function LandingPage() {
         <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
           {!inConversation ? (
             /* Initial hero */
-            <div className="flex-1 flex flex-col justify-center px-14 py-10 overflow-y-auto">
-              <div className="w-full max-w-2xl">
+            <div className="flex-1 flex flex-col justify-center px-8 py-10 overflow-y-auto">
+              <div className="w-full max-w-3xl mx-auto">
 
                 {/* Badge */}
                 <div className="flex items-center gap-2 mb-7">
@@ -455,55 +455,45 @@ export default function LandingPage() {
         </div>
 
         {/* ════ RIGHT: Portal System (narrow vertical panel) ════ */}
-        <div className={`w-64 shrink-0 flex flex-col border-l ${vline} px-5 py-8`}>
+        <div className={`w-72 shrink-0 flex flex-col border-l ${vline} px-6 py-10`}>
           {/* Header */}
-          <div className="mb-6">
-            <p className={`text-[10px] uppercase tracking-wider font-semibold mb-2 ${text3}`}>Or use</p>
-            <div className="flex items-center gap-2 mb-1.5">
-              <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${dark ? 'bg-white/8' : 'bg-gray-100'}`}>
-                <LayoutDashboard size={14} className={text2} />
-              </div>
-              <h3 className={`text-base font-bold ${text1}`}>Portal System</h3>
-            </div>
+          <div className="mb-7">
+            <p className={`text-[10px] uppercase tracking-wider font-semibold mb-3 ${text3}`}>Or use</p>
+            <h3 className={`text-xl font-bold mb-2 ${text1}`}>Portal System</h3>
             <p className={`text-xs ${text2} leading-relaxed`}>
               Classic dashboard with full module navigation.
             </p>
           </div>
 
-          {/* Module list */}
-          <div className="space-y-1.5 mb-6">
+          {/* Module grid — 2 columns like screenshot */}
+          <div className="grid grid-cols-2 gap-2 mb-5">
             {PORTAL_MODULES.map(({ icon: Icon, label, color }) => (
               <button key={label} onClick={() => navigate('/portal')}
-                className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl border text-xs font-medium transition-all ${portalSurface} ${hoverBg}`}>
+                className={`flex items-center gap-2 px-3 py-3 rounded-xl border text-xs font-medium transition-all ${portalSurface} ${hoverBg}`}>
                 <Icon size={14} className={color} />
                 <span className={text2}>{label}</span>
-                <ChevronRight size={11} className={`ml-auto ${text3}`} />
               </button>
             ))}
             <button onClick={() => navigate('/portal')}
-              className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl border text-xs font-medium transition-all ${portalSurface} ${hoverBg}`}>
-              <span className={`text-xs font-bold ${text3}`}>+8</span>
-              <span className={text3}>More modules</span>
+              className={`flex items-center gap-2 px-3 py-3 rounded-xl border text-xs font-medium transition-all ${portalSurface} ${hoverBg}`}>
+              <span className={`font-bold ${text3}`}>+8</span>
+              <span className={text3}>More</span>
             </button>
           </div>
 
           {/* Enter button */}
           <button onClick={() => navigate('/portal')}
-            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-violet-600/10 border border-violet-500/30 hover:bg-violet-600/20 transition-colors text-sm font-semibold text-violet-400 mb-4">
-            <LayoutDashboard size={14} />
+            className={`w-full flex items-center gap-2 py-3 px-4 rounded-xl border transition-all text-sm font-medium mb-6 ${portalSurface} ${hoverBg} ${text2}`}>
+            <LayoutDashboard size={15} />
             Enter Portal
-            <ChevronRight size={14} className="ml-auto" />
+            <ChevronRight size={14} className={`ml-auto ${text3}`} />
           </button>
 
-          {/* Footer hint */}
-          <div className={`mt-auto pt-4 border-t ${vline}`}>
-            <p className={`text-[10px] ${text3} text-center leading-relaxed mb-2`}>
+          {/* Divider + hint */}
+          <div className={`border-t ${vline} pt-5`}>
+            <p className={`text-[10px] ${text3} text-center leading-relaxed`}>
               You can switch between<br />Super Agent and Portal anytime
             </p>
-            <button onClick={() => navigate('/portal')}
-              className={`w-full text-[11px] ${text3} hover:text-violet-400 transition-colors flex items-center justify-center gap-1`}>
-              <ArrowRight size={10} /> Quick tour of Portal
-            </button>
           </div>
         </div>
       </div>
