@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+﻿import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Sparkles, LayoutDashboard, Send, Package, Truck,
@@ -248,7 +248,8 @@ export default function LandingPage() {
   const text1   = dark ? 'text-white/90' : 'text-gray-900'
   const text2   = dark ? 'text-white/50' : 'text-gray-500'
   const text3   = dark ? 'text-white/25' : 'text-gray-400'
-  const divider = dark ? 'border-white/6' : 'border-gray-200'
+  const divider  = dark ? 'border-white/[0.06]' : 'border-gray-100'   // 横向（内部区域用，很淡）
+  const vDivider = dark ? 'border-white/[0.04]' : 'border-gray-100/80' // 竖向分栏线，更淡
   const hoverBg = dark ? 'hover:bg-white/8' : 'hover:bg-gray-100'
   const inputBg = dark ? 'bg-white/6 placeholder-white/25 text-white/90' : 'bg-white placeholder-gray-400 text-gray-800'
   const chipCls = dark
@@ -268,7 +269,7 @@ export default function LandingPage() {
       )}
 
       {/* ── Header ── */}
-      <header className={`relative z-10 flex items-center justify-between px-5 py-3 border-b ${divider}`}>
+      <header className="relative z-10 flex items-center justify-between px-5 py-3">
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 bg-violet-600 rounded-lg flex items-center justify-center shadow-sm shadow-violet-500/30">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
@@ -294,7 +295,7 @@ export default function LandingPage() {
       <div className="relative z-10 flex flex-1 min-h-0 overflow-hidden">
 
         {/* ════ Col 1: Agent nav sidebar (narrow) ════ */}
-        <div className={`w-44 shrink-0 flex flex-col border-r ${divider} py-4`}>
+        <div className={`w-44 shrink-0 flex flex-col border-r ${vDivider} py-4`}>
           {/* AI Agents header */}
           <div className="px-3 mb-3">
             <div className="flex items-center gap-2 px-2 py-2 rounded-xl bg-violet-500/15 border border-violet-500/25">
@@ -362,69 +363,96 @@ export default function LandingPage() {
         <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
 
           {!inConversation ? (
-            /* ── Initial chat state ── */
-            <div className="flex-1 flex flex-col items-center justify-center px-8 py-8 overflow-y-auto">
+            /* ── Super Agent initial state ── */
+            <div className="flex-1 flex flex-col justify-center px-14 py-12 overflow-y-auto">
+              <div className="w-full max-w-2xl">
 
-              {/* Agent icon */}
-              <div className="w-12 h-12 bg-gradient-to-br from-violet-500 to-blue-500 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-violet-500/25">
-                <MessageSquare size={22} className="text-white" />
-              </div>
-
-              <div className="flex items-center gap-1.5 mb-1">
-                <span className="w-2 h-2 rounded-full bg-blue-500" />
-                <span className={`text-xs font-medium ${text2}`}>All-in-One Copilot</span>
-              </div>
-
-              <h2 className={`text-2xl font-bold mb-2 ${text1}`}>有什么我能帮到你？</h2>
-              <p className={`text-sm ${text2} text-center max-w-sm leading-relaxed mb-6`}>
-                订单状态 · 入库跟踪 · 库存查询 · 出库进度 全都能问。<br />
-                无需切换模块，一个入口查询所有业务数据。
-              </p>
-
-              {/* Hint chips */}
-              <div className="flex items-center gap-4 mb-6 flex-wrap justify-center">
-                {['⚡ 跨模块自动取数', '🔍 结合真实业务', '📐 复杂任务 → Agent Workstation'].map(h => (
-                  <span key={h} className={`text-[11px] font-medium ${text2}`}>{h}</span>
-                ))}
-              </div>
-
-              {/* Input box */}
-              <div className="w-full max-w-xl mb-4">
-                <div className={`flex items-end gap-2 rounded-2xl px-4 py-3 transition-all ${
-                  dark ? 'bg-white/6 focus-within:bg-white/9' : 'bg-white shadow-sm focus-within:shadow-md border border-gray-200 focus-within:border-violet-400'
-                }`}>
-                  <MessageSquare size={15} className="text-violet-400 shrink-0 mb-0.5" />
-                  <textarea
-                    ref={textareaRef}
-                    value={inputVal}
-                    onChange={e => setInputVal(e.target.value)}
-                    onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() } }}
-                    placeholder="问任何与入库、库存、出库相关的问题..."
-                    rows={2}
-                    className={`flex-1 bg-transparent text-sm resize-none focus:outline-none leading-relaxed ${inputBg}`}
-                  />
-                  <button
-                    onClick={() => handleSend()}
-                    disabled={!inputVal.trim() || isTyping}
-                    className="shrink-0 w-8 h-8 rounded-xl bg-violet-600 hover:bg-violet-500 disabled:opacity-30 flex items-center justify-center transition-colors shadow-sm shadow-violet-500/25"
-                  >
-                    <Send size={13} className="text-white" />
-                  </button>
+                {/* Badge */}
+                <div className="flex items-center gap-2 mb-8">
+                  <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-semibold ${
+                    dark ? 'bg-violet-500/15 border-violet-500/30 text-violet-300' : 'bg-violet-50 border-violet-200 text-violet-600'
+                  }`}>
+                    <Sparkles size={11} />
+                    Super Agent
+                    <span className={`ml-1 px-1.5 py-0.5 rounded-full text-[9px] font-bold tracking-wider uppercase ${
+                      dark ? 'bg-violet-500/30' : 'bg-violet-200 text-violet-700'
+                    }`}>Recommended</span>
+                  </div>
                 </div>
-                <p className={`text-[10px] ${text3} mt-1.5 ml-1`}>Enter 发送 · Shift+Enter 换行</p>
-              </div>
 
-              {/* Quick chips */}
-              <div className="flex flex-wrap gap-2 justify-center max-w-xl">
-                {CHIPS.map(chip => (
-                  <button
-                    key={chip.text}
-                    onClick={() => handleSend(chip.text)}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs transition-all ${chipCls}`}
-                  >
-                    <span>{chip.icon}</span>{chip.text}
-                  </button>
-                ))}
+                {/* Headline */}
+                <h1 className={`text-4xl font-bold leading-tight mb-3 ${text1}`}>
+                  Ask anything about your
+                  <br />
+                  <span className="bg-gradient-to-r from-violet-400 via-blue-300 to-cyan-300 bg-clip-text text-transparent">
+                    supply chain
+                  </span>
+                </h1>
+                <p className={`text-sm ${text2} mb-8 leading-relaxed max-w-lg`}>
+                  Natural language AI across Inbound, Inventory, Outbound, Shipping &amp; Finance.
+                  No module switching — just ask.
+                </p>
+
+                {/* ── Input box — large ── */}
+                <div className="mb-5">
+                  <div className={`flex items-end gap-3 rounded-2xl px-5 py-4 transition-all ${
+                    dark
+                      ? 'bg-white/7 focus-within:bg-white/10'
+                      : 'bg-white shadow-md border border-gray-200 focus-within:border-violet-400 focus-within:shadow-lg'
+                  }`}>
+                    <textarea
+                      ref={textareaRef}
+                      value={inputVal}
+                      onChange={e => setInputVal(e.target.value)}
+                      onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() } }}
+                      placeholder="问任何关于入库、库存、出库的问题..."
+                      rows={3}
+                      className={`flex-1 bg-transparent text-base resize-none focus:outline-none leading-relaxed ${inputBg}`}
+                    />
+                    <button
+                      onClick={() => handleSend()}
+                      disabled={!inputVal.trim() || isTyping}
+                      className="shrink-0 w-10 h-10 rounded-xl bg-violet-600 hover:bg-violet-500 disabled:opacity-30 flex items-center justify-center transition-colors shadow-lg shadow-violet-500/30 mb-0.5"
+                    >
+                      <Send size={15} className="text-white" />
+                    </button>
+                  </div>
+                  <p className={`text-[10px] ${text3} mt-1.5 ml-1`}>Enter 发送 · Shift+Enter 换行</p>
+                </div>
+
+                {/* Quick chips — 2 rows */}
+                <div className="flex flex-wrap gap-2 mb-8">
+                  {[
+                    { icon: '📦', text: '查一下进行中的RN' },
+                    { icon: '🚚', text: '出库单状态汇总' },
+                    { icon: '📊', text: 'Ontario CA库存查询' },
+                    { icon: '💰', text: '未结发票列表' },
+                    { icon: '📅', text: '待到仓预约列表' },
+                    { icon: '📈', text: 'OTIF达成率分析' },
+                  ].map(chip => (
+                    <button
+                      key={chip.text}
+                      onClick={() => handleSend(chip.text)}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-medium transition-all ${chipCls}`}
+                    >
+                      <span>{chip.icon}</span>{chip.text}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Feature row */}
+                <div className="flex items-center gap-6">
+                  {[
+                    { icon: Zap, text: 'Instant answers' },
+                    { icon: BarChart2, text: 'Real-time data' },
+                    { icon: Sparkles, text: 'AI-powered' },
+                  ].map(({ icon: Icon, text }) => (
+                    <div key={text} className={`flex items-center gap-1.5 text-xs ${text3}`}>
+                      <Icon size={12} className="text-violet-400/60" />
+                      {text}
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           ) : (
@@ -531,7 +559,7 @@ export default function LandingPage() {
         </div>
 
         {/* ════ Col 3: Portal System (unchanged) ════ */}
-        <div className={`w-72 shrink-0 flex flex-col justify-center px-7 py-10 border-l ${divider}`}>
+        <div className={`w-72 shrink-0 flex flex-col justify-center px-7 py-10 border-l ${vDivider}`}>
           <div className="mb-5">
             <p className={`text-[10px] ${text3} uppercase tracking-wider font-semibold mb-1`}>Or use</p>
             <h2 className={`text-lg font-bold ${text1}`}>Portal System</h2>
@@ -582,7 +610,7 @@ export default function LandingPage() {
       </div>
 
       {/* ── Footer ── */}
-      <footer className={`relative z-10 py-3 text-center text-[11px] ${text3} border-t ${divider}`}>
+      <footer className={`relative z-10 py-3 text-center text-[11px] ${text3}`}>
         © 2026 Unis · Client Portal 3.0
       </footer>
     </div>
