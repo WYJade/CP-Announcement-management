@@ -10,7 +10,7 @@ import {
 // ─── Types ─────────────────────────────────────────────────────────────────
 type ChatMsg = { role: 'user' | 'agent'; text: string; lines?: string[]; done?: boolean }
 
-// ─── Mock agent responses ───────────────────────────────────────────────────
+// ─── Mock responses ─────────────────────────────────────────────────────────
 const SIM_RESPONSES: Record<string, ChatMsg[]> = {
   '查一下进行中的RN': [
     { role: 'user', text: '查一下进行中的RN' },
@@ -50,14 +50,13 @@ const SIM_RESPONSES: Record<string, ChatMsg[]> = {
       '- 总 SKU 数：**1,284**',
       '- 可用库存：**42,300 units**',
       '- 过期预警：**3 SKU** 需关注',
-      '- 上架待处理：**156 units**',
       '',
       '需要查看具体 SKU 或过期清单吗？',
     ]},
   ],
 }
 
-// ─── Agent bubble renderer ──────────────────────────────────────────────────
+// ─── Agent bubble ────────────────────────────────────────────────────────────
 function AgentLine({ text }: { text: string }) {
   const parts = text.split(/(\*\*[^*]+\*\*)/)
   return (
@@ -74,7 +73,6 @@ function AgentLine({ text }: { text: string }) {
 function AgentBubble({ lines, done, dark }: { lines: string[]; done: boolean; dark: boolean }) {
   const isTableRow = (s: string) => s.startsWith('|')
   const isSep = (s: string) => /^\|[-| :]+\|$/.test(s.trim())
-
   let inTable = false
   const rendered: React.ReactNode[] = []
   let tableRows: string[][] = []
@@ -84,7 +82,7 @@ function AgentBubble({ lines, done, dark }: { lines: string[]; done: boolean; da
     const [header, , ...body] = tableRows
     rendered.push(
       <div key={`t${rendered.length}`} className="overflow-x-auto my-1.5">
-        <table className={`text-xs border-collapse w-full`}>
+        <table className="text-xs border-collapse w-full">
           <thead>
             <tr className={dark ? 'bg-white/10' : 'bg-gray-100'}>
               {header.filter(Boolean).map((h, i) => (
@@ -149,7 +147,7 @@ function AgentBubble({ lines, done, dark }: { lines: string[]; done: boolean; da
   )
 }
 
-// ─── Portal modules ─────────────────────────────────────────────────────────
+// ─── Constants ───────────────────────────────────────────────────────────────
 const PORTAL_MODULES = [
   { icon: Package,    label: 'Inbound',   color: 'text-blue-400' },
   { icon: BarChart2,  label: 'Inventory', color: 'text-emerald-400' },
@@ -158,11 +156,13 @@ const PORTAL_MODULES = [
   { icon: DollarSign, label: 'Finance',   color: 'text-rose-400' },
 ]
 
-// ─── Quick chips ─────────────────────────────────────────────────────────────
 const CHIPS = [
   { icon: '📦', text: '查一下进行中的RN' },
   { icon: '🚚', text: '出库单状态汇总' },
   { icon: '📊', text: 'Ontario CA库存查询' },
+  { icon: '💰', text: '未结发票列表' },
+  { icon: '📅', text: '待到仓预约列表' },
+  { icon: '📈', text: 'OTIF达成率分析' },
 ]
 
 const RECENTS = [
@@ -172,15 +172,14 @@ const RECENTS = [
   '未结发票列表',
 ]
 
-// ─── Agent nav items ─────────────────────────────────────────────────────────
 const AGENT_NAV = [
-  { id: 'chat',        label: 'Chat',              icon: MessageSquare },
-  { id: 'workstation', label: 'Agent Workstation',  icon: Zap },
-  { id: 'customize',   label: 'Customize',          icon: Settings },
-  { id: 'marketplace', label: 'Marketplace',        icon: Store },
+  { id: 'chat',        label: 'Chat',             icon: MessageSquare },
+  { id: 'workstation', label: 'Agent Workstation', icon: Zap },
+  { id: 'customize',   label: 'Customize',         icon: Settings },
+  { id: 'marketplace', label: 'Marketplace',       icon: Store },
 ]
 
-// ─── Main component ──────────────────────────────────────────────────────────
+// ─── Main ─────────────────────────────────────────────────────────────────────
 export default function LandingPage() {
   const navigate = useNavigate()
   const [dark, setDark] = useState(true)
@@ -217,7 +216,6 @@ export default function LandingPage() {
         if (idx >= allLines.length) { clearInterval(iv); setIsTyping(false) }
       }, 120)
     } else {
-      // Generic thinking response
       setMessages(prev => [...prev, { role: 'agent', text: '正在分析您的问题...', lines: [], done: false }])
       setTimeout(() => {
         setMessages(prev => {
@@ -242,35 +240,35 @@ export default function LandingPage() {
     setTimeout(() => simulateResponse(q), 500)
   }
 
-  // ── theme tokens ──
+  // ── Theme ──
   const bg      = dark ? 'bg-[#07071a]' : 'bg-gray-50'
-  const surface = dark ? 'bg-white/5 border-white/8' : 'bg-white border-gray-200'
   const text1   = dark ? 'text-white/90' : 'text-gray-900'
   const text2   = dark ? 'text-white/50' : 'text-gray-500'
   const text3   = dark ? 'text-white/25' : 'text-gray-400'
-  const divider  = dark ? 'border-white/[0.06]' : 'border-gray-100'   // 横向（内部区域用，很淡）
-  const vDivider = dark ? 'border-white/[0.04]' : 'border-gray-100/80' // 竖向分栏线，更淡
+  const vline   = dark ? 'border-white/[0.04]' : 'border-gray-100'
+  const hline   = dark ? 'border-white/[0.06]' : 'border-gray-100'
   const hoverBg = dark ? 'hover:bg-white/8' : 'hover:bg-gray-100'
-  const inputBg = dark ? 'bg-white/6 placeholder-white/25 text-white/90' : 'bg-white placeholder-gray-400 text-gray-800'
+  const inputBg = dark ? 'bg-transparent placeholder-white/25 text-white/90' : 'bg-transparent placeholder-gray-400 text-gray-800'
   const chipCls = dark
     ? 'bg-white/5 border-white/8 hover:bg-violet-500/15 hover:border-violet-500/30 text-white/50 hover:text-white/80'
     : 'bg-white border-gray-200 hover:bg-violet-50 hover:border-violet-300 text-gray-500 hover:text-violet-700'
+  const portalSurface = dark ? 'bg-white/5 border-white/8' : 'bg-white border-gray-200'
 
   return (
-    <div className={`min-h-screen ${bg} text-white flex flex-col overflow-hidden relative transition-colors duration-200`}>
+    <div className={`min-h-screen ${bg} flex flex-col overflow-hidden relative transition-colors duration-200`}>
 
-      {/* ── Background (dark only) ── */}
+      {/* Background blobs (dark) */}
       {dark && (
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 left-[15%] w-[600px] h-[500px] bg-violet-600/15 rounded-full blur-[130px]" />
-          <div className="absolute bottom-0 right-[5%] w-[350px] h-[350px] bg-blue-500/8 rounded-full blur-[100px]" />
+          <div className="absolute top-0 left-[10%] w-[700px] h-[500px] bg-violet-600/15 rounded-full blur-[140px]" />
+          <div className="absolute top-[30%] right-0 w-[400px] h-[400px] bg-blue-500/8 rounded-full blur-[120px]" />
           <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.012)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.012)_1px,transparent_1px)] bg-[size:56px_56px]" />
         </div>
       )}
 
       {/* ── Header ── */}
-      <header className="relative z-10 flex items-center justify-between px-5 py-3">
-        <div className="flex items-center gap-2">
+      <header className="relative z-10 flex items-center justify-between px-6 py-4">
+        <div className="flex items-center gap-2.5">
           <div className="w-7 h-7 bg-violet-600 rounded-lg flex items-center justify-center shadow-sm shadow-violet-500/30">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
               <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="white"/>
@@ -279,28 +277,24 @@ export default function LandingPage() {
           </div>
           <span className={`text-sm font-bold ${text1}`}>Client Portal</span>
         </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setDark(v => !v)}
-            className={`p-2 rounded-lg transition-colors ${hoverBg} ${text2}`}
-            title={dark ? 'Switch to Light mode' : 'Switch to Dark mode'}
-          >
-            {dark ? <Sun size={15} /> : <Moon size={15} />}
+        <div className="flex items-center gap-3">
+          <button onClick={() => setDark(v => !v)}
+            className={`p-2 rounded-lg transition-colors ${hoverBg} ${text2}`}>
+            {dark ? <Sun size={15}/> : <Moon size={15}/>}
           </button>
           <span className={`text-xs ${text3}`}>Powered by Unis AI · v3.0</span>
         </div>
       </header>
 
-      {/* ── 3-column layout ── */}
-      <div className="relative z-10 flex flex-1 min-h-0 overflow-hidden">
+      {/* ════════════ SUPER AGENT SECTION (top, full-width) ════════════ */}
+      <div className="relative z-10 flex flex-1 min-h-0" style={{ minHeight: '82vh' }}>
 
-        {/* ════ Col 1: Agent nav sidebar (narrow) ════ */}
-        <div className={`w-44 shrink-0 flex flex-col border-r ${vDivider} py-4`}>
-          {/* AI Agents header */}
+        {/* Left: Agent nav */}
+        <div className={`w-44 shrink-0 flex flex-col border-r ${vline} py-4`}>
           <div className="px-3 mb-3">
-            <div className="flex items-center gap-2 px-2 py-2 rounded-xl bg-violet-500/15 border border-violet-500/25">
+            <div className="flex items-center gap-2 px-2 py-2 rounded-xl bg-violet-500/15 border border-violet-500/20">
               <div className="w-7 h-7 bg-violet-600 rounded-lg flex items-center justify-center shrink-0">
-                <Sparkles size={13} className="text-white" />
+                <Sparkles size={13} className="text-white"/>
               </div>
               <div>
                 <p className="text-xs font-bold text-violet-300 leading-tight">AI Agents</p>
@@ -309,49 +303,33 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* Nav items */}
           <nav className="px-2 space-y-0.5 mb-4">
             {AGENT_NAV.map(({ id, label, icon: Icon }) => (
-              <button
-                key={id}
-                onClick={() => {
-                  if (id === 'chat') { setActiveNav('chat') }
-                  else { navigate(`/portal/agents?nav=${id}`) }
-                }}
+              <button key={id}
+                onClick={() => id === 'chat' ? setActiveNav('chat') : navigate(`/portal/agents?nav=${id}`)}
                 className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
-                  activeNav === id && id === 'chat'
-                    ? 'bg-violet-500/20 text-violet-300'
-                    : `${text2} ${hoverBg}`
-                }`}
-              >
-                <Icon size={13} className="shrink-0" />
-                {label}
+                  activeNav === id ? 'bg-violet-500/20 text-violet-300' : `${text2} ${hoverBg}`
+                }`}>
+                <Icon size={13} className="shrink-0"/> {label}
               </button>
             ))}
           </nav>
 
-          {/* New chat button */}
           <div className="px-2 mb-3">
-            <button
-              onClick={() => setMessages([])}
-              className={`w-full flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs ${text3} ${hoverBg} transition-colors`}
-            >
-              <Plus size={12} /> New Chat
+            <button onClick={() => setMessages([])}
+              className={`w-full flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs ${text3} ${hoverBg} transition-colors`}>
+              <Plus size={12}/> New Chat
             </button>
           </div>
 
-          {/* Recents */}
           <div className="px-3 flex-1 overflow-y-auto">
             <p className={`text-[9px] font-semibold uppercase tracking-wider mb-2 flex items-center gap-1 ${text3}`}>
-              <Clock size={9} /> RECENTS
+              <Clock size={9}/> RECENTS
             </p>
             <div className="space-y-0.5">
               {RECENTS.map((r, i) => (
-                <button
-                  key={i}
-                  onClick={() => handleSend(r)}
-                  className={`w-full text-left px-2 py-1.5 text-[11px] ${text2} ${hoverBg} rounded-lg transition-colors truncate`}
-                >
+                <button key={i} onClick={() => handleSend(r)}
+                  className={`w-full text-left px-2 py-1.5 text-[11px] ${text2} ${hoverBg} rounded-lg transition-colors truncate`}>
                   {r}
                 </button>
               ))}
@@ -359,20 +337,19 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* ════ Col 2: Chat area (main) ════ */}
+        {/* Center: Chat / Super Agent content */}
         <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
-
           {!inConversation ? (
-            /* ── Super Agent initial state ── */
-            <div className="flex-1 flex flex-col justify-center px-14 py-12 overflow-y-auto">
+            /* ── Initial: Super Agent hero ── */
+            <div className="flex-1 flex flex-col justify-center px-14 py-10 overflow-y-auto">
               <div className="w-full max-w-2xl">
 
                 {/* Badge */}
-                <div className="flex items-center gap-2 mb-8">
+                <div className="flex items-center gap-2 mb-7">
                   <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-semibold ${
                     dark ? 'bg-violet-500/15 border-violet-500/30 text-violet-300' : 'bg-violet-50 border-violet-200 text-violet-600'
                   }`}>
-                    <Sparkles size={11} />
+                    <Sparkles size={11}/>
                     Super Agent
                     <span className={`ml-1 px-1.5 py-0.5 rounded-full text-[9px] font-bold tracking-wider uppercase ${
                       dark ? 'bg-violet-500/30' : 'bg-violet-200 text-violet-700'
@@ -383,22 +360,20 @@ export default function LandingPage() {
                 {/* Headline */}
                 <h1 className={`text-4xl font-bold leading-tight mb-3 ${text1}`}>
                   Ask anything about your
-                  <br />
+                  <br/>
                   <span className="bg-gradient-to-r from-violet-400 via-blue-300 to-cyan-300 bg-clip-text text-transparent">
                     supply chain
                   </span>
                 </h1>
-                <p className={`text-sm ${text2} mb-8 leading-relaxed max-w-lg`}>
+                <p className={`text-sm ${text2} mb-8 leading-relaxed`}>
                   Natural language AI across Inbound, Inventory, Outbound, Shipping &amp; Finance.
                   No module switching — just ask.
                 </p>
 
-                {/* ── Input box — large ── */}
+                {/* Input */}
                 <div className="mb-5">
                   <div className={`flex items-end gap-3 rounded-2xl px-5 py-4 transition-all ${
-                    dark
-                      ? 'bg-white/7 focus-within:bg-white/10'
-                      : 'bg-white shadow-md border border-gray-200 focus-within:border-violet-400 focus-within:shadow-lg'
+                    dark ? 'bg-white/7 focus-within:bg-white/10' : 'bg-white shadow-md border border-gray-200 focus-within:border-violet-400 focus-within:shadow-lg'
                   }`}>
                     <textarea
                       ref={textareaRef}
@@ -407,40 +382,27 @@ export default function LandingPage() {
                       onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() } }}
                       placeholder="问任何关于入库、库存、出库的问题..."
                       rows={3}
-                      className={`flex-1 bg-transparent text-base resize-none focus:outline-none leading-relaxed ${inputBg}`}
+                      className={`flex-1 text-base resize-none focus:outline-none leading-relaxed ${inputBg}`}
                     />
-                    <button
-                      onClick={() => handleSend()}
-                      disabled={!inputVal.trim() || isTyping}
-                      className="shrink-0 w-10 h-10 rounded-xl bg-violet-600 hover:bg-violet-500 disabled:opacity-30 flex items-center justify-center transition-colors shadow-lg shadow-violet-500/30 mb-0.5"
-                    >
-                      <Send size={15} className="text-white" />
+                    <button onClick={() => handleSend()} disabled={!inputVal.trim() || isTyping}
+                      className="shrink-0 w-10 h-10 rounded-xl bg-violet-600 hover:bg-violet-500 disabled:opacity-30 flex items-center justify-center transition-colors shadow-lg shadow-violet-500/30 mb-0.5">
+                      <Send size={15} className="text-white"/>
                     </button>
                   </div>
                   <p className={`text-[10px] ${text3} mt-1.5 ml-1`}>Enter 发送 · Shift+Enter 换行</p>
                 </div>
 
-                {/* Quick chips — 2 rows */}
+                {/* Chips */}
                 <div className="flex flex-wrap gap-2 mb-8">
-                  {[
-                    { icon: '📦', text: '查一下进行中的RN' },
-                    { icon: '🚚', text: '出库单状态汇总' },
-                    { icon: '📊', text: 'Ontario CA库存查询' },
-                    { icon: '💰', text: '未结发票列表' },
-                    { icon: '📅', text: '待到仓预约列表' },
-                    { icon: '📈', text: 'OTIF达成率分析' },
-                  ].map(chip => (
-                    <button
-                      key={chip.text}
-                      onClick={() => handleSend(chip.text)}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-medium transition-all ${chipCls}`}
-                    >
+                  {CHIPS.map(chip => (
+                    <button key={chip.text} onClick={() => handleSend(chip.text)}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-medium transition-all ${chipCls}`}>
                       <span>{chip.icon}</span>{chip.text}
                     </button>
                   ))}
                 </div>
 
-                {/* Feature row */}
+                {/* Feature pills */}
                 <div className="flex items-center gap-6">
                   {[
                     { icon: Zap, text: 'Instant answers' },
@@ -448,25 +410,21 @@ export default function LandingPage() {
                     { icon: Sparkles, text: 'AI-powered' },
                   ].map(({ icon: Icon, text }) => (
                     <div key={text} className={`flex items-center gap-1.5 text-xs ${text3}`}>
-                      <Icon size={12} className="text-violet-400/60" />
-                      {text}
+                      <Icon size={12} className="text-violet-400/60"/> {text}
                     </div>
                   ))}
                 </div>
               </div>
             </div>
           ) : (
-            /* ── Conversation view ── */
+            /* ── Conversation ── */
             <div className="flex-1 flex flex-col overflow-hidden">
-              {/* Conversation header */}
-              <div className={`flex items-center gap-2 px-5 py-2.5 border-b ${divider} shrink-0`}>
-                <Plus size={14} className={`${text3} cursor-pointer`} />
-                <Clock size={14} className={`${text3} cursor-pointer`} />
+              <div className={`flex items-center gap-2 px-5 py-2.5 border-b ${hline} shrink-0`}>
+                <Plus size={14} className={`${text3} cursor-pointer`}/>
+                <Clock size={14} className={`${text3} cursor-pointer`}/>
                 <span className={`text-xs ${text2} truncate`}>{messages[0]?.text}</span>
                 <span className="text-[10px] bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full shrink-0">● All-in-One Copilot</span>
               </div>
-
-              {/* Messages */}
               <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4 max-w-2xl mx-auto w-full">
                 {messages.map((msg, i) => (
                   <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -476,142 +434,107 @@ export default function LandingPage() {
                       </div>
                     ) : (
                       <div className="max-w-[90%] w-full">
-                        {/* Working with tools header */}
                         <div className={`flex items-center gap-2 mb-2 text-xs ${text2}`}>
                           <div className="w-6 h-6 bg-gradient-to-br from-violet-500 to-blue-500 rounded-lg flex items-center justify-center">
-                            <Sparkles size={11} className="text-white" />
+                            <Sparkles size={11} className="text-white"/>
                           </div>
-                          {!msg.done && msg.lines?.length === 0 ? (
+                          {!msg.done && (msg.lines?.length ?? 0) === 0 ? (
                             <span className="flex items-center gap-1.5">
                               Working with tools
                               <span className="inline-flex gap-0.5">
-                                {[0,1,2].map(j => (
-                                  <span key={j} className="w-1 h-1 rounded-full bg-violet-400 animate-bounce"
-                                    style={{ animationDelay: `${j * 0.15}s` }} />
-                                ))}
+                                {[0,1,2].map(j => <span key={j} className="w-1 h-1 rounded-full bg-violet-400 animate-bounce" style={{ animationDelay: `${j * 0.15}s` }}/>)}
                               </span>
                             </span>
                           ) : (
                             <span className="flex items-center gap-1">
                               {msg.done
-                                ? <><CheckCircle2 size={12} className="text-green-500" /> Completed</>
-                                : <><span className="inline-flex gap-0.5">{[0,1,2].map(j => <span key={j} className="w-1 h-1 rounded-full bg-violet-400 animate-bounce" style={{ animationDelay: `${j * 0.15}s` }} />)}</span> Processing...</>
+                                ? <><CheckCircle2 size={12} className="text-green-500"/> Completed</>
+                                : <><span className="inline-flex gap-0.5">{[0,1,2].map(j => <span key={j} className="w-1 h-1 rounded-full bg-violet-400 animate-bounce" style={{ animationDelay: `${j * 0.15}s` }}/>)}</span> Processing...</>
                               }
                             </span>
                           )}
                         </div>
-
-                        {/* Thinking process pills (while streaming) */}
                         {!msg.done && (msg.lines?.length ?? 0) === 0 && (
-                          <div className={`text-xs ${text2} px-3 py-2 rounded-xl ${surface} mb-2 border`}>
+                          <div className={`text-xs ${text2} px-3 py-2 rounded-xl mb-2 ${dark ? 'bg-white/5' : 'bg-gray-50 border border-gray-100'}`}>
                             <span className="flex items-center gap-1.5">
-                              <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" />
+                              <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse"/>
                               Thinking... {msg.text}
                             </span>
                           </div>
                         )}
-
-                        {/* Response content */}
                         {(msg.lines?.length ?? 0) > 0 && (
-                          <div className={`px-4 py-3 rounded-2xl rounded-tl-sm text-xs ${dark ? 'bg-white/6 text-white/75' : 'bg-white border border-gray-100 text-gray-700 shadow-sm'}`}>
-                            <AgentBubble lines={msg.lines!} done={!!msg.done} dark={dark} />
+                          <div className={`px-4 py-3 rounded-2xl rounded-tl-sm ${dark ? 'bg-white/6' : 'bg-white border border-gray-100 shadow-sm'}`}>
+                            <AgentBubble lines={msg.lines!} done={!!msg.done} dark={dark}/>
                           </div>
                         )}
                       </div>
                     )}
                   </div>
                 ))}
-                <div ref={bottomRef} />
+                <div ref={bottomRef}/>
               </div>
-
-              {/* Input in conversation */}
-              <div className={`px-5 py-3 border-t ${divider} shrink-0`}>
+              <div className={`px-5 py-3 border-t ${hline} shrink-0`}>
                 <div className={`flex items-end gap-2 rounded-2xl px-4 py-2.5 ${
                   dark ? 'bg-white/6 focus-within:bg-white/9' : 'bg-white border border-gray-200 focus-within:border-violet-400 shadow-sm'
                 }`}>
-                  <textarea
-                    value={inputVal}
-                    onChange={e => setInputVal(e.target.value)}
+                  <textarea value={inputVal} onChange={e => setInputVal(e.target.value)}
                     onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() } }}
-                    placeholder="Send a message..."
-                    rows={1}
-                    disabled={isTyping}
-                    className={`flex-1 bg-transparent text-sm resize-none focus:outline-none leading-relaxed disabled:opacity-50 ${inputBg}`}
-                  />
-                  <button
-                    onClick={() => handleSend()}
-                    disabled={!inputVal.trim() || isTyping}
+                    placeholder="Send a message..." rows={1} disabled={isTyping}
+                    className={`flex-1 text-sm resize-none focus:outline-none leading-relaxed disabled:opacity-50 ${inputBg}`}/>
+                  <button onClick={() => handleSend()} disabled={!inputVal.trim() || isTyping}
                     className={`shrink-0 w-7 h-7 rounded-lg flex items-center justify-center transition-colors ${
-                      isTyping
-                        ? 'bg-red-500 hover:bg-red-600'
-                        : 'bg-violet-600 hover:bg-violet-500 disabled:opacity-30'
-                    }`}
-                  >
-                    {isTyping
-                      ? <XCircle size={13} className="text-white" />
-                      : <Send size={13} className="text-white" />}
+                      isTyping ? 'bg-red-500 hover:bg-red-600' : 'bg-violet-600 hover:bg-violet-500 disabled:opacity-30'
+                    }`}>
+                    {isTyping ? <XCircle size={13} className="text-white"/> : <Send size={13} className="text-white"/>}
                   </button>
                 </div>
-                <p className={`text-[10px] ${text3} mt-1 ml-1`}>Enter 发送 · @ 引用单号</p>
               </div>
             </div>
           )}
         </div>
+      </div>
 
-        {/* ════ Col 3: Portal System (unchanged) ════ */}
-        <div className={`w-72 shrink-0 flex flex-col justify-center px-7 py-10 border-l ${vDivider}`}>
-          <div className="mb-5">
-            <p className={`text-[10px] ${text3} uppercase tracking-wider font-semibold mb-1`}>Or use</p>
-            <h2 className={`text-lg font-bold ${text1}`}>Portal System</h2>
-            <p className={`text-xs ${text2} mt-1 leading-relaxed`}>
-              Classic dashboard with full module navigation.
-            </p>
+      {/* ════════════ PORTAL SYSTEM — bottom strip ════════════ */}
+      <div className={`relative z-10 border-t ${hline} px-6 py-5`}>
+        <div className="max-w-5xl mx-auto flex items-center gap-8">
+          {/* Label */}
+          <div className="shrink-0">
+            <p className={`text-[10px] uppercase tracking-wider font-semibold mb-0.5 ${text3}`}>Or use</p>
+            <h3 className={`text-base font-bold ${text1}`}>Portal System</h3>
+            <p className={`text-xs ${text2} mt-0.5`}>Classic dashboard navigation</p>
           </div>
 
-          <div className="grid grid-cols-2 gap-2 mb-5">
+          {/* Module pills */}
+          <div className="flex items-center gap-2 flex-1 flex-wrap">
             {PORTAL_MODULES.map(({ icon: Icon, label, color }) => (
-              <button
-                key={label}
-                onClick={() => navigate('/portal')}
-                className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border transition-all ${surface} ${hoverBg}`}
-              >
-                <Icon size={13} className={color} />
-                <span className={`text-xs ${text2}`}>{label}</span>
+              <button key={label} onClick={() => navigate('/portal')}
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-medium transition-all ${portalSurface} ${hoverBg} ${text2}`}>
+                <Icon size={13} className={color}/> {label}
               </button>
             ))}
             <button onClick={() => navigate('/portal')}
-              className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border transition-all ${surface} ${hoverBg}`}>
-              <span className={`text-xs font-bold ${text3}`}>+8</span>
-              <span className={`text-xs ${text3}`}>More</span>
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-medium transition-all ${portalSurface} ${hoverBg} ${text3}`}>
+              +8 More
             </button>
           </div>
 
-          <button
-            onClick={() => navigate('/portal')}
-            className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border transition-all ${surface} ${hoverBg} ${text2}`}
-          >
-            <LayoutDashboard size={14} />
-            <span className="text-sm font-medium">Enter Portal</span>
-            <ChevronRight size={13} className={`ml-auto ${text3}`} />
+          {/* Enter button */}
+          <button onClick={() => navigate('/portal')}
+            className={`shrink-0 flex items-center gap-2 px-5 py-2.5 rounded-xl border font-medium text-sm transition-all ${portalSurface} ${hoverBg} ${text2}`}>
+            <LayoutDashboard size={15}/>
+            Enter Portal
+            <ChevronRight size={14} className={text3}/>
           </button>
-
-          <div className={`mt-8 pt-6 border-t ${divider}`}>
-            <p className={`text-[10px] ${text3} text-center leading-relaxed`}>
-              You can switch between<br />Super Agent and Portal anytime
-            </p>
-            <button
-              onClick={() => navigate('/portal')}
-              className={`w-full mt-3 flex items-center justify-center gap-1.5 text-[11px] ${text3} hover:text-violet-400 transition-colors`}
-            >
-              <ArrowRight size={11} /> Quick tour of Portal
-            </button>
-          </div>
         </div>
       </div>
 
-      {/* ── Footer ── */}
-      <footer className={`relative z-10 py-3 text-center text-[11px] ${text3}`}>
+      {/* Footer */}
+      <footer className={`relative z-10 py-2.5 text-center text-[11px] ${text3}`}>
         © 2026 Unis · Client Portal 3.0
+        <button onClick={() => navigate('/portal')}
+          className={`ml-4 inline-flex items-center gap-1 hover:text-violet-400 transition-colors`}>
+          <ArrowRight size={10}/> Quick tour of Portal
+        </button>
       </footer>
     </div>
   )
