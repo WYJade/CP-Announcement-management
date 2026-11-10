@@ -177,14 +177,14 @@ const PORTAL_MODULES = [
   { icon: DollarSign, label: 'Finance',   color: 'text-rose-400' },
 ]
 
-// ─── Quick actions (user-centric, not technical nav) ─────────────────────────
+// ─── Quick actions (user-centric) ────────────────────────────────────────────
 const QUICK_ACTIONS = [
-  { icon: AlertTriangle, label: '今日异常汇总',   query: '今天有哪些异常需要处理？',   color: 'text-red-400',    bg: dark => dark ? 'bg-red-500/10 border-red-500/20' : 'bg-red-50 border-red-200' },
-  { icon: TrendingUp,    label: '本周OTIF达成',  query: '本周OTIF达成情况',           color: 'text-emerald-400', bg: dark => dark ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-emerald-50 border-emerald-200' },
-  { icon: Package,       label: '进行中的入库',   query: '查一下进行中的RN',            color: 'text-blue-400',   bg: dark => dark ? 'bg-blue-500/10 border-blue-500/20' : 'bg-blue-50 border-blue-200' },
-  { icon: Truck,         label: '出库单汇总',    query: '出库单状态汇总',              color: 'text-amber-400',  bg: dark => dark ? 'bg-amber-500/10 border-amber-500/20' : 'bg-amber-50 border-amber-200' },
-  { icon: BarChart2,     label: '库存快照',      query: 'Ontario CA库存查询',          color: 'text-violet-400', bg: dark => dark ? 'bg-violet-500/10 border-violet-500/20' : 'bg-violet-50 border-violet-200' },
-  { icon: FileText,      label: '未结发票',      query: '未结发票列表',                color: 'text-orange-400', bg: dark => dark ? 'bg-orange-500/10 border-orange-500/20' : 'bg-orange-50 border-orange-200' },
+  { icon: AlertTriangle, label: 'Today\'s Exceptions', query: 'What exceptions need attention today?', color: 'text-red-400' },
+  { icon: TrendingUp,    label: 'Weekly OTIF',          query: 'Weekly OTIF performance',              color: 'text-emerald-400' },
+  { icon: Package,       label: 'Active Inbound',       query: 'Show active inbound receipts',         color: 'text-blue-400' },
+  { icon: Truck,         label: 'Outbound Summary',     query: 'Outbound order status summary',        color: 'text-amber-400' },
+  { icon: BarChart2,     label: 'Inventory Snapshot',   query: 'Ontario CA inventory snapshot',        color: 'text-violet-400' },
+  { icon: FileText,      label: 'Open Invoices',        query: 'List open invoices',                   color: 'text-orange-400' },
 ]
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
@@ -306,9 +306,7 @@ export default function LandingPage() {
                   }`}>
                     <Sparkles size={11} />
                     Super Agent
-                    <span className={`ml-1 px-1.5 py-0.5 rounded-full text-[9px] font-bold tracking-wider uppercase ${
-                      dark ? 'bg-violet-500/30' : 'bg-violet-200 text-violet-700'
-                    }`}>Recommended</span>
+                    <span className={`ml-1 px-1.5 py-0.5 rounded-full text-[9px] font-bold tracking-wider uppercase bg-violet-600 text-white`}>Recommended</span>
                   </div>
                 </div>
 
@@ -335,7 +333,7 @@ export default function LandingPage() {
                       value={inputVal}
                       onChange={e => setInputVal(e.target.value)}
                       onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() } }}
-                      placeholder="问任何关于入库、库存、出库的问题..."
+                      placeholder="Ask anything about inbound, inventory, or outbound..."
                       rows={3}
                       className={`flex-1 bg-transparent text-base resize-none focus:outline-none leading-relaxed ${inputBg}`}
                     />
@@ -344,18 +342,16 @@ export default function LandingPage() {
                       <Send size={15} className="text-white" />
                     </button>
                   </div>
-                  <p className={`text-[10px] ${text3} mt-1.5 ml-1`}>Enter 发送 · Shift+Enter 换行</p>
+                  <p className={`text-[10px] ${text3} mt-1.5 ml-1`}>Enter to send · Shift+Enter for newline</p>
                 </div>
 
                 {/* User-centric quick action grid */}
                 <div className="grid grid-cols-3 gap-2 mb-7">
-                  {QUICK_ACTIONS.map(({ icon: Icon, label, query, color, bg: bgFn }) => (
+                  {QUICK_ACTIONS.map(({ icon: Icon, label, query, color }) => (
                     <button key={label} onClick={() => handleSend(query)}
-                      className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-xs font-medium transition-all text-left ${bgFn(dark)} ${
-                        dark ? 'hover:opacity-90' : 'hover:shadow-sm'
-                      }`}>
+                      className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-xs font-medium transition-all text-left ${chipCls}`}>
                       <Icon size={13} className={`${color} shrink-0`} />
-                      <span className={text2}>{label}</span>
+                      <span>{label}</span>
                     </button>
                   ))}
                 </div>
@@ -385,7 +381,6 @@ export default function LandingPage() {
                   className={`text-[10px] ${text3} ${hoverBg} px-2 py-1 rounded-lg transition-colors`}>
                   New chat
                 </button>
-              </div>
               <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4 max-w-2xl mx-auto w-full">
                 {messages.map((msg, i) => (
                   <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -420,7 +415,6 @@ export default function LandingPage() {
                             <span className="flex items-center gap-1.5">
                               <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" />
                               Thinking... {msg.text}
-                            </span>
                           </div>
                         )}
                         {(msg.lines?.length ?? 0) > 0 && (
@@ -440,7 +434,7 @@ export default function LandingPage() {
                 }`}>
                   <textarea value={inputVal} onChange={e => setInputVal(e.target.value)}
                     onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() } }}
-                    placeholder="继续提问..." rows={1} disabled={isTyping}
+                    placeholder="Continue the conversation..." rows={1} disabled={isTyping}
                     className={`flex-1 bg-transparent text-sm resize-none focus:outline-none leading-relaxed disabled:opacity-50 ${inputBg}`} />
                   <button onClick={() => handleSend()} disabled={!inputVal.trim() || isTyping}
                     className={`shrink-0 w-7 h-7 rounded-lg flex items-center justify-center transition-colors ${
