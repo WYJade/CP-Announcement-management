@@ -331,7 +331,7 @@ export default function LandingPage() {
 
                 {/* Input */}
                 <div className="mb-5">
-                  <div className={`flex items-end gap-3 rounded-2xl px-5 py-4 transition-all ${dark ? 'bg-white/7 focus-within:bg-white/10' : 'bg-white shadow-md border border-gray-200 focus-within:border-violet-400 focus-within:shadow-lg'}`}>
+                  <div className={`flex items-end gap-3 rounded-2xl px-5 py-4 transition-all ${dark ? 'bg-white/7 focus-within:bg-white/10' : 'bg-gray-100/80 focus-within:bg-gray-100'}`}>
                     <textarea
                       ref={textareaRef}
                       value={inputVal}
@@ -463,7 +463,7 @@ export default function LandingPage() {
 
               {/* Conversation input */}
               <div className={`px-5 py-3 border-t ${hline} shrink-0`}>
-                <div className={`flex items-end gap-2 rounded-2xl px-4 py-2.5 ${dark ? 'bg-white/6 focus-within:bg-white/9' : 'bg-white border border-gray-200 focus-within:border-violet-400 shadow-sm'}`}>
+                <div className={`flex items-end gap-2 rounded-2xl px-4 py-2.5 ${dark ? 'bg-white/6 focus-within:bg-white/9' : 'bg-gray-100/80 focus-within:bg-gray-100'}`}>
                   <textarea
                     value={inputVal}
                     onChange={e => setInputVal(e.target.value)}
