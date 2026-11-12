@@ -3,81 +3,89 @@ import { useNavigate } from 'react-router-dom'
 import {
   Sparkles, LayoutDashboard, Send, Package, Truck,
   DollarSign, BarChart2, ChevronRight, Sun, Moon,
-  Zap, CheckCircle2, XCircle, Clock, ArrowRight,
+  Zap, CheckCircle2, XCircle, Clock,
   TrendingUp, AlertTriangle, FileText,
 } from 'lucide-react'
 
-// ─── Types ─────────────────────────────────────────────────────────────────
 type ChatMsg = { role: 'user' | 'agent'; text: string; lines?: string[]; done?: boolean }
 
-// ─── Mock responses ─────────────────────────────────────────────────────────
-const SIM_RESPONSES: Record<string, ChatMsg[]> = {
-  '今天有哪些异常需要处理？': [
-    { role: 'user', text: '今天有哪些异常需要处理？' },
-    { role: 'agent', text: '正在检查今日异常...', lines: [
-      '⚠️ 今日共 **3 项**需关注：',
+const SIM: Record<string, { text: string; lines: string[] }> = {
+  "What exceptions need attention today?": {
+    text: 'Checking today\'s exceptions...',
+    lines: [
+      '⚠️ **3 items** require attention today:',
       '',
-      '- 🔴 **RN-20260910** 到仓超时 2小时，承运商未更新状态',
-      '- 🟡 **DN-8821001** 出库单拣货停滞 40分钟，需确认',
-      '- 🔵 **SKU-A100** Ontario CA 库存低于安全水位（剩余 85 units）',
+      '- 🔴 **RN-20260910** overdue by 2h, carrier has not updated status',
+      '- 🟡 **DN-8821001** picking stalled for 40 min, please confirm',
+      '- 🔵 **SKU-A100** inventory at Ontario CA below safety level (85 units)',
       '',
-      '建议优先处理红色异常。是否要查看详情？',
-    ]},
-  ],
-  '查一下进行中的RN': [
-    { role: 'user', text: '查一下进行中的RN' },
-    { role: 'agent', text: '正在查询进行中的 Receipt Notice...', lines: [
-      '✅ 共找到 **4 条**进行中的 RN：',
+      'Recommend addressing the red item first. Would you like details?',
+    ],
+  },
+  "Weekly OTIF performance": {
+    text: 'Fetching weekly OTIF data...',
+    lines: [
+      '📈 **Weekly OTIF: 94.2%**',
       '',
-      '| RN # | 状态 | 到仓日期 | 供应商 |',
+      '- On-Time: **96.1%** (target 95%) ✅',
+      '- In-Full: **97.8%** (target 98%) ⚠️ slightly below',
+      '',
+      'Main drag: 3 delayed inbound shipments at Ontario CA.',
+    ],
+  },
+  "Show active inbound receipts": {
+    text: 'Querying active Receipt Notices...',
+    lines: [
+      '✅ **4 active** RNs found:',
+      '',
+      '| RN # | Status | ETA | Vendor |',
       '|---|---|---|---|',
       '| RN-20260910 | In Progress | 09/15 | VITA COCO |',
       '| RN-20260909 | Receiving | 09/14 | ADOORN LLC |',
       '| RN-20260908 | Scheduled | 09/16 | ORGAIN LLC |',
       '| RN-20260907 | In Progress | 09/13 | SAMUN INC |',
-    ]},
-  ],
-  '出库单状态汇总': [
-    { role: 'user', text: '出库单状态汇总' },
-    { role: 'agent', text: '正在统计出库单数据...', lines: [
-      '📊 **Ontario, CA — 出库单汇总**：',
+    ],
+  },
+  "Outbound order status summary": {
+    text: 'Summarizing outbound orders...',
+    lines: [
+      '📊 **Ontario, CA — Outbound Summary:**',
       '',
-      '| 状态 | 单数 |',
+      '| Status | Orders |',
       '|---|---|',
       '| Pending | 8 |',
       '| Picking | 5 |',
       '| Shipped | 12 |',
       '| On Hold | 2 |',
       '',
-      '⚠️ 2 单 On Hold，建议优先处理。',
-    ]},
-  ],
-  '本周OTIF达成情况': [
-    { role: 'user', text: '本周OTIF达成情况' },
-    { role: 'agent', text: '正在获取本周 OTIF 数据...', lines: [
-      '📈 **本周 OTIF 达成率：94.2%**',
+      '⚠️ 2 orders On Hold — recommend follow-up.',
+    ],
+  },
+  "Ontario CA inventory snapshot": {
+    text: 'Loading inventory snapshot for Ontario CA...',
+    lines: [
+      '📦 **Ontario, CA — Inventory Snapshot:**',
       '',
-      '- On-Time 达成：**96.1%**（目标 95%）✅',
-      '- In-Full 达成：**97.8%**（目标 98%）⚠️ 略低',
+      '- Total SKUs: **1,284**',
+      '- Available: **42,300 units**',
+      '- Expiry alerts: **3 SKUs**',
+      '- Low-stock alerts: **7 SKUs**',
+    ],
+  },
+  "List open invoices": {
+    text: 'Fetching open invoices...',
+    lines: [
+      '💰 **Open Invoices:**',
       '',
-      '⚠️ 主要拖累：Ontario CA Inbound 延误 3 单',
-      '建议：跟进承运商 J B HUNT 的 ETA 更新',
-    ]},
-  ],
-  'Ontario CA库存查询': [
-    { role: 'user', text: 'Ontario CA库存查询' },
-    { role: 'agent', text: '正在查询 Ontario CA 库存...', lines: [
-      '📦 **Ontario, CA — 库存快照**：',
+      '- Total open: **12 invoices**',
+      '- Overdue: **3** (oldest: 45 days)',
+      '- Amount due: **$47,320**',
       '',
-      '- 总 SKU 数：**1,284**',
-      '- 可用库存：**42,300 units**',
-      '- 过期预警：**3 SKU**',
-      '- 低库存预警：**7 SKU**',
-    ]},
-  ],
+      'Would you like to view the overdue list or export?',
+    ],
+  },
 }
 
-// ─── Agent bubble ────────────────────────────────────────────────────────────
 function AgentLine({ text }: { text: string }) {
   const parts = text.split(/(\*\*[^*]+\*\*)/)
   return (
@@ -127,7 +135,8 @@ function AgentBubble({ lines, done, dark }: { lines: string[]; done: boolean; da
         </table>
       </div>
     )
-    tableRows = []; inTable = false
+    tableRows = []
+    inTable = false
   }
 
   for (let i = 0; i < lines.length; i++) {
@@ -168,7 +177,6 @@ function AgentBubble({ lines, done, dark }: { lines: string[]; done: boolean; da
   )
 }
 
-// ─── Portal modules ──────────────────────────────────────────────────────────
 const PORTAL_MODULES = [
   { icon: Package,    label: 'Inbound',   color: 'text-blue-400' },
   { icon: BarChart2,  label: 'Inventory', color: 'text-emerald-400' },
@@ -177,9 +185,8 @@ const PORTAL_MODULES = [
   { icon: DollarSign, label: 'Finance',   color: 'text-rose-400' },
 ]
 
-// ─── Quick actions (user-centric) ────────────────────────────────────────────
 const QUICK_ACTIONS = [
-  { icon: AlertTriangle, label: 'Today\'s Exceptions', query: 'What exceptions need attention today?', color: 'text-red-400' },
+  { icon: AlertTriangle, label: "Today's Exceptions",  query: "What exceptions need attention today?", color: 'text-red-400' },
   { icon: TrendingUp,    label: 'Weekly OTIF',          query: 'Weekly OTIF performance',              color: 'text-emerald-400' },
   { icon: Package,       label: 'Active Inbound',       query: 'Show active inbound receipts',         color: 'text-blue-400' },
   { icon: Truck,         label: 'Outbound Summary',     query: 'Outbound order status summary',        color: 'text-amber-400' },
@@ -187,7 +194,6 @@ const QUICK_ACTIONS = [
   { icon: FileText,      label: 'Open Invoices',        query: 'List open invoices',                   color: 'text-orange-400' },
 ]
 
-// ─── Main ─────────────────────────────────────────────────────────────────────
 export default function LandingPage() {
   const navigate = useNavigate()
   const [dark, setDark] = useState(true)
@@ -196,7 +202,6 @@ export default function LandingPage() {
   const [isTyping, setIsTyping] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
-
   const inConversation = messages.length > 0
 
   useEffect(() => {
@@ -204,31 +209,32 @@ export default function LandingPage() {
   }, [messages])
 
   const simulateResponse = (q: string) => {
-    const sim = SIM_RESPONSES[q]
-    if (sim && sim.length >= 2) {
-      const agentMsg = sim[1]
-      setMessages(prev => [...prev, { role: 'agent', text: agentMsg.text, lines: [], done: false }])
-      const allLines = agentMsg.lines ?? []
+    const sim = SIM[q]
+    if (sim) {
+      setMessages(prev => [...prev, { role: 'agent', text: sim.text, lines: [], done: false }])
       let idx = 0
       const iv = setInterval(() => {
         idx++
         setMessages(prev => {
-          const updated = [...prev]
-          const last = { ...updated[updated.length - 1] }
-          last.lines = allLines.slice(0, idx)
-          last.done = idx >= allLines.length
-          updated[updated.length - 1] = last
-          return updated
+          const u = [...prev]
+          const l = { ...u[u.length - 1] }
+          l.lines = sim.lines.slice(0, idx)
+          l.done = idx >= sim.lines.length
+          u[u.length - 1] = l
+          return u
         })
-        if (idx >= allLines.length) { clearInterval(iv); setIsTyping(false) }
+        if (idx >= sim.lines.length) { clearInterval(iv); setIsTyping(false) }
       }, 120)
     } else {
-      setMessages(prev => [...prev, { role: 'agent', text: '正在处理您的问题...', lines: [], done: false }])
+      setMessages(prev => [...prev, { role: 'agent', text: 'Processing...', lines: [], done: false }])
       setTimeout(() => {
         setMessages(prev => {
-          const u = [...prev]; const l = { ...u[u.length - 1] }
-          l.lines = ['✅ 已找到相关数据，请通过 Super Agent 查看完整结果。']
-          l.done = true; u[u.length - 1] = l; return u
+          const u = [...prev]
+          const l = { ...u[u.length - 1] }
+          l.lines = ['Result retrieved. Please use the full Super Agent for detailed data.']
+          l.done = true
+          u[u.length - 1] = l
+          return u
         })
         setIsTyping(false)
       }, 1200)
@@ -244,19 +250,20 @@ export default function LandingPage() {
     setTimeout(() => simulateResponse(q), 500)
   }
 
-  // ── Theme tokens ──
-  const bg      = dark ? 'bg-[#07071a]' : 'bg-gray-50'
-  const text1   = dark ? 'text-white/90' : 'text-gray-900'
-  const text2   = dark ? 'text-white/50' : 'text-gray-500'
-  const text3   = dark ? 'text-white/25' : 'text-gray-400'
-  const vline   = dark ? 'border-white/[0.04]' : 'border-gray-100'
-  const hline   = dark ? 'border-white/[0.06]' : 'border-gray-100'
-  const hoverBg = dark ? 'hover:bg-white/8' : 'hover:bg-gray-100'
-  const inputBg = dark ? 'placeholder-white/25 text-white/90' : 'placeholder-gray-400 text-gray-800'
-  const chipCls = dark
+  // Theme tokens
+  const bg            = dark ? 'bg-[#07071a]' : 'bg-gray-50'
+  const text1         = dark ? 'text-white/90' : 'text-gray-900'
+  const text2         = dark ? 'text-white/50' : 'text-gray-500'
+  const text3         = dark ? 'text-white/25' : 'text-gray-400'
+  const vline         = dark ? 'border-white/[0.04]' : 'border-gray-100'
+  const hline         = dark ? 'border-white/[0.06]' : 'border-gray-100'
+  const hoverBg       = dark ? 'hover:bg-white/8' : 'hover:bg-gray-100'
+  const inputBg       = dark ? 'placeholder-white/25 text-white/90' : 'placeholder-gray-400 text-gray-800'
+  const chipCls       = dark
     ? 'bg-white/5 border-white/8 hover:bg-violet-500/15 hover:border-violet-500/30 text-white/50 hover:text-white/80'
     : 'bg-white border-gray-200 hover:bg-violet-50 hover:border-violet-300 text-gray-500 hover:text-violet-700'
   const portalSurface = dark ? 'bg-white/5 border-white/8' : 'bg-white border-gray-200 shadow-sm'
+  const badgeCls      = dark ? 'bg-violet-500/15 border-violet-500/30 text-violet-300' : 'bg-violet-50 border-violet-200 text-violet-600'
 
   return (
     <div className={`min-h-screen ${bg} flex flex-col overflow-hidden relative transition-colors duration-200`}>
@@ -289,24 +296,23 @@ export default function LandingPage() {
         </div>
       </header>
 
-      {/* ── Two-column main area ── */}
+      {/* Main two-column */}
       <div className="relative z-10 flex flex-1 min-h-0" style={{ minHeight: '88vh' }}>
 
-        {/* ════ LEFT: Super Agent (main) ════ */}
+        {/* LEFT: Super Agent */}
         <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
           {!inConversation ? (
-            /* Initial hero */
             <div className="flex-1 flex flex-col justify-center px-8 py-10 overflow-y-auto">
               <div className="w-full max-w-3xl mx-auto">
 
                 {/* Badge */}
                 <div className="flex items-center gap-2 mb-7">
-                  <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-semibold ${
-                    dark ? 'bg-violet-500/15 border-violet-500/30 text-violet-300' : 'bg-violet-50 border-violet-200 text-violet-600'
-                  }`}>
+                  <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-semibold ${badgeCls}`}>
                     <Sparkles size={11} />
                     Super Agent
-                    <span className={`ml-1 px-1.5 py-0.5 rounded-full text-[9px] font-bold tracking-wider uppercase bg-violet-600 text-white`}>Recommended</span>
+                    <span className="ml-1 px-1.5 py-0.5 rounded-full text-[9px] font-bold tracking-wider uppercase bg-violet-600 text-white">
+                      Recommended
+                    </span>
                   </div>
                 </div>
 
@@ -325,9 +331,7 @@ export default function LandingPage() {
 
                 {/* Input */}
                 <div className="mb-5">
-                  <div className={`flex items-end gap-3 rounded-2xl px-5 py-4 transition-all ${
-                    dark ? 'bg-white/7 focus-within:bg-white/10' : 'bg-white shadow-md border border-gray-200 focus-within:border-violet-400 focus-within:shadow-lg'
-                  }`}>
+                  <div className={`flex items-end gap-3 rounded-2xl px-5 py-4 transition-all ${dark ? 'bg-white/7 focus-within:bg-white/10' : 'bg-white shadow-md border border-gray-200 focus-within:border-violet-400 focus-within:shadow-lg'}`}>
                     <textarea
                       ref={textareaRef}
                       value={inputVal}
@@ -337,19 +341,25 @@ export default function LandingPage() {
                       rows={3}
                       className={`flex-1 bg-transparent text-base resize-none focus:outline-none leading-relaxed ${inputBg}`}
                     />
-                    <button onClick={() => handleSend()} disabled={!inputVal.trim() || isTyping}
-                      className="shrink-0 w-10 h-10 rounded-xl bg-violet-600 hover:bg-violet-500 disabled:opacity-30 flex items-center justify-center transition-colors shadow-lg shadow-violet-500/30 mb-0.5">
+                    <button
+                      onClick={() => handleSend()}
+                      disabled={!inputVal.trim() || isTyping}
+                      className="shrink-0 w-10 h-10 rounded-xl bg-violet-600 hover:bg-violet-500 disabled:opacity-30 flex items-center justify-center transition-colors shadow-lg shadow-violet-500/30 mb-0.5"
+                    >
                       <Send size={15} className="text-white" />
                     </button>
                   </div>
                   <p className={`text-[10px] ${text3} mt-1.5 ml-1`}>Enter to send · Shift+Enter for newline</p>
                 </div>
 
-                {/* User-centric quick action grid */}
+                {/* Quick action grid */}
                 <div className="grid grid-cols-3 gap-2 mb-7">
                   {QUICK_ACTIONS.map(({ icon: Icon, label, query, color }) => (
-                    <button key={label} onClick={() => handleSend(query)}
-                      className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-xs font-medium transition-all text-left ${chipCls}`}>
+                    <button
+                      key={label}
+                      onClick={() => handleSend(query)}
+                      className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-xs font-medium transition-all text-left ${chipCls}`}
+                    >
                       <Icon size={13} className={`${color} shrink-0`} />
                       <span>{label}</span>
                     </button>
@@ -364,23 +374,29 @@ export default function LandingPage() {
                     { icon: Sparkles, text: 'AI-powered' },
                   ].map(({ icon: Icon, text }) => (
                     <div key={text} className={`flex items-center gap-1.5 text-xs ${text3}`}>
-                      <Icon size={12} className="text-violet-400/60" /> {text}
+                      <Icon size={12} className="text-violet-400/60" />
+                      {text}
                     </div>
                   ))}
                 </div>
               </div>
             </div>
           ) : (
-            /* Conversation */
             <div className="flex-1 flex flex-col overflow-hidden">
+              {/* Conversation header */}
               <div className={`flex items-center gap-2 px-5 py-2.5 border-b ${hline} shrink-0`}>
                 <Clock size={13} className={`${text3} cursor-pointer`} />
                 <span className={`text-xs ${text2} truncate flex-1`}>{messages[0]?.text}</span>
                 <span className="text-[10px] bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full shrink-0">● Super Agent</span>
-                <button onClick={() => setMessages([])}
-                  className={`text-[10px] ${text3} ${hoverBg} px-2 py-1 rounded-lg transition-colors`}>
+                <button
+                  onClick={() => setMessages([])}
+                  className={`text-[10px] ${text3} ${hoverBg} px-2 py-1 rounded-lg transition-colors`}
+                >
                   New chat
                 </button>
+              </div>
+
+              {/* Messages */}
               <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4 max-w-2xl mx-auto w-full">
                 {messages.map((msg, i) => (
                   <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -398,25 +414,41 @@ export default function LandingPage() {
                             <span className="flex items-center gap-1.5">
                               Working with tools
                               <span className="inline-flex gap-0.5">
-                                {[0,1,2].map(j => <span key={j} className="w-1 h-1 rounded-full bg-violet-400 animate-bounce" style={{ animationDelay: `${j * 0.15}s` }} />)}
+                                {[0, 1, 2].map(j => (
+                                  <span key={j} className="w-1 h-1 rounded-full bg-violet-400 animate-bounce" style={{ animationDelay: `${j * 0.15}s` }} />
+                                ))}
                               </span>
                             </span>
                           ) : (
                             <span className="flex items-center gap-1">
-                              {msg.done
-                                ? <><CheckCircle2 size={12} className="text-green-500" /> Completed</>
-                                : <><span className="inline-flex gap-0.5">{[0,1,2].map(j => <span key={j} className="w-1 h-1 rounded-full bg-violet-400 animate-bounce" style={{ animationDelay: `${j * 0.15}s` }} />)}</span> Processing...</>
-                              }
+                              {msg.done ? (
+                                <>
+                                  <CheckCircle2 size={12} className="text-green-500" />
+                                  Completed
+                                </>
+                              ) : (
+                                <>
+                                  <span className="inline-flex gap-0.5">
+                                    {[0, 1, 2].map(j => (
+                                      <span key={j} className="w-1 h-1 rounded-full bg-violet-400 animate-bounce" style={{ animationDelay: `${j * 0.15}s` }} />
+                                    ))}
+                                  </span>
+                                  Processing...
+                                </>
+                              )}
                             </span>
                           )}
                         </div>
+
                         {!msg.done && (msg.lines?.length ?? 0) === 0 && (
                           <div className={`text-xs ${text2} px-3 py-2 rounded-xl mb-2 ${dark ? 'bg-white/5' : 'bg-gray-50 border border-gray-100'}`}>
                             <span className="flex items-center gap-1.5">
                               <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" />
                               Thinking... {msg.text}
+                            </span>
                           </div>
                         )}
+
                         {(msg.lines?.length ?? 0) > 0 && (
                           <div className={`px-4 py-3 rounded-2xl rounded-tl-sm ${dark ? 'bg-white/6' : 'bg-white border border-gray-100 shadow-sm'}`}>
                             <AgentBubble lines={msg.lines!} done={!!msg.done} dark={dark} />
@@ -428,18 +460,24 @@ export default function LandingPage() {
                 ))}
                 <div ref={bottomRef} />
               </div>
+
+              {/* Conversation input */}
               <div className={`px-5 py-3 border-t ${hline} shrink-0`}>
-                <div className={`flex items-end gap-2 rounded-2xl px-4 py-2.5 ${
-                  dark ? 'bg-white/6 focus-within:bg-white/9' : 'bg-white border border-gray-200 focus-within:border-violet-400 shadow-sm'
-                }`}>
-                  <textarea value={inputVal} onChange={e => setInputVal(e.target.value)}
+                <div className={`flex items-end gap-2 rounded-2xl px-4 py-2.5 ${dark ? 'bg-white/6 focus-within:bg-white/9' : 'bg-white border border-gray-200 focus-within:border-violet-400 shadow-sm'}`}>
+                  <textarea
+                    value={inputVal}
+                    onChange={e => setInputVal(e.target.value)}
                     onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() } }}
-                    placeholder="Continue the conversation..." rows={1} disabled={isTyping}
-                    className={`flex-1 bg-transparent text-sm resize-none focus:outline-none leading-relaxed disabled:opacity-50 ${inputBg}`} />
-                  <button onClick={() => handleSend()} disabled={!inputVal.trim() || isTyping}
-                    className={`shrink-0 w-7 h-7 rounded-lg flex items-center justify-center transition-colors ${
-                      isTyping ? 'bg-red-500 hover:bg-red-600' : 'bg-violet-600 hover:bg-violet-500 disabled:opacity-30'
-                    }`}>
+                    placeholder="Continue the conversation..."
+                    rows={1}
+                    disabled={isTyping}
+                    className={`flex-1 bg-transparent text-sm resize-none focus:outline-none leading-relaxed disabled:opacity-50 ${inputBg}`}
+                  />
+                  <button
+                    onClick={() => handleSend()}
+                    disabled={!inputVal.trim() || isTyping}
+                    className={`shrink-0 w-7 h-7 rounded-lg flex items-center justify-center transition-colors ${isTyping ? 'bg-red-500 hover:bg-red-600' : 'bg-violet-600 hover:bg-violet-500 disabled:opacity-30'}`}
+                  >
                     {isTyping ? <XCircle size={13} className="text-white" /> : <Send size={13} className="text-white" />}
                   </button>
                 </div>
@@ -448,9 +486,8 @@ export default function LandingPage() {
           )}
         </div>
 
-        {/* ════ RIGHT: Portal System (narrow vertical panel) ════ */}
+        {/* RIGHT: Portal System */}
         <div className={`w-72 shrink-0 flex flex-col border-l ${vline} px-6 py-10`}>
-          {/* Header */}
           <div className="mb-7">
             <p className={`text-[10px] uppercase tracking-wider font-semibold mb-3 ${text3}`}>Or use</p>
             <h3 className={`text-xl font-bold mb-2 ${text1}`}>Portal System</h3>
@@ -459,31 +496,38 @@ export default function LandingPage() {
             </p>
           </div>
 
-          {/* Module grid — 2 columns like screenshot */}
+          {/* Module grid 2-col */}
           <div className="grid grid-cols-2 gap-2 mb-5">
             {PORTAL_MODULES.map(({ icon: Icon, label, color }) => (
-              <button key={label} onClick={() => navigate('/portal')}
-                className={`flex items-center gap-2 px-3 py-3 rounded-xl border text-xs font-medium transition-all ${portalSurface} ${hoverBg}`}>
+              <button
+                key={label}
+                onClick={() => navigate('/portal')}
+                className={`flex items-center gap-2 px-3 py-3 rounded-xl border text-xs font-medium transition-all ${portalSurface} ${hoverBg}`}
+              >
                 <Icon size={14} className={color} />
                 <span className={text2}>{label}</span>
               </button>
             ))}
-            <button onClick={() => navigate('/portal')}
-              className={`flex items-center gap-2 px-3 py-3 rounded-xl border text-xs font-medium transition-all ${portalSurface} ${hoverBg}`}>
+            <button
+              onClick={() => navigate('/portal')}
+              className={`flex items-center gap-2 px-3 py-3 rounded-xl border text-xs font-medium transition-all ${portalSurface} ${hoverBg}`}
+            >
               <span className={`font-bold ${text3}`}>+8</span>
               <span className={text3}>More</span>
             </button>
           </div>
 
-          {/* Enter button */}
-          <button onClick={() => navigate('/portal')}
-            className={`w-full flex items-center gap-2 py-3 px-4 rounded-xl border transition-all text-sm font-medium mb-6 ${portalSurface} ${hoverBg} ${text2}`}>
+          {/* Enter Portal button */}
+          <button
+            onClick={() => navigate('/portal')}
+            className={`w-full flex items-center gap-2 py-3 px-4 rounded-xl border transition-all text-sm font-medium mb-6 ${portalSurface} ${hoverBg} ${text2}`}
+          >
             <LayoutDashboard size={15} />
             Enter Portal
             <ChevronRight size={14} className={`ml-auto ${text3}`} />
           </button>
 
-          {/* Divider + hint */}
+          {/* Footer hint */}
           <div className={`border-t ${vline} pt-5`}>
             <p className={`text-[10px] ${text3} text-center leading-relaxed`}>
               You can switch between<br />Super Agent and Portal anytime
