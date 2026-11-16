@@ -329,7 +329,7 @@ export default function LandingPage() {
 
                 {/* Input */}
                 <div className="mb-5">
-                  <div className={`flex items-end gap-3 rounded-2xl px-5 py-4 transition-all ${dark ? 'bg-white/8 border border-white/12 focus-within:border-violet-500/50 focus-within:bg-white/12' : 'bg-gray-100/80 focus-within:bg-gray-100 border border-gray-200 focus-within:border-violet-400'}`}>
+                  <div className={`flex items-end gap-3 rounded-2xl px-5 py-4 transition-all ${dark ? 'bg-white/8 border border-white/12' : 'bg-gray-100/80 border border-gray-200'}`}>
                     <textarea
                       ref={textareaRef}
                       value={inputVal}
