@@ -151,6 +151,11 @@ function App() {
         <Route path="insights/routing"      element={<InsightsSubPage pageKey="routing" />} />
         <Route path="insights/root-cause"   element={<InsightsSubPage pageKey="root-cause" />} />
       </Route>
+
+      {/* Fallback: also serve portal routes without /portal prefix (for direct navigation from NavSidebar) */}
+      <Route path="/" element={<Layout />}>
+        <Route path="outbound/order-entry" element={<OrderEntry />} />
+      </Route>
     </Routes>
   )
 }
