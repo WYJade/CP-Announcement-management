@@ -244,10 +244,8 @@ export default function LandingPage() {
   const handleSend = (text?: string) => {
     const q = (text ?? inputVal).trim()
     if (!q || isTyping) return
-    setInputVal('')
-    setIsTyping(true)
-    setMessages(prev => [...prev, { role: 'user', text: q }])
-    setTimeout(() => simulateResponse(q), 500)
+    // Navigate to the full Super Agent chat page, passing the query
+    navigate(`/portal/agents?nav=chat&q=${encodeURIComponent(q)}`)
   }
 
   // Theme tokens

@@ -65,7 +65,7 @@ export default function AgentWorkstation() {
 
       {/* Main Content Area */}
       <div className="flex-1 overflow-y-auto bg-white">
-        {activeNav === 'chat' && <ChatView />}
+        {activeNav === 'chat' && <ChatView initialQuery={new URLSearchParams(location.search).get('q') ?? ''} />}
         {activeNav === 'workstation' && <WorkstationView />}
         {activeNav === 'customize' && <CustomizeView />}
         {activeNav === 'marketplace' && <MarketplaceView />}
