@@ -38,6 +38,7 @@ import AppointmentList from './components/Inbound/AppointmentList'
 import ClaimList from './components/Finance/ClaimList'
 import ShipmentsList from './components/Shipping/ShipmentsList'
 import RoleManagement from './components/System/RoleManagement'
+import OrderEntry from './components/Orders/OrderEntry'
 import EntryList from './components/Yard/EntryList'
 import EntryDetail from './components/Yard/EntryDetail'
 import InsightsSubPage from './components/Insights/InsightsSubPage'
@@ -78,6 +79,7 @@ function App() {
         {/* Outbound */}
         <Route path="outbound/inquiry" element={<OutboundInquiry />} />
         <Route path="outbound/freight-quote" element={<FreightQuote />} />
+        <Route path="outbound/order-entry" element={<OrderEntry />} />
 
         {/* Inbound */}
         <Route path="inbound/inquiry" element={<InboundInquiry />} />

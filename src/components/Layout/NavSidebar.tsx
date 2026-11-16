@@ -141,7 +141,7 @@ const menuItems: MenuItem[] = [
       { id: 'outbound-schedule', label: 'Schedule Summary' },
       { id: 'shipped-summary', label: 'Shipped Summary' },
       { id: 'order-carrier', label: 'Order Carrier Update' },
-      { id: 'order-entry', label: 'Order Entry' },
+      { id: 'order-entry', label: 'Order Entry', path: '/outbound/order-entry' },
       { id: 'small-parcel', label: 'Small Parcel Tracking Status' },
       { id: 'automated-order-entry', label: 'Automated Order Entry' },
     ],
