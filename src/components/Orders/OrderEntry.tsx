@@ -29,7 +29,7 @@ const DELIVERY_SERVICES= ['Standard', 'Express', 'Overnight', 'Economy']
 const FREIGHT_TERMS    = ['Prepaid', 'Collect', 'Third Party']
 const UOM_OPTIONS      = ['EA', 'CS', 'PL', 'LB', 'KG', 'FT', 'MT']
 const CURRENCY_OPTIONS = ['USD', 'CAD', 'EUR', 'CNY', 'GBP']
-const GOODS_TYPES      = ['Normal', 'Dangerous Goods', 'Perishable', 'Frozen', 'High Value', 'Fragile', 'Hazmat', 'Oversized', 'Expired', 'Returned']
+const GOODS_TYPES      = ['GOOD', 'Normal', 'Dangerous Goods', 'Perishable', 'Frozen', 'High Value', 'Fragile', 'Hazmat', 'Oversized', 'Expired', 'Returned']
 
 // ─── Form field components ────────────────────────────────────────────────────
 function FieldLabel({ label, required }: { label: string; required?: boolean }) {
@@ -89,7 +89,7 @@ function AddItemModal({ onClose, onSubmit }: {
 }) {
   const [form, setForm] = useState({
     item: '', title: '', uom: '', qty: '', lotNo: '', palletQty: '',
-    supplier: '', unitPrice: '', unitPriceCurrency: '', goodsType: '',
+    supplier: '', unitPrice: '', unitPriceCurrency: '', goodsType: 'GOOD',
     buyerItemId: '', notes: '',
   })
 
@@ -162,12 +162,13 @@ function AddItemModal({ onClose, onSubmit }: {
           <div className="grid grid-cols-3 gap-4">
             <div>
               <FieldLabel label="Goods Type" />
-              <SelectInput
-                placeholder="Select goods type"
-                options={GOODS_TYPES}
+              <select
                 value={form.goodsType}
-                onChange={set('goodsType')}
-              />
+                onChange={e => set('goodsType')(e.target.value)}
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 focus:outline-none focus:border-primary-400"
+              >
+                {GOODS_TYPES.map(o => <option key={o} value={o}>{o}</option>)}
+              </select>
             </div>
             <div className="col-span-2">
               <FieldLabel label="Buyer Item ID" />
