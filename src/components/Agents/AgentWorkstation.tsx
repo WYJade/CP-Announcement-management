@@ -453,7 +453,7 @@ function AgentBubble({ lines, done }: { lines: string[]; done: boolean }) {
 
 // ─── Chat View ───────────────────────────────────────────────────────────────
 
-function ChatView() {
+function ChatView({ initialQuery = '' }: { initialQuery?: string }) {
   type ChatMsg = { role: 'user' | 'agent'; text: string; lines?: string[]; done?: boolean }
 
   const [input, setInput] = useState('')
@@ -466,6 +466,7 @@ function ChatView() {
   const [selectedModule, setSelectedModule] = useState<string | null>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
   const inputRef  = useRef<HTMLTextAreaElement>(null)
+  const didAutoSend = useRef(false)
 
   const agent = AGENTS.find(a => a.id === activeAgentId)!
   const currentTab = COPILOT_TABS.find(t => t.id === activeTabId)!
@@ -530,6 +531,17 @@ function ChatView() {
     setMessages(prev => [...prev, { role: 'user', text: q }])
     setTimeout(() => simulateResponse(q), 600)
   }
+
+  // Auto-send query from landing page URL param
+  useEffect(() => {
+    if (initialQuery && !didAutoSend.current) {
+      didAutoSend.current = true
+      setIsTyping(true)
+      setMessages([{ role: 'user', text: initialQuery }])
+      setTimeout(() => simulateResponse(initialQuery), 600)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const handleChipClick = (chip: string) => {
     setInput(chip)
