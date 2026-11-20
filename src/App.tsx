@@ -155,6 +155,9 @@ function App() {
       {/* Fallback: also serve portal routes without /portal prefix (for direct navigation from NavSidebar) */}
       <Route path="/" element={<Layout />}>
         <Route path="outbound/order-entry" element={<OrderEntry />} />
+        {/* Yard Management — 允许不带 /portal 前缀直接访问 */}
+        <Route path="yard/entry-list" element={<EntryList />} />
+        <Route path="yard/entry-detail/:id" element={<EntryDetail />} />
       </Route>
     </Routes>
   )
